@@ -1,1 +1,0 @@
-Spikes for bettingscience.ru
