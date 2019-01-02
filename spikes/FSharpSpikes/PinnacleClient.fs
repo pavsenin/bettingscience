@@ -30,6 +30,9 @@ type PinnacleClient(id, pwd, proxyInfo) =
     let baseAddress = "https://api.pinnacle.com/"
     let getBalanceUrl = "v1/client/balance"
     let getSportsUrl = "v2/sports"
+    let getLeaguesUrl = "v2/leagues"
+    let getOddsUrl = "v1/odds"
+    let getFixturesUrl = "v1/fixtures"
     let getBetsUrl = "v3/bets"
 
     let placeStraightBetUrl = "v2/bets/straight"
@@ -65,6 +68,24 @@ type PinnacleClient(id, pwd, proxyInfo) =
         async {
             let! responseJson = getJsonStringAsync httpClient getSportsUrl
             return Compact.deserialize<SportsResponse> responseJson
+        }
+    member this.GetLeagues data =
+        async {
+            let request = buildRequest getLeaguesUrl data
+            let! responseJson = getJsonStringAsync httpClient request
+            return Compact.deserialize<LeaguesResponse> responseJson
+        }
+    member this.GetOdds data =
+        async {
+            let request = buildRequest getOddsUrl data
+            let! responseJson = getJsonStringAsync httpClient request
+            return Compact.deserialize<OddsResponse> responseJson
+        }
+    member this.GetFixtures data =
+        async {
+            let request = buildRequest getFixturesUrl data
+            let! responseJson = getJsonStringAsync httpClient request
+            return Compact.deserialize<FixturesResponse> responseJson
         }
     member this.GetBets data =
         async {

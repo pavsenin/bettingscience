@@ -47,6 +47,30 @@ type SportsResponse = {
     [<JsonProperty(PropertyName = "sports")>]
     Sports : Sport array
 }
+type League = {
+    [<JsonProperty(PropertyName = "id")>]
+    Id : int
+    [<JsonProperty(PropertyName = "name")>]
+    Name : string
+    [<JsonProperty(PropertyName = "homeTeamType")>]
+    HomeTeamType : string
+    [<JsonProperty(PropertyName = "hasOfferings")>]
+    HasOfferings : bool
+    [<JsonProperty(PropertyName = "container")>]
+    Container : string
+    [<JsonProperty(PropertyName = "allowRoundRobins")>]
+    AllowRoundRobins : bool
+    [<JsonProperty(PropertyName = "leagueSpecialsCount")>]
+    LeagueSpecialsCount : int
+    [<JsonProperty(PropertyName = "eventSpecialsCount")>]
+    EventSpecialsCount : int
+    [<JsonProperty(PropertyName = "eventCount")>]
+    EventCount : int
+}
+type LeaguesResponse = {
+    [<JsonProperty(PropertyName = "leagues")>]
+    Leagues : League array
+}
 type StraightBet = {
     [<JsonProperty(PropertyName = "betId")>]
     BetId:int
@@ -196,4 +220,196 @@ type PlaceBetResponse = {
     UniqueRequestId:Guid
     [<JsonProperty(PropertyName = "straightBet")>]
     StraightBet:StraightBet option
+}
+type OddsMoneyline = {
+    [<JsonProperty(PropertyName = "home")>]
+    Home:double
+    [<JsonProperty(PropertyName = "away")>]
+    Away:double
+    [<JsonProperty(PropertyName = "draw")>]
+    Draw:double
+}
+type OddsTeamTotal = {
+    [<JsonProperty(PropertyName = "points")>]
+    Points:double
+    [<JsonProperty(PropertyName = "over")>]
+    Over:double
+    [<JsonProperty(PropertyName = "under")>]
+    Under:double
+}
+type OddsTeamTotals = {
+    [<JsonProperty(PropertyName = "home")>]
+    Home:OddsTeamTotal
+    [<JsonProperty(PropertyName = "away")>]
+    Away:OddsTeamTotal
+}
+type OddsSpread = {
+    [<JsonProperty(PropertyName = "altLineId")>]
+    AltLineId:int64
+    [<JsonProperty(PropertyName = "hdp")>]
+    Hdp:double
+    [<JsonProperty(PropertyName = "home")>]
+    Home:double
+    [<JsonProperty(PropertyName = "away")>]
+    Away:double
+}
+type OddsTotal = {
+    [<JsonProperty(PropertyName = "altLineId")>]
+    AltLineId:int64
+    [<JsonProperty(PropertyName = "points")>]
+    Points:double
+    [<JsonProperty(PropertyName = "over")>]
+    Over:double
+    [<JsonProperty(PropertyName = "under")>]
+    Under:double
+}
+type OddsPeriod = {
+    [<JsonProperty(PropertyName = "lineId")>]
+    LineId:int64
+    [<JsonProperty(PropertyName = "number")>]
+    Number:int
+    [<JsonProperty(PropertyName = "cutoff")>]
+    Cutoff:string
+    [<JsonProperty(PropertyName = "status")>]
+    Status:int
+    [<JsonProperty(PropertyName = "maxSpread")>]
+    MaxSpread:double
+    [<JsonProperty(PropertyName = "maxMoneyline")>]
+    MaxMoneyline:double
+    [<JsonProperty(PropertyName = "maxTotal")>]
+    MaxTotal:double
+    [<JsonProperty(PropertyName = "maxTeamTotal")>]
+    MaxTeamTotal:double
+    [<JsonProperty(PropertyName = "spreads")>]
+    Spreads:OddsSpread array
+    [<JsonProperty(PropertyName = "moneyline")>]
+    Moneyline:OddsMoneyline
+    [<JsonProperty(PropertyName = "totals")>]
+    Totals:OddsTotal array
+    [<JsonProperty(PropertyName = "teamTotal")>]
+    TeamTotal:OddsTeamTotals
+}
+type OddsEvent = {
+    [<JsonProperty(PropertyName = "id")>]
+    Id:int64
+    [<JsonProperty(PropertyName = "awayScore")>]
+    AwayScore:double
+    [<JsonProperty(PropertyName = "homeScore")>]
+    HomeScore:double
+    [<JsonProperty(PropertyName = "awayRedCards")>]
+    AwayRedCards:int
+    [<JsonProperty(PropertyName = "homeRedCards")>]
+    HomeRedCards:int
+    [<JsonProperty(PropertyName = "periods")>]
+    Periods:OddsPeriod array
+}
+type OddsLeague = {
+    [<JsonProperty(PropertyName = "id")>]
+    Id:int
+    [<JsonProperty(PropertyName = "events")>]
+    Events:OddsEvent array
+}
+type OddsResponse = {
+    [<JsonProperty(PropertyName = "sportId")>]
+    SportId:int
+    [<JsonProperty(PropertyName = "last")>]
+    Last:int64
+    [<JsonProperty(PropertyName = "leagues")>]
+    Leagues:OddsLeague array
+}
+type FixturesEvent = {
+    [<JsonProperty(PropertyName = "id")>]
+    Id:int64
+    [<JsonProperty(PropertyName = "parentId")>]
+    ParentId:int64
+    [<JsonProperty(PropertyName = "starts")>]
+    Starts:string
+    [<JsonProperty(PropertyName = "home")>]
+    Home:string
+    [<JsonProperty(PropertyName = "away")>]
+    Away:string
+    [<JsonProperty(PropertyName = "rotNum")>]
+    RotNum:string
+    [<JsonProperty(PropertyName = "liveStatus")>]
+    LiveStatus:int
+    [<JsonProperty(PropertyName = "homePitcher")>]
+    HomePitcher:string
+    [<JsonProperty(PropertyName = "awayPitcher")>]
+    AwayPitcher:string
+    [<JsonProperty(PropertyName = "status")>]
+    Status:string
+    [<JsonProperty(PropertyName = "parlayRestriction")>]
+    ParlayRestriction:int
+    [<JsonProperty(PropertyName = "altTeaser")>]
+    AltTeaser:bool
+    [<JsonProperty(PropertyName = "resultingUnit")>]
+    ResultingUnit:string
+}
+type FixturesLeague = {
+    [<JsonProperty(PropertyName = "id")>]
+    Id:int
+    [<JsonProperty(PropertyName = "name")>]
+    Name:string
+    [<JsonProperty(PropertyName = "events")>]
+    Events:FixturesEvent array
+}
+type FixturesResponse = {
+    [<JsonProperty(PropertyName = "sportId")>]
+    SportId:int
+    [<JsonProperty(PropertyName = "last")>]
+    Last:int64
+    [<JsonProperty(PropertyName = "leagues")>]
+    League:FixturesLeague array
+}
+type SpreadData = {
+    AltLineId:int64
+    Handicap:double
+    Home:double
+    Away:double
+}
+type MoneylineData = {
+    Home:double
+    Away:double
+    Draw:double
+}
+type TotalData = {
+    AltLineId:int64
+    Points:double
+    Over:double
+    Under:double
+}
+type TeamTotal = {
+    Points:double
+    Over:double
+    Under:double
+}
+type TeamTotals = {
+    Home:TeamTotal
+    Away:TeamTotal
+}
+type PeriodData = {
+    LineId:int64
+    Number:int
+    Cutoff:DateTime
+    Spreads:SpreadData array
+    Moneyline:MoneylineData
+    Totals:TotalData array
+    TeamTotals:TeamTotals
+}
+type EventData = {
+    Id:int64
+    Starts:DateTime
+    HomeTeam:string
+    AwayTeam:string
+    Periods:PeriodData array
+}
+type LeagueData = {
+    Id:int
+    Name:string
+    Events:EventData array
+}
+type SportData = {
+    Id:int
+    Name:string
+    Leagues:LeagueData array
 }
