@@ -283,11 +283,11 @@ type OddsPeriod = {
     [<JsonProperty(PropertyName = "spreads")>]
     Spreads:OddsSpread array
     [<JsonProperty(PropertyName = "moneyline")>]
-    Moneyline:OddsMoneyline
+    Moneyline:OddsMoneyline option
     [<JsonProperty(PropertyName = "totals")>]
     Totals:OddsTotal array
     [<JsonProperty(PropertyName = "teamTotal")>]
-    TeamTotal:OddsTeamTotals
+    TeamTotal:OddsTeamTotals option
 }
 type OddsEvent = {
     [<JsonProperty(PropertyName = "id")>]
@@ -412,4 +412,12 @@ type SportData = {
     Id:int
     Name:string
     Leagues:LeagueData array
+}
+type TreeNode = {
+  [<JsonProperty(PropertyName = "id")>]
+  Id:string
+  [<JsonProperty(PropertyName = "text")>]
+  Text:string
+  [<JsonProperty(PropertyName = "children")>]
+  Children:TreeNode array
 }

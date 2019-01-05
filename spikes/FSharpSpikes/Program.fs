@@ -97,14 +97,28 @@ let main argv =
             let league = { Id = item.Id; Name = item.Name; Events = events }
             state.Add(item.Id, league) |> ignore
             state
-        let getPeriod (period:OddsPeriod) = {
+        let getPeriod (period:OddsPeriod) =
+            let getHome (value:OddsTeamTotals) = value.Home
+            let getAway (value:OddsTeamTotals) = value.Away
+            let getTeamTotal (getValue:OddsTeamTotals->OddsTeamTotal) =
+                match period.TeamTotal with
+                | None -> { Points = 0.0; Over = 0.0; Under = 0.0 }
+                | Some total ->
+                    let value = getValue total
+                    { Points = value.Points; Over = value.Over; Under = value.Under }
+            let teamTotalHome, teamTotalAway = getTeamTotal getHome, getTeamTotal getAway
+            let money =
+                match period.Moneyline with
+                | None -> { Home = 0.0; Away = 0.0; Draw = 0.0 }
+                | Some value -> { Home = value.Home; Away = value.Away; Draw = value.Draw }
+            {
                 LineId = period.LineId
                 Number = period.Number
                 Cutoff = parseDate period.Cutoff
                 Spreads = [||]
-                Moneyline = { Home = 0.0; Away = 0.0; Draw = 0.0 }
+                Moneyline = money
                 Totals = [||]
-                TeamTotals = { Home = { Points = 0.0; Over = 0.0; Under = 0.0 }; Away = { Points = 0.0; Over = 0.0; Under = 0.0 } }
+                TeamTotals = { Home = teamTotalHome; Away = teamTotalAway }
             }
         async {
             let sportId = sport.Id.ToString()
@@ -140,5 +154,20 @@ let main argv =
         |> Async.Parallel
         |> Async.RunSynchronously
     printfn "%A" sports
-    Compact.serializeToFile "sports.json" sports
+
+    let convertPeriod (period:PeriodData) =
+        let text = sprintf "%d (%s) |%f|%f|%f|" period.LineId (period.Cutoff.ToString()) period.Moneyline.Home period.Moneyline.Draw period.Moneyline.Away
+        { Id = period.LineId.ToString(); Text = text; Children = [||] }
+    let convertEvent (event:EventData) =
+        let text = sprintf "%s - %s (%s)" event.HomeTeam event.AwayTeam (event.Starts.ToString())
+        let children = event.Periods |> Array.map convertPeriod
+        { Id = event.Id.ToString(); Text = text; Children = children }
+    let convertLeague (league:LeagueData) =
+        let children = league.Events |> Array.map convertEvent
+        { Id = league.Id.ToString() + league.Name; Text = league.Name; Children = children }
+    let convertSport (sport:SportData) =
+        let children = sport.Leagues |> Array.map convertLeague
+        { Id = sport.Id.ToString() + sport.Name; Text = sport.Name; Children = children }
+    let values = sports |> Array.map convertSport
+    Compact.serializeToFile "sports.json" values
     0
