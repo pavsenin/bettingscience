@@ -148,8 +148,8 @@ let main argv =
         client.GetSports()
         |> Async.RunSynchronously
         |> (fun s -> s.Sports)
-        |> Array.filter (fun s -> s.HasOfferings)
-        |> Array.filter (fun s -> s.Id < 5)
+        //|> Array.filter (fun s -> s.HasOfferings)
+        |> Array.filter (fun s -> s.Id = 24)
         |> Array.map fetchSportData
         |> Async.Parallel
         |> Async.RunSynchronously
