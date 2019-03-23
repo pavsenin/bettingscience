@@ -1,8 +1,15 @@
 var express = require('express');
 var http = require('http');
 var path = require('path');
-var config = require('config');
-var log = require('libs/log')(module);
+var config = require('./config');
+var log = require('./libs/log')(module);
+var errorHandler = require('errorhandler')
+var session = require('express-session')
+var cookieParser = require('cookie-parser')
+var bodyParser = require('body-parser')
+var HttpError = require('./error').HttpError
+var mongoose = require('./libs/mongoose')
+
 
 var app = express();
 
@@ -17,30 +24,45 @@ app.set('view engine', 'ejs');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
+app.use(bodyParser());
+app.use(cookieParser());
+
+var MongoStore = require('connect-mongo')(session)
+app.use(session({
+  secret: config.get('session:secret'),
+  //key: config.get('session:key'),
+  cookie: config.get('session:cookie'),
+  store: new MongoStore({mongooseConnection: mongoose.connection})
+}))
+
+// app.use(function(req, res, next) {
+//   req.session.numberOfVisits = req.session.numberOfVisits + 1 || 1
+//   res.send("Visits: " + req.session.numberOfVisits);
+// })
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', function(req, res, next) {
-  res.render("index");
-})
+app.use(require('./middleware/sendHttpError'))
+app.use(require('./middleware/loadUser'))
 
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
-
-// // catch 404 and forward to error handler
-// app.use(function(req, res, next) {
-//   next(createError(404));
-// });
+require('./routes/index')(app)
 
 // error handler
+//app.use(errorHandler());
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  if (typeof err == 'number') {
+    err = new HttpError(err)
+  }
+  if (err instanceof HttpError) {
+    res.sendHttpError(err)
+  } else {
+    if (app.get('env') === 'development') {
+      errorHandler()(err, req, res, next)
+    } else {
+      err = new HttpError(500)
+      res.sendHttpError(err)
+    }
+  }
 });
 
 module.exports = app;
