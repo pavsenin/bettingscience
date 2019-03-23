@@ -1,0 +1,43 @@
+<<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Web Socket</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script>
+        function updateStats(memuse) {
+            document.getElementById('rss').innerHTML = memuse.rss;
+            document.getElementById('heapTotal').innerHTML = memuse.heapTotal;
+            document.getElementById('heapUsed').innerHTML = memuse.heapUsed;
+        }
+        var ws = new WebSocket('ws://localhost:8080');
+
+        ws.onmessage = function(event) {
+            updateStats(JSON.parse(event.data));
+        }
+        ws.onopen = function(event) {
+            console.log('Соединение установлено.');
+        }
+        ws.onclose = function(event) {
+            if(event.wasClean) {
+                console.log('Соединение закрыто чисто');
+            } else {
+                console.log('Обрыв соединения');
+            }
+            console.log('Код: ' + event.code + ' причина: ' + event.reason);
+        }
+        ws.onerror = function(error) {
+            console.error('Ошибка ' + error.message);
+        }
+
+    </script>
+</head>
+<body>
+    <strong>Server Stats</strong>
+    <p id="rss"></p>
+    <p id="heapTotal"></p>
+    <p id="heapUsed"></p>
+</body>
+</html>>
