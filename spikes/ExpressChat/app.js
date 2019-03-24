@@ -13,9 +13,21 @@ var mongoose = require('./libs/mongoose')
 
 var app = express();
 
-http.createServer(app).listen(config.get('port'), function() {
+var server = http.createServer(app);
+server.listen(config.get('port'), function() {
   log.info('Express listening port ' + config.get('port'))
 });
+
+var io = require('socket.io').listen(server);
+io.set('origins', 'localhost:*');
+io.set('logger', log);
+io.sockets.on('connection', function(socket) {
+  socket.on('message', function(data, cb) {
+    console.log(data);
+    socket.broadcast.emit('message', data);
+    cb(data);
+  });
+})
 
 // view engine setup
 app.engine('ejs', require('ejs-locals'));
