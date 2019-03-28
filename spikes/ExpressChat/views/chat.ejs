@@ -37,14 +37,14 @@
     function sendMessage() {
         var text = input.val();
         socket.emit('message', text, function() {
-            printMessage(text);
+            printMessage("я >" + text);
         });
         input.val('');
         return false;
     }
 
     function printStatus(status) {
-        $('<li>').append($('<i>')).text(status).appendTo(ul);
+        $('<li>').append($('<i>').text(status)).appendTo(ul);
     }
     function printMessage(text) {
         $('<li>').text(text).appendTo(ul);

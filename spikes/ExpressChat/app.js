@@ -1,3 +1,4 @@
+var connect = require('connect');
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -5,11 +6,11 @@ var config = require('./config');
 var log = require('./libs/log')(module);
 var errorHandler = require('errorhandler')
 var session = require('express-session')
-var connect = require('connect');
 var cookie = require('cookie');
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var HttpError = require('./error').HttpError
+var mongoose = require('./libs/mongoose')
 
 function loadSession(sid, callback) {
   sessionStore.load(sid, function(err, session) {
@@ -99,8 +100,9 @@ io.sockets.on('session:reload', function(sid) {
 });
 
 io.sockets.on('connection', function(socket) {
-
+  
   var username = socket.handshake.user.get('username');
+  console.log('connected' + username);
   socket.broadcast.emit('join', username);
 
   socket.on('message', function(data, cb) {
@@ -125,12 +127,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser());
 app.use(cookieParser());
 
-var sessionStore = require('./libs/sessionStore');
+var MongoStore = require('connect-mongo')(session)
+
 app.use(session({
   secret: config.get('session:secret'),
   //key: config.get('session:key'),
   cookie: config.get('session:cookie'),
-  store: sessionStore
+  store: new MongoStore({mongooseConnection: mongoose.connection})
 }))
 
 // app.use(function(req, res, next) {
