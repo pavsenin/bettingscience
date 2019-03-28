@@ -21,18 +21,18 @@
     var ul = $('#room ul');
     var input = $('#room input');
 
-    form.submit(function() {
-        console.log('submit');
-        var text = input.val();
-        input.val('');
+    // form.submit(function() {
+    //     console.log('submit');
+    //     var text = input.val();
+    //     input.val('');
         
-        socket.emit('message', text, function(data) {
-            console.log('callback');
-            $('<li>', {text: text}).appendTo(ul);
-        });
+    //     socket.emit('message', text, function(data) {
+    //         console.log('callback');
+    //         $('<li>', {text: text}).appendTo(ul);
+    //     });
 
-        return false;
-    });
+    //     return false;
+    // });
 
     function sendMessage() {
         var text = input.val();
@@ -47,12 +47,21 @@
         $('<li>').append($('<i>')).text(status).appendTo(ul);
     }
     function printMessage(text) {
-        $('<li>', {text: text}).appendTo(ul);
+        $('<li>').text(text).appendTo(ul);
     }
 
     socket
-        .on('message', function(text) {
-            $('<li>', {text: text}).appendTo(ul);
+        .on('message', function(username, text) {
+            printMessage(username + " > " + text);
+        })
+        .on('leave', function(username) {
+            printStatus(username + ' вышел из чата');
+        })
+        .on('join', function(username) {
+            printStatus(username + ' вошел в чат');
+        })
+        .on('logout', function() {
+            location.href = "/";
         })
         .on('connect', function() {
             printStatus('Соединение установлено');

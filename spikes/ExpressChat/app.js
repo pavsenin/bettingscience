@@ -5,11 +5,34 @@ var config = require('./config');
 var log = require('./libs/log')(module);
 var errorHandler = require('errorhandler')
 var session = require('express-session')
+var connect = require('connect');
+var cookie = require('cookie');
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var HttpError = require('./error').HttpError
-var mongoose = require('./libs/mongoose')
 
+function loadSession(sid, callback) {
+  sessionStore.load(sid, function(err, session) {
+    if(arguments.length == 0) {
+      return callback(null, null);
+    } else {
+      return callback(null, session);
+    }
+  })
+}
+
+function loadUser(session, callback) {
+  if(!session.user) {
+    return callback(null, null);
+  }
+  User.findById(session.user, function(err, user) {
+    if (err) return callback(err);
+
+    if (!user) return callback(null, null);
+
+    callback(null, user);
+  })
+}
 
 var app = express();
 
@@ -21,13 +44,76 @@ server.listen(config.get('port'), function() {
 var io = require('socket.io').listen(server);
 io.set('origins', 'localhost:*');
 io.set('logger', log);
+
+io.set('authorization', function(handshake, callback) {
+  async.waterfall([
+    function(callback) {
+      handshake.cookies = cookie.parse(handshake.headers.cookie || '');
+      var sidCookie = handshake.cookies[config.get('session:key')];
+      var sid = connect.utils.parseSignedCookie(sidCookie, config.get('session:secret'));
+
+      loadSession(sid, callback);
+    },
+    function (session, callback) {
+      if (!session) {
+        callback(new HttpError(401, "No session"));
+      }
+      handshake.session = session;
+      loadUser(session, callback);
+    },
+    function(user, callback) {
+      if(!user)
+        callback(new HttpError(403, "Anonymous session may not connect"));
+
+      handshake.user = user;
+      callback(null);
+    }
+  ], function(err) {
+    if(!err)
+      return callback(null, true);
+    if (err instanceof HttpError)
+      return callback(null, false);
+    callback(err);
+  })
+})
+
+
+io.sockets.on('session:reload', function(sid) {
+  var clients = io.sockets.clients()
+  clients.forEach(function(client) {
+    if(client.handshake.session.id != sid) return;
+    loadSession(sid, function(err, session) {
+      if (err) {
+        client.emit('error', 'server error');
+        client.disconnect();
+        return;
+      }
+      if (!session) {
+        client.emit('logout');
+        client.disconnect();
+        return;
+      }
+      client.handshake.session = session;
+    });
+  })
+});
+
 io.sockets.on('connection', function(socket) {
+
+  var username = socket.handshake.user.get('username');
+  socket.broadcast.emit('join', username);
+
   socket.on('message', function(data, cb) {
-    console.log(data);
-    socket.broadcast.emit('message', data);
-    cb(data);
+    socket.broadcast.emit('message', username, data);
+    cb && cb();
+  });
+
+  socket.on('disconnect', function() {
+    socket.broadcast.emit('leave', username);
   });
 })
+
+app.set('io', io);
 
 // view engine setup
 app.engine('ejs', require('ejs-locals'));
@@ -39,12 +125,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser());
 app.use(cookieParser());
 
-var MongoStore = require('connect-mongo')(session)
+var sessionStore = require('./libs/sessionStore');
 app.use(session({
   secret: config.get('session:secret'),
   //key: config.get('session:key'),
   cookie: config.get('session:cookie'),
-  store: new MongoStore({mongooseConnection: mongoose.connection})
+  store: sessionStore
 }))
 
 // app.use(function(req, res, next) {
