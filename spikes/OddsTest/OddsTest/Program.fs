@@ -1617,25 +1617,45 @@ let parseMatchResponse =
 [<EntryPoint>]
 let main argv = 
     let time = fromUnixTimestamp()
-    let url = "https://fb.oddsportal.com/feed/match/1-1-hjTtp2r3-1-2-yjddf.dat?_=" + time
-    //let url = "https//fb.oddsportal.com/feed/postmatchscore/1-hjTtp2r3-yjc78.dat?_=" + time
-    let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/soccer/estonia/esiliiga/levadia-keila-jk-hjTtp2r3/"
-    let json = extractDataFromResponse "/feed/postmatchscore/1-hjTtp2r3-yjc78.dat" content |> Option.map JsonValue.Parse
+    //hdM4QuuS
+    //dSBJYVTs
+    // https://fb.oddsportal.com/ajax-sport-country-tournament-archive/1/hdM4QuuS/X0/1/0/4/?_=1558291356100
+    let url = "https://fb.oddsportal.com/ajax-sport-country-tournament-archive/1/hdM4QuuS/X0/1/0/1/?_=" + time
+    let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/"
+    let json = extractDataFromResponse "/ajax-sport-country-tournament-archive/1/hdM4QuuS/X0/1/0/1/" content |> Option.map JsonValue.Parse
     match json with
     | None -> 0
     | Some value ->
-        let odds = value?d?oddsdata?back.["E-1-2-0-0-0"]?odds
-        let outcomeID = value?d?oddsdata?back.["E-1-2-0-0-0"]?OutcomeID
-        let history0 = value?d?history?back.[outcomeID.["0"].AsString()]
-        let history1 = value?d?history?back.[outcomeID.["1"].AsString()]
-        let history2 = value?d?history?back.[outcomeID.["2"].AsString()]
-
-        let pinnacleOdds = odds.[pinnacleID]
-        let pinnacleHistory0 = history0.[pinnacleID]
-        let pinnacleHistory1 = history1.[pinnacleID]
-        let pinnacleHistory2 = history2.[pinnacleID]
+        let html = value?d?html.AsString()
+        let document = HtmlDocument()
+        document.LoadHtml(html)
+        let trs = document.DocumentNode.SelectNodes("/table/tbody/tr") |> List.ofSeq
+        let matches =
+            trs |> List.choose (fun tr ->
+                tr.Attributes |> List.ofSeq |> List.tryFind (fun attr -> attr.Name = "xeid")
+            ) |> List.map (fun attr -> attr.Value)
+        
         0
     |> ignore
+    //let url = "https://fb.oddsportal.com/feed/match/1-1-hjTtp2r3-1-2-yjddf.dat?_=" + time
+    //let url = "https//fb.oddsportal.com/feed/postmatchscore/1-hjTtp2r3-yjc78.dat?_=" + time
+    //let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/soccer/estonia/esiliiga/levadia-keila-jk-hjTtp2r3/"
+    //let json = extractDataFromResponse "/feed/postmatchscore/1-hjTtp2r3-yjc78.dat" content |> Option.map JsonValue.Parse
+    //match json with
+    //| None -> 0
+    //| Some value ->
+    //    let odds = value?d?oddsdata?back.["E-1-2-0-0-0"]?odds
+    //    let outcomeID = value?d?oddsdata?back.["E-1-2-0-0-0"]?OutcomeID
+    //    let history0 = value?d?history?back.[outcomeID.["0"].AsString()]
+    //    let history1 = value?d?history?back.[outcomeID.["1"].AsString()]
+    //    let history2 = value?d?history?back.[outcomeID.["2"].AsString()]
+
+    //    let pinnacleOdds = odds.[pinnacleID]
+    //    let pinnacleHistory0 = history0.[pinnacleID]
+    //    let pinnacleHistory1 = history1.[pinnacleID]
+    //    let pinnacleHistory2 = history2.[pinnacleID]
+    //    0
+    //|> ignore
 
     (*
     let html = fetchContent matchUrl matchHost matchUrl
