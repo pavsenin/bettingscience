@@ -1597,11 +1597,9 @@ let extractDataFromResponse dataFilePath (response:string) =
 
 let pinnacleID = "18"
 
-let parseMatchResponse =
-    let json = extractDataFromResponse dataFilePath content1x2 |> Option.map JsonValue.Parse
-    match json with
-    | None -> 0
-    | Some value ->
+let parseFootballMatchResponse id content =
+    let json = extractDataFromResponse id content |> Option.map JsonValue.Parse
+    json |> Option.map (fun value ->
         let odds = value?d?oddsdata?back.["E-1-2-0-0-0"]?odds
         let outcomeID = value?d?oddsdata?back.["E-1-2-0-0-0"]?OutcomeID
         let history0 = value?d?history?back.[outcomeID.["0"].AsString()]
@@ -1612,15 +1610,26 @@ let parseMatchResponse =
         let pinnacleHistory0 = history0.[pinnacleID]
         let pinnacleHistory1 = history1.[pinnacleID]
         let pinnacleHistory2 = history2.[pinnacleID]
-        0 // return an integer exit code
+
+        let homeOddsClosing, drawOddsClosing, awayOddsClosing = pinnacleOdds.["0"].AsFloat(), pinnacleOdds.["1"].AsFloat(), pinnacleOdds.["2"].AsFloat()
+
+        let extractStartingOdds (history:JsonValue) =
+            let start = history.AsArray() |> Array.head
+            let odds = start.AsArray() |> Array.head
+            odds.AsFloat()
+        let homeOddsStarting, drawOddsStarting, awayOddsStarting =
+            extractStartingOdds pinnacleHistory0,
+            extractStartingOdds pinnacleHistory1,
+            extractStartingOdds pinnacleHistory2
+        
+        (homeOddsStarting, drawOddsStarting, awayOddsStarting), (homeOddsClosing, drawOddsClosing, awayOddsClosing)
+    )
 
 [<EntryPoint>]
-let main argv = 
-    let time = fromUnixTimestamp()
+let main argv =
     //hdM4QuuS
     //dSBJYVTs
-    // https://fb.oddsportal.com/ajax-sport-country-tournament-archive/1/hdM4QuuS/X0/1/0/4/?_=1558291356100
-    let url = "https://fb.oddsportal.com/ajax-sport-country-tournament-archive/1/hdM4QuuS/X0/1/0/1/?_=" + time
+    let url = "https://fb.oddsportal.com/ajax-sport-country-tournament-archive/1/hdM4QuuS/X0/1/0/1/?_=" + fromUnixTimestamp()
     let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/"
     let json = extractDataFromResponse "/ajax-sport-country-tournament-archive/1/hdM4QuuS/X0/1/0/1/" content |> Option.map JsonValue.Parse
     match json with
@@ -1634,7 +1643,10 @@ let main argv =
             trs |> List.choose (fun tr ->
                 tr.Attributes |> List.ofSeq |> List.tryFind (fun attr -> attr.Name = "xeid")
             ) |> List.map (fun attr -> attr.Value)
-        
+        let matchID = "/feed/match/1-1-" + matches.[5] + "-1-2-yjf94.dat"
+        let matchUrl = "https://fb.oddsportal.com" + matchID + "?_=" + fromUnixTimestamp()
+        let matchContent = fetchContent matchUrl "fb.oddsportal.com" "https://www.oddsportal.com/"
+        let pinnacleOdds = parseFootballMatchResponse matchID matchContent
         0
     |> ignore
     //let url = "https://fb.oddsportal.com/feed/match/1-1-hjTtp2r3-1-2-yjddf.dat?_=" + time
