@@ -4,10 +4,13 @@ open System.Net
 open FSharp.Data
 open FSharp.Data.JsonExtensions
 open HtmlAgilityPack
+open System.Security.Policy
+open System.Net
 
 let defArg defaultValue arg = defaultArg arg defaultValue
 let (|>>) v f = v |> Option.map f
 let (||>) v f = v |> Option.bind f
+let (|><|) v1 v2 = match v1, v2 with | Some x1, Some x2 -> Some (x1, x2) | _ -> None
 
 let oddsDataHost = "fb.oddsportal.com"
 let matchHost = "www.oddsportal.com"
@@ -67,33 +70,37 @@ let parseFootballMatchResponse id content =
         (homeOddsStarting, drawOddsStarting, awayOddsStarting), (homeOddsClosing, drawOddsClosing, awayOddsClosing)
     )
 
-let parseXhashKey url =
+let parseMainMatchPage url =
+    let parseScriptText (text:string) =
+        let idStartText = "\"id\":\""
+        let endText = "\",\""
+        let idStart = text.IndexOf idStartText
+        let idEnd = text.IndexOf endText
+        if idStart < 0 || idEnd < idStart then None
+        else
+            let restText = text.Substring(idEnd + endText.Length)
+            let hashStartText = "xhash\":\""
+            let hashStart = restText.IndexOf hashStartText
+            let hashEnd = restText.IndexOf "\",\""
+            if hashStart < 0 || hashEnd < hashStart then None
+            else
+                let start = hashStart + hashStartText.Length
+                let xhash = restText.Substring(start, hashEnd - start)
+                WebUtility.UrlDecode(xhash) |> Some
     let html = fetchContent url matchHost url
     let document = HtmlDocument()
     document.LoadHtml(html)
-    let scripts = document.DocumentNode.SelectNodes("/html/body/script") |> List.ofSeq
-    let result =
-        scripts |> Seq.tryPick (fun script ->
-            let text = script.InnerText
-            let idStartText = "\"id\":\""
-            let endText = "\",\""
-            let idStart = text.IndexOf idStartText
-            let idEnd = text.IndexOf endText
-            if idStart < 0 || idEnd < idStart then None
+    let xhash = document.DocumentNode.SelectNodes("/html/body/script") |> List.ofSeq |> Seq.tryPick (fun script -> parseScriptText script.InnerText)
+    let score =
+        document.DocumentNode.SelectSingleNode("/html/body/div/div/div/div/div/div/div/div/div/div[@xeid]/p/strong")
+        |> (fun node ->
+            if node = null then None
             else
-                let start = idStart + idStartText.Length
-                let id = text.Substring(start, idEnd - start)
-                let restText = text.Substring(idEnd + endText.Length)
-                let hashStartText = "xhash\":\""
-                let hashStart = restText.IndexOf hashStartText
-                let hashEnd = restText.IndexOf "\",\""
-                if hashStart < 0 || hashEnd < hashStart then None
-                else
-                    let start = hashStart + hashStartText.Length
-                    let hash = restText.Substring(start, hashEnd - start)
-                    Some(id, hash)
+                match node.InnerText.Split(':') with
+                | [|x1; x2|] -> Some(int(x1), int(x2))
+                | _ -> None
         )
-    result
+    xhash |><| score
 
 let getAttribute (node:HtmlNode) func =
     node.Attributes |> List.ofSeq |> List.tryFind func
@@ -105,10 +112,8 @@ let main argv =
     //dSBJYVTs RFL1617
     let url = "https://fb.oddsportal.com/ajax-sport-country-tournament-archive/1/jytwvQhq/X0/1/0/1/?_=" + fromUnixTimestamp()
     let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/"
-    let json = extractDataFromResponse "/ajax-sport-country-tournament-archive/1/jytwvQhq/X0/1/0/1/" content |> Option.map JsonValue.Parse
-    match json with
-    | None -> 0
-    | Some value ->
+    let json = extractDataFromResponse "/ajax-sport-country-tournament-archive/1/jytwvQhq/X0/1/0/1/" content |>> JsonValue.Parse
+    json |>> (fun value ->
         let html = value?d?html.AsString()
         let document = HtmlDocument()
         document.LoadHtml(html)
@@ -123,19 +128,19 @@ let main argv =
                         ) |> defArg ""
                     )
                 )
-                match xeid, matchUrl with
-                | Some v1, Some v2 -> Some (v1, v2)
-                | _ -> None
+                xeid |><| matchUrl
             )
         let (matchID, matchRelativeUrl) = matches.[5]
         let matchUrl = "http://www.oddsportal.com/" + matchRelativeUrl
-        let xhash = parseXhashKey matchUrl
-
-        let matchData = "/feed/match/1-1-" + matchID + "-1-2-yjf94.dat"
-        let matchDataUrl = "https://fb.oddsportal.com" + matchData + "?_=" + fromUnixTimestamp()
-        let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" "https://www.oddsportal.com/"
-        let pinnacleOdds = parseFootballMatchResponse matchData matchContent
-        0
+        let xhash = parseMainMatchPage matchUrl
+        xhash |>> (fun (hash, score) ->
+            let matchData = "/feed/match/1-1-" + matchID + "-1-2-" + hash + ".dat"
+            let matchDataUrl = "https://fb.oddsportal.com" + matchData + "?_=" + fromUnixTimestamp()
+            let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" "https://www.oddsportal.com/"
+            let pinnacleOdds = parseFootballMatchResponse matchData matchContent
+            (pinnacleOdds, score)
+        )
+    )
     |> ignore
     //https://www.oddsportal.com/soccer/russia/premier-league-2017-2018/results/
 
