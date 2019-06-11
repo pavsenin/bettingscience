@@ -43,13 +43,21 @@ let extractDataFromResponse dataFilePath (response:string) =
 let pinnacleID = "18"
 
 let parseFootballMatchResponse id content =
+    let getOutcomeIds (id:JsonValue) =
+        match id with
+        | JsonValue.Array x ->
+            Some("", "", "")
+        | JsonValue.Record _ ->
+            Some(id.["0"].AsString(), id.["1"].AsString(), id.["2"].AsString())
+        | _ -> None
     let json = extractDataFromResponse id content |> Option.map JsonValue.Parse
     json |> Option.map (fun value ->
-        let odds = value?d?oddsdata?back.["E-1-2-0-0-0"]?odds
-        let outcomeID = value?d?oddsdata?back.["E-1-2-0-0-0"]?OutcomeID
-        let history0 = value?d?history?back.[outcomeID.["0"].AsString()]
-        let history1 = value?d?history?back.[outcomeID.["1"].AsString()]
-        let history2 = value?d?history?back.[outcomeID.["2"].AsString()]
+        let oddsData = value?d?oddsdata?back.["E-1-2-0-0-0"]
+        let historyData = value?d?history?back
+        let odds, outcomeID = oddsData?odds, oddsData?OutcomeID
+        let 
+        let (homeId, drawId, awayId) = getOutcomeIds outcomeID
+        let history0, history1, history2 = historyData.[homeId], historyData.[drawId], historyData.[awayId]
 
         let pinnacleOdds = odds.[pinnacleID]
         let pinnacleHistory0 = history0.[pinnacleID]
@@ -71,7 +79,7 @@ let parseFootballMatchResponse id content =
     )
 
 let parseMainMatchPage url =
-    let parseScriptText (text:string) =
+    let extractXHashKey (text:string) =
         let idStartText = "\"id\":\""
         let endText = "\",\""
         let idStart = text.IndexOf idStartText
@@ -90,7 +98,7 @@ let parseMainMatchPage url =
     let html = fetchContent url matchHost url
     let document = HtmlDocument()
     document.LoadHtml(html)
-    let xhash = document.DocumentNode.SelectNodes("/html/body/script") |> List.ofSeq |> Seq.tryPick (fun script -> parseScriptText script.InnerText)
+    let xhash = document.DocumentNode.SelectNodes("/html/body/script") |> List.ofSeq |> Seq.tryPick (fun script -> extractXHashKey script.InnerText)
     let score =
         document.DocumentNode.SelectSingleNode("/html/body/div/div/div/div/div/div/div/div/div/div[@xeid]/p/strong")
         |> (fun node ->
@@ -113,55 +121,34 @@ let main argv =
     let url = "https://fb.oddsportal.com/ajax-sport-country-tournament-archive/1/jytwvQhq/X0/1/0/1/?_=" + fromUnixTimestamp()
     let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/"
     let json = extractDataFromResponse "/ajax-sport-country-tournament-archive/1/jytwvQhq/X0/1/0/1/" content |>> JsonValue.Parse
-    json |>> (fun value ->
-        let html = value?d?html.AsString()
-        let document = HtmlDocument()
-        document.LoadHtml(html)
-        let trs = document.DocumentNode.SelectNodes("/table/tbody/tr") |> List.ofSeq
-        let matches =
-            trs |> List.choose (fun tr ->
-                let xeid = getAttribute tr (fun attr -> attr.Name = "xeid") |>> (fun attr -> attr.Value)
-                let matchUrl = tr.ChildNodes |> List.ofSeq |> List.tryPick (fun child ->
-                    getAttribute child (fun attr -> attr.Name = "class" && attr.Value = "name table-participant") |>> (fun _ ->
-                        child.ChildNodes |> List.ofSeq |> List.tryFind (fun c -> c.Name = "a") |>> (fun a ->
-                            getAttribute a (fun attr -> attr.Name = "href") |>> (fun attr -> attr.Value) |> defArg ""
-                        ) |> defArg ""
+    let odds =
+        json |>> (fun value ->
+            let html = value?d?html.AsString()
+            let document = HtmlDocument()
+            document.LoadHtml(html)
+            let trs = document.DocumentNode.SelectNodes("/table/tbody/tr") |> List.ofSeq
+            let matches =
+                trs |> List.choose (fun tr ->
+                    let xeid = getAttribute tr (fun attr -> attr.Name = "xeid") |>> (fun attr -> attr.Value)
+                    let matchUrl = tr.ChildNodes |> List.ofSeq |> List.tryPick (fun child ->
+                        getAttribute child (fun attr -> attr.Name = "class" && attr.Value = "name table-participant") |>> (fun _ ->
+                            child.ChildNodes |> List.ofSeq |> List.tryFind (fun c -> c.Name = "a") |>> (fun a ->
+                                getAttribute a (fun attr -> attr.Name = "href") |>> (fun attr -> attr.Value) |> defArg ""
+                            ) |> defArg ""
+                        )
                     )
+                    xeid |><| matchUrl
                 )
-                xeid |><| matchUrl
+            matches |> List.map (fun (matchID, matchRelativeUrl) ->
+                let matchUrl = "http://www.oddsportal.com/" + matchRelativeUrl
+                let xhash = parseMainMatchPage matchUrl
+                xhash |>> (fun (hash, score) ->
+                    let matchData = "/feed/match/1-1-" + matchID + "-1-2-" + hash + ".dat"
+                    let matchDataUrl = "https://fb.oddsportal.com" + matchData + "?_=" + fromUnixTimestamp()
+                    let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" "https://www.oddsportal.com/"
+                    let pinnacleOdds = parseFootballMatchResponse matchData matchContent
+                    (pinnacleOdds, score)
+                )
             )
-        let (matchID, matchRelativeUrl) = matches.[5]
-        let matchUrl = "http://www.oddsportal.com/" + matchRelativeUrl
-        let xhash = parseMainMatchPage matchUrl
-        xhash |>> (fun (hash, score) ->
-            let matchData = "/feed/match/1-1-" + matchID + "-1-2-" + hash + ".dat"
-            let matchDataUrl = "https://fb.oddsportal.com" + matchData + "?_=" + fromUnixTimestamp()
-            let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" "https://www.oddsportal.com/"
-            let pinnacleOdds = parseFootballMatchResponse matchData matchContent
-            (pinnacleOdds, score)
         )
-    )
-    |> ignore
-    //https://www.oddsportal.com/soccer/russia/premier-league-2017-2018/results/
-
-    //let url = "https://fb.oddsportal.com/feed/match/1-1-hjTtp2r3-1-2-yjddf.dat?_=" + time
-    //let url = "https//fb.oddsportal.com/feed/postmatchscore/1-hjTtp2r3-yjc78.dat?_=" + time
-    //let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/soccer/estonia/esiliiga/levadia-keila-jk-hjTtp2r3/"
-    //let json = extractDataFromResponse "/feed/postmatchscore/1-hjTtp2r3-yjc78.dat" content |> Option.map JsonValue.Parse
-    //match json with
-    //| None -> 0
-    //| Some value ->
-    //    let odds = value?d?oddsdata?back.["E-1-2-0-0-0"]?odds
-    //    let outcomeID = value?d?oddsdata?back.["E-1-2-0-0-0"]?OutcomeID
-    //    let history0 = value?d?history?back.[outcomeID.["0"].AsString()]
-    //    let history1 = value?d?history?back.[outcomeID.["1"].AsString()]
-    //    let history2 = value?d?history?back.[outcomeID.["2"].AsString()]
-
-    //    let pinnacleOdds = odds.[pinnacleID]
-    //    let pinnacleHistory0 = history0.[pinnacleID]
-    //    let pinnacleHistory1 = history1.[pinnacleID]
-    //    let pinnacleHistory2 = history2.[pinnacleID]
-    //    0
-    //|> ignore
-
-    0 // return an integer exit code
+    0
