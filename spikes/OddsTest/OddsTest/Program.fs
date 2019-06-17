@@ -246,10 +246,10 @@ let fetchLeagueDataAndSaveToFile sportID outID (leagueID, pageCount, fileName) =
     Compact.serializeToFile fileName leagueData
 
 
-// ("Uanezsbs", 30, "MLB19.json"), ("r3414Mwe", 58, "MLB18.json"), ("bwFloypH", 58, "MLB17.json")
+// ("Uanezsbs", 30, "MLB19.json"), ("r3414Mwe", 58, "MLB18.json"), ("bwFloypH", 58, "MLB17.json"), ("67blnzDc", 57, "MLB16.json"), ("QgQMkPOM", 57, "MLB15.json"), ("Y9I8VpDI", 57, "MLB14.json")
 
 [<EntryPoint>]
 let main argv =
-    fetchLeagueDataAndSaveToFile baseballID outHomeAwayID ("Uanezsbs", 30, "MLB19.json")
-    //checkEffectiveMarketHypothese ["MLB17.json"]
+    //fetchLeagueDataAndSaveToFile baseballID outHomeAwayID ("Y9I8VpDI", 57, "MLB14.json")
+    checkEffectiveMarketHypothese ["MLB19.json";"MLB18.json";"MLB17.json";"MLB16.json";"MLB15.json";"MLB14.json"]
     0
