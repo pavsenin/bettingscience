@@ -1,0 +1,335 @@
+{
+  "id": "xdttaT5s",
+  "matches": [
+    {
+      "id": "40myleC5",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/team-liquid-league-of-legends-team-solomid-league-of-legends-40myleC5/",
+      "score": {
+        "home": 3,
+        "away": 2
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 1.54,
+            "away": 2.51
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 1.51,
+            "away": 2.59
+          }
+        }
+      }
+    },
+    {
+      "id": "EJSDHyzp",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/team-liquid-league-of-legends-flyquest-esports-league-of-legends-EJSDHyzp/",
+      "score": {
+        "home": 3,
+        "away": 0
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 1.1,
+            "away": 7.3
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 1.1,
+            "away": 7.3
+          }
+        }
+      }
+    },
+    {
+      "id": "drIIGekj",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/cloud9-league-of-legends-team-solomid-league-of-legends-drIIGekj/",
+      "score": {
+        "home": 2,
+        "away": 3
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 2.23,
+            "away": 1.67
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 1.78,
+            "away": 2.06
+          }
+        }
+      }
+    },
+    {
+      "id": "WzDzMJtD",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/team-solomid-league-of-legends-echo-fox-league-of-legends-WzDzMJtD/",
+      "score": {
+        "home": 3,
+        "away": 1
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 1.14,
+            "away": 5.79
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 1.12,
+            "away": 6.44
+          }
+        }
+      }
+    },
+    {
+      "id": "ARBvLwdJ",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/flyquest-esports-league-of-legends-golden-guardians-league-of-legends-ARBvLwdJ/",
+      "score": {
+        "home": 3,
+        "away": 2
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 1.69,
+            "away": 2.19
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 1.74,
+            "away": 2.11
+          }
+        }
+      }
+    },
+    {
+      "id": "SzEvhRLu",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/echo-fox-league-of-legends-golden-guardians-league-of-legends-SzEvhRLu/",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 1.65,
+            "away": 2.26
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 1.75,
+            "away": 2.09
+          }
+        }
+      }
+    },
+    {
+      "id": "jFxZWsjU",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/clutch-gaming-league-of-legends-team-solomid-league-of-legends-jFxZWsjU/",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 2.15,
+            "away": 1.71
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 2.19,
+            "away": 1.69
+          }
+        }
+      }
+    },
+    {
+      "id": "COwVXNzO",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/counter-logic-gaming-league-of-legends-team-liquid-league-of-legends-COwVXNzO/",
+      "score": {
+        "home": 0,
+        "away": 1
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 3.29,
+            "away": 1.34
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 3.55,
+            "away": 1.31
+          }
+        }
+      }
+    },
+    {
+      "id": "p27YY3LH",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/cloud9-league-of-legends-100-thieves-league-of-legends-p27YY3LH/",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 2.32,
+            "away": 1.62
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 2.23,
+            "away": 1.67
+          }
+        }
+      }
+    },
+    {
+      "id": "6B8UZq6B",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/optic-gaming-league-of-legends-flyquest-esports-league-of-legends-6B8UZq6B/",
+      "score": {
+        "home": 0,
+        "away": 1
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 1.57,
+            "away": 2.43
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 2.02,
+            "away": 1.81
+          }
+        }
+      }
+    },
+    {
+      "id": "Cl9QzQj5",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/clutch-gaming-league-of-legends-echo-fox-league-of-legends-Cl9QzQj5/",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 1.65,
+            "away": 2.26
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 1.64,
+            "away": 2.29
+          }
+        }
+      }
+    },
+    {
+      "id": "bo5My6ya",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/flyquest-esports-league-of-legends-golden-guardians-league-of-legends-bo5My6ya/",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 2.32,
+            "away": 1.62
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 2.29,
+            "away": 1.64
+          }
+        }
+      }
+    },
+    {
+      "id": "GMFHxnMh",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/counter-logic-gaming-league-of-legends-optic-gaming-league-of-legends-GMFHxnMh/",
+      "score": {
+        "home": 0,
+        "away": 1
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 2.07,
+            "away": 1.77
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 1.78,
+            "away": 2.06
+          }
+        }
+      }
+    },
+    {
+      "id": "xWGDwS6n",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/100-thieves-league-of-legends-team-solomid-league-of-legends-xWGDwS6n/",
+      "score": {
+        "home": 0,
+        "away": 1
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 1.59,
+            "away": 2.39
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 1.6,
+            "away": 2.36
+          }
+        }
+      }
+    },
+    {
+      "id": "8dC9v8it",
+      "url": "http://www.oddsportal.com//esports/world/league-of-legends-championship-series/team-liquid-league-of-legends-cloud9-league-of-legends-8dC9v8it/",
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "odds": {
+        "starting": {
+          "X2": {
+            "home": 1.48,
+            "away": 2.69
+          }
+        },
+        "closing": {
+          "X2": {
+            "home": 1.5,
+            "away": 2.63
+          }
+        }
+      }
+    }
+  ]
+}
