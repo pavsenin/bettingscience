@@ -6,6 +6,11 @@ open FSharp.Data.JsonExtensions
 open HtmlAgilityPack
 open Domain
 open Microsoft.FSharpLu.Json
+open Accord.Controls
+open Accord.MachineLearning.DecisionTrees
+open Accord.Neuro
+open Accord.Neuro.Learning
+open Accord.Statistics
 
 let defArg defaultValue arg = defaultArg arg defaultValue
 let (|>>) v f = try v |> Option.map f with | _ -> None
@@ -224,6 +229,8 @@ let checkEffectiveMarketHypothese fileNames =
 // ("fTANbXxl", 6, "OWL18.json")
 // ("xdttaT5s", 3, "LoLC19.json"), ("UqMHACKl", 8, "LoLC18.json"), ("tQQ0iGoN", 7, "LoLC17.json"), ("Ys6Qr462", 8, "LoLC16.json")
 // ("W2c1dRk0", 4, "LoLChina19.json"), ("OIF6g7Tp", 6, "LoLChina18.json"), ("hOlI07Jp", 5, "LoLChina17.json")
+// ("Uanezsbs", 30, "MLB19.json"), ("r3414Mwe", 58, "MLB18.json"), ("bwFloypH", 58, "MLB17.json"), ("67blnzDc", 57, "MLB16.json"), ("QgQMkPOM", 57, "MLB15.json"), ("Y9I8VpDI", 57, "MLB14.json")
+
 
 let fetchLeagueDataAndSaveToFile sportID outID (leagueID, pageCount, fileName) =
     let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + sportID + "/" + leagueID + "/X0/1/0/"
@@ -245,11 +252,91 @@ let fetchLeagueDataAndSaveToFile sportID outID (leagueID, pageCount, fileName) =
     let leagueData = { ID = leagueID; Matches = matches }
     Compact.serializeToFile fileName leagueData
 
-
-// ("Uanezsbs", 30, "MLB19.json"), ("r3414Mwe", 58, "MLB18.json"), ("bwFloypH", 58, "MLB17.json"), ("67blnzDc", 57, "MLB16.json"), ("QgQMkPOM", 57, "MLB15.json"), ("Y9I8VpDI", 57, "MLB14.json")
+//let inputs, outputs =
+//    matches
+//    |> Array.choose (fun m ->
+//        let { Starting = starting; Closing = closing } = m.Odds
+//        let result = getMatchResult m.Score
+//        let realHome = if result = Home then 1 else 0
+//        let startingHomeProb = getProbabilities starting
+//        let closingHomeProb = getProbabilities closing
+//        let homeProbDiff = (closingHomeProb - startingHomeProb) / startingHomeProb
+//        //printfn "%f %f %d" startingHomeProb homeProbDiff realHome
+//        if startingHomeProb < 0.1f then None
+//        else Some([|double(closingHomeProb); double(homeProbDiff)|], realHome)
+//    )
+//    |> Array.unzip
+//ScatterplotBox.Show("MLB", inputs, outputs).SetSymbolSize(1.f).Hold();
+//let values =
+//    matches
+//    |> Array.choose (fun m ->
+//        let { Starting = starting; Closing = closing } = m.Odds
+//        let result = getMatchResult m.Score
+//        let realHome = if result = Home then 1.f else 0.f
+//        let startingHomeProb = getProbabilities starting
+//        let closingHomeProb = getProbabilities closing
+//        let homeProbDiff = (closingHomeProb - startingHomeProb) / startingHomeProb
+//        //printfn "%f %f %d" startingHomeProb homeProbDiff realHome
+//        if startingHomeProb < 0.1f then None
+//        else Some(closingHomeProb, realHome)
+//    )
+//    |> Array.groupBy (fun (prob, _) -> prob)
+//    |> Array.sortBy (fun (prob, _) -> prob)
+//    |> Array.filter (fun (_, arr) -> (Array.length arr) >= 15)
+//    |> Array.map (fun (prob, arr) -> (prob, arr |> Array.map (fun (_, r) -> r) |> Array.average))
+//    |> Array.map (fun (prob, real) -> [|double(prob); double(real)|])
+//ScatterplotBox.Show("MLB", values).SetSymbolSize(1.f).Hold();
 
 [<EntryPoint>]
 let main argv =
     //fetchLeagueDataAndSaveToFile baseballID outHomeAwayID ("Y9I8VpDI", 57, "MLB14.json")
-    checkEffectiveMarketHypothese ["MLB19.json";"MLB18.json";"MLB17.json";"MLB16.json";"MLB15.json";"MLB14.json"]
+    //checkEffectiveMarketHypothese ["MLB19.json";"MLB18.json";"MLB17.json";"MLB16.json";"MLB15.json";"MLB14.json"]
+    let getData fileNames = 
+        fileNames
+        |> List.map (fun fileName ->
+            let leagueData = Compact.deserializeFile<LeagueData> fileName
+            leagueData.Matches
+        )
+        |> Array.concat
+        |> Array.choose (fun m ->
+            let { Starting = starting; Closing = closing } = m.Odds
+            let result = getMatchResult m.Score
+            let realHome = if result = Home then 1. else 0.
+            let startingHomeProb = getProbabilities starting
+            let closingHomeProb = getProbabilities closing
+            let homeProbDiff = (closingHomeProb - startingHomeProb) / startingHomeProb
+            //printfn "%f %f %d" startingHomeProb homeProbDiff realHome
+            if startingHomeProb < 0.1f then None
+            else Some([|float(closingHomeProb); float(homeProbDiff)|], [|realHome|])
+        )
+        |> Array.unzip
+    let trainInputs, trainOutputs = getData ["MLB18.json";"MLB17.json";"MLB16.json";"MLB15.json";"MLB14.json"]
+    let testInputs, testOutputs = getData ["MLB19.json"]
+    //let teacher = new RandomForestLearning(NumberOfTrees = 100, SampleRatio = 1.0)
+    //let forest = teacher.Learn(trainInputs, trainOutputs)
+    //let predicted = forest.Decide(testInputs)
+    //let mutable correct = 0.f
+    //[0..testOutputs.Length-1]
+    //|> List.iter (fun i ->
+    //    printfn "%d %d" predicted.[i] testOutputs.[i]
+    //    if predicted.[i] = testOutputs.[i] then correct <- correct + 1.f
+    //)
+    //printfn "Correct %f" (correct / float32(testOutputs.Length))
+
+    let func = new SigmoidFunction()
+    let network = new ActivationNetwork(func, inputsCount = 2, neuronsCount = [|5; 1|])
+    let teacher = new LevenbergMarquardtLearning(network, UseRegularization = true)
+    let mutable error = Double.PositiveInfinity
+    let mutable previous = 0.0
+
+    //while (Math.Abs(previous - error) < 1e-10 * previous) do
+    [0..29] |> List.iter (fun i ->
+        previous <- error
+        error <- teacher.RunEpoch(trainInputs, trainOutputs)
+        printfn "%f" error
+    )
+    [0..testInputs.Length-1] |> List.iter (fun i ->
+        let predicted = network.Compute(testInputs.[i])
+        printfn "%f %f %f" testInputs.[i].[0] predicted.[0] testOutputs.[i].[0]
+    )
     0
