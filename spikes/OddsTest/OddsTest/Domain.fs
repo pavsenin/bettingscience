@@ -45,6 +45,8 @@ type MatchData = {
     ID : string
     [<JsonProperty(PropertyName = "url")>]
     Url : string
+    [<JsonProperty(PropertyName = "time")>]
+    Time : int
     [<JsonProperty(PropertyName = "score")>]
     Score:MatchScore
     [<JsonProperty(PropertyName = "odds")>]

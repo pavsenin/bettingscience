@@ -212,22 +212,16 @@ let getOverUnderOdds value =
     let oddsData = value?d?oddsdata?back
     match oddsData with
     | JsonValue.Record data ->
-        data
-        |> Array.choose (fun (_, value) ->
-            let handicap = value?handicapValue
+        data |> Array.choose (fun (_, innerValue) ->
+            let handicap = innerValue?handicapValue
             let starting =
-                getStringOutcomes2 value?OutcomeID |>> (fun (o1, o2) ->
+                getStringOutcomes2 innerValue?OutcomeID |>> (fun (o1, o2) ->
                     extractStartingOdds history.[o1].[pinnacleID], extractStartingOdds history.[o2].[pinnacleID]
             )
             let closing = 
-                match value?odds with
+                match innerValue?odds with
                 | JsonValue.Record books ->
-                    books |> Array.tryFind (fun (key, _) -> key = pinnacleID)
-                    ||> (fun (_, value) ->
-                        match value with
-                        | JsonValue.Array [|o; u|] -> Some (asFloat o, asFloat u)
-                        | _ -> None
-                    )
+                    books |> Array.tryFind (fun (key, _) -> key = pinnacleID) ||> (fun (_, value) -> getFloatOutcomes2 value)
                 | _ -> None
             match starting, closing with
             | Some (so1, so2), Some (co1, co2) ->
@@ -318,7 +312,26 @@ let parseMainMatchPage url =
                 | [|x1; x2|] -> Some(int(x1), int(x2))
                 | _ -> None
         )
-    xhash |><| score
+    let time =
+        document.DocumentNode.SelectSingleNode("/html/body/div/div/div/div/div/div/div/div/div[@id='col-content']/p")
+        |> (fun node ->
+            if node = null then None
+            else
+                match node.GetAttributeValue("class", "") with
+                | value ->
+                    let startIndex = "date datet t".Length
+                    let endIndex = value.IndexOf("-")
+                    if startIndex >= 0 && endIndex > startIndex then
+                        let timeValue = value.Substring(startIndex, endIndex - startIndex)
+                        match Int32.TryParse(timeValue) with
+                        | true, time -> Some time
+                        | _ -> None
+                    else None
+                | _ -> None
+        )
+    match xhash, score, time with
+    | Some x1, Some x2, Some x3 -> Some (x1, x2, x3)
+    | _ -> None
 
 let extractMatches (document:HtmlDocument) =
     document.DocumentNode.SelectNodes("/table/tbody/tr") |> List.ofSeq |> List.choose (fun tr ->
@@ -336,7 +349,7 @@ let extractMatches (document:HtmlDocument) =
 let extractOdds (sportID, outIDs, hzID) (matchID, matchRelativeUrl) =
     let matchUrl = "http://www.oddsportal.com/" + matchRelativeUrl
     let xhash = parseMainMatchPage matchUrl
-    xhash |>> (fun (hash, (score1, score2)) ->
+    xhash |>> (fun (hash, (score1, score2), time) ->
         let odds =
             outIDs |> List.choose (fun outID ->
                 let matchData = "/feed/match/1-" + sportID + "-" + matchID + "-" + outID + "-" + hzID + "-" + hash + ".dat"
@@ -345,7 +358,7 @@ let extractOdds (sportID, outIDs, hzID) (matchID, matchRelativeUrl) =
                 let odds = parseFootballMatchResponseNew outID matchData matchContent
                 odds |>> (fun values -> { OutcomeID = outID; Values = values })
             ) |> List.toArray
-        { ID = matchID; Url = matchUrl; Score = { Home = score1; Away = score2 }; Odds = odds }
+        { ID = matchID; Url = matchUrl; Time = time; Score = { Home = score1; Away = score2 }; Odds = odds }
     )
 
 type MatchResult = Home | Draw | Away
@@ -432,7 +445,7 @@ let fetchLeagueDataAndSaveToFile sportID outIDs (leagueID, pageCount, fileName) 
 
 [<EntryPoint>]
 let main argv =
-    //fetchLeagueDataAndSaveToFile baseballID [outHomeAwayID; outOverUnderID] ("bwFloypH", 58, "MLB17.json")
+    fetchLeagueDataAndSaveToFile baseballID [outHomeAwayID; outAsianHandicapID; outOverUnderID] ("r3414Mwe", 58, "MLB18.json")
     //checkEffectiveMarketHypothese ["MLB18.json";"MLB17.json"]
     //let network = new DeepBeliefNetwork(new BernoulliFunction(), 1024, 50, 10);
     //let weights = new GaussianWeights(network)
@@ -449,36 +462,36 @@ let main argv =
     //)
 
 
-    let inputs, outputs =
-        [|"MLBF18.json";"MLBF17.json"|]
-        |> Array.map (fun fileName ->
-            let leagueData = Compact.deserializeFile<LeagueData> fileName
-            leagueData.Matches
-        )
-        |> Array.concat
-        |> Array.choose (fun m ->
-            m.Odds
-            |> Array.tryFind (fun o -> o.OutcomeID = outHomeAwayID)
-            ||> (fun odds ->
-                match odds.Values with
-                | [| { Value = None; Odds = { Starting = starting; Closing = closing } }|] ->
-                    let result = getMatchResult m.Score
-                    let realHome = if result = Home then 1 else 0
-                    let startingHomeProb = getProbabilities starting
-                    let closingHomeProb = getProbabilities closing
-                    let homeProbDiff = (closingHomeProb - startingHomeProb) / startingHomeProb
-                    //printfn "%f %f %d" startingHomeProb homeProbDiff realHome
-                    if startingHomeProb < 0.1f then None
-                    else Some([|double(closingHomeProb); double(homeProbDiff)|], realHome)
-                | _ -> None
-            )
-        ) |> Array.unzip
-        //|> Array.groupBy (fun (prob, _) -> prob)
-        //|> Array.sortBy (fun (prob, _) -> prob)
-        //|> Array.filter (fun (_, arr) -> (Array.length arr) >= 5)
-        //|> Array.map (fun (prob, arr) -> (prob, arr |> Array.map (fun (_, r) -> r) |> Array.average))
-        //|> Array.map (fun (prob, real) -> [|double(prob); double(real)|])
-    ScatterplotBox.Show("MLB", inputs, outputs).SetSymbolSize(2.f).Hold();
+    //let inputs, outputs =
+    //    [|"MLBF18.json";"MLBF17.json"|]
+    //    |> Array.map (fun fileName ->
+    //        let leagueData = Compact.deserializeFile<LeagueData> fileName
+    //        leagueData.Matches
+    //    )
+    //    |> Array.concat
+    //    |> Array.choose (fun m ->
+    //        m.Odds
+    //        |> Array.tryFind (fun o -> o.OutcomeID = outHomeAwayID)
+    //        ||> (fun odds ->
+    //            match odds.Values with
+    //            | [| { Value = None; Odds = { Starting = starting; Closing = closing } }|] ->
+    //                let result = getMatchResult m.Score
+    //                let realHome = if result = Home then 1 else 0
+    //                let startingHomeProb = getProbabilities starting
+    //                let closingHomeProb = getProbabilities closing
+    //                let homeProbDiff = (closingHomeProb - startingHomeProb) / startingHomeProb
+    //                //printfn "%f %f %d" startingHomeProb homeProbDiff realHome
+    //                if startingHomeProb < 0.1f then None
+    //                else Some([|double(closingHomeProb); double(homeProbDiff)|], realHome)
+    //            | _ -> None
+    //        )
+    //    ) |> Array.unzip
+    //    //|> Array.groupBy (fun (prob, _) -> prob)
+    //    //|> Array.sortBy (fun (prob, _) -> prob)
+    //    //|> Array.filter (fun (_, arr) -> (Array.length arr) >= 5)
+    //    //|> Array.map (fun (prob, arr) -> (prob, arr |> Array.map (fun (_, r) -> r) |> Array.average))
+    //    //|> Array.map (fun (prob, real) -> [|double(prob); double(real)|])
+    //ScatterplotBox.Show("MLB", inputs, outputs).SetSymbolSize(2.f).Hold();
 
 
     let matches =
