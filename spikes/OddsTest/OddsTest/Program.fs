@@ -11,6 +11,8 @@ open Accord.MachineLearning.DecisionTrees
 open Accord.Neuro
 open Accord.Neuro.Learning
 open Accord.Statistics
+open Accord.Neuro.Networks
+open Accord.Neuro.ActivationFunctions
 
 //let inputs, outputs =
 //    matches
@@ -139,55 +141,120 @@ let getAttribute (node:HtmlNode) func =
     node.Attributes |> List.ofSeq |> List.tryFind func
 
 let getOutcomes3 asFunc = function
-    | JsonValue.Array [|home; draw; away|] ->
-        Some(asFunc home, asFunc draw, asFunc away)
+    | JsonValue.Array [|o1; o0; o2|] ->
+        Some(asFunc o1, asFunc o0, asFunc o2)
     | JsonValue.Record _ as value ->
         Some(asFunc value.["0"], asFunc value.["1"], asFunc value.["2"])
     | _ -> None
 let getOutcomes2 asFunc = function
-    | JsonValue.Array [|home; away|] ->
-        Some(asFunc home, asFunc away)
+    | JsonValue.Array [|o1; o2|] ->
+        Some(asFunc o1, asFunc o2)
     | JsonValue.Record _ as value ->
         Some(asFunc value.["0"], asFunc value.["1"])
     | _ -> None
 let getStringOutcomes3, getFloatOutcomes3 = getOutcomes3 asString, getOutcomes3 asFloat
 let getStringOutcomes2, getFloatOutcomes2 = getOutcomes2 asString, getOutcomes2 asFloat
 
-let getStartingClosingOdds3 (historyData:JsonValue) pinnacleOdds outcomeID =
-    getStringOutcomes3 outcomeID ||> (fun (homeId, drawId, awayId) ->
-        let pinnacleHistory0, pinnacleHistory1, pinnacleHistory2 =
-            historyData.[homeId].[pinnacleID], historyData.[drawId].[pinnacleID], historyData.[awayId].[pinnacleID]
-            
-        getFloatOutcomes3 pinnacleOdds |>> (fun (homeOddsClosing, drawOddsClosing, awayOddsClosing) ->
-            let extractStartingOdds (history:JsonValue) =
-                let start = history.AsArray() |> Array.head
-                let odds = start.AsArray() |> Array.head
-                asFloat odds
-            let homeOddsStarting, drawOddsStarting, awayOddsStarting =
-                extractStartingOdds pinnacleHistory0, extractStartingOdds pinnacleHistory1, extractStartingOdds pinnacleHistory2
-            {
-                Starting = X3 { Home = homeOddsStarting; Draw = drawOddsStarting; Away = awayOddsStarting };
-                Closing = X3 { Home = homeOddsClosing; Draw = drawOddsClosing; Away = awayOddsClosing }
+let extractStartingOdds (history:JsonValue) =
+    let start = history.AsArray() |> Array.head
+    let odds = start.AsArray() |> Array.head
+    asFloat odds
+
+//let getStartingClosingOdds3 (historyData:JsonValue) pinnacleOdds outcomeID =
+//    getStringOutcomes3 outcomeID ||> (fun (homeId, drawId, awayId) ->
+//        let pinnacleHistory0, pinnacleHistory1, pinnacleHistory2 =
+//            historyData.[homeId].[pinnacleID], historyData.[drawId].[pinnacleID], historyData.[awayId].[pinnacleID]
+//            
+//        getFloatOutcomes3 pinnacleOdds |>> (fun (homeOddsClosing, drawOddsClosing, awayOddsClosing) ->
+//            let homeOddsStarting, drawOddsStarting, awayOddsStarting =
+//                extractStartingOdds pinnacleHistory0, extractStartingOdds pinnacleHistory1, extractStartingOdds pinnacleHistory2
+//            {
+//                Starting = X3 { Home = homeOddsStarting; Draw = drawOddsStarting; Away = awayOddsStarting };
+//                Closing = X3 { Home = homeOddsClosing; Draw = drawOddsClosing; Away = awayOddsClosing }
+//            }
+//        )
+//    )
+let getStartingOdds2 (value:JsonValue) =
+    let oddsData = value?d?oddsdata?back
+    let history = value?d?history?back
+    match oddsData with
+    | JsonValue.Record data ->
+        data |> Array.tryPick (fun (_, value) ->
+            getStringOutcomes2 value?OutcomeID |>> (fun (o1, o2) ->
+                extractStartingOdds history.[o1].[pinnacleID], extractStartingOdds history.[o2].[pinnacleID]
+            )
+        )
+    | _ -> None
+let getClosingOdds2 (value:JsonValue) =
+    let oddsData = value?d?oddsdata?back
+    match oddsData with
+    | JsonValue.Record data ->
+        data |> Array.tryPick (fun (_, value) ->
+            getFloatOutcomes2 value?odds.[pinnacleID]
+        )
+    | _ -> None
+let getStartingClosingOdds2 (value:JsonValue) =
+    let starting = getStartingOdds2 value
+    let closing = getClosingOdds2 value
+    match starting, closing with
+    | Some (s1, s2), Some (c1, c2) ->
+        Some [|{
+            Value = None;
+            Odds = {
+                Starting = X2 { O1 = s1; O2 = s2 };
+                Closing = X2 { O1 = c1; O2 = c2 }
+            }
+        }|]
+    | _ -> None
+
+let getOverUnderOdds value =
+    let history = value?d?history?back
+    let oddsData = value?d?oddsdata?back
+    match oddsData with
+    | JsonValue.Record data ->
+        data
+        |> Array.choose (fun (_, value) ->
+            let handicap = value?handicapValue
+            let starting =
+                getStringOutcomes2 value?OutcomeID |>> (fun (o1, o2) ->
+                    extractStartingOdds history.[o1].[pinnacleID], extractStartingOdds history.[o2].[pinnacleID]
+            )
+            let closing = 
+                match value?odds with
+                | JsonValue.Record books ->
+                    books |> Array.tryFind (fun (key, _) -> key = pinnacleID)
+                    ||> (fun (_, value) ->
+                        match value with
+                        | JsonValue.Array [|o; u|] -> Some (asFloat o, asFloat u)
+                        | _ -> None
+                    )
+                | _ -> None
+            match starting, closing with
+            | Some (so1, so2), Some (co1, co2) ->
+                Some (asFloat handicap, (so1, so2), (co1, co2))
+            | _ -> None
+        )
+        |> Array.sortBy (fun (handicap, _, _) -> handicap)
+        |> Array.map (fun (handicap, (s1, s2), (c1, c2)) -> {
+                Value = Some handicap;
+                Odds = {
+                    Starting = X2 { O1 = s1; O2 = s2 };
+                    Closing = X2 { O1 = c1; O2 = c2 }
+                }
             }
         )
-    )
-let getStartingClosingOdds2 (historyData:JsonValue) pinnacleOdds outcomeID =
-    getStringOutcomes2 outcomeID ||> (fun (homeId, awayId) ->
-        let pinnacleHistory0, pinnacleHistory1 =
-            historyData.[homeId].[pinnacleID], historyData.[awayId].[pinnacleID]
-            
-        getFloatOutcomes2 pinnacleOdds |>> (fun (homeOddsClosing, awayOddsClosing) ->
-            let extractStartingOdds (history:JsonValue) =
-                let start = history.AsArray() |> Array.head
-                let odds = start.AsArray() |> Array.head
-                asFloat odds
-            let homeOddsStarting, awayOddsStarting =
-                extractStartingOdds pinnacleHistory0, extractStartingOdds pinnacleHistory1
-            {
-                Starting = X2 { Home = homeOddsStarting; Away = awayOddsStarting };
-                Closing = X2 { Home = homeOddsClosing; Away = awayOddsClosing }
-            }
-        )
+        |> Some
+    | _ -> None
+let parseFootballMatchResponseNew outID id content =
+    let json = extractDataFromResponse id content |> Option.map JsonValue.Parse
+    json ||> (fun value ->
+        if outID = outOverUnderID then getOverUnderOdds value
+        else if outID = outHomeAwayID then getStartingClosingOdds2 value
+        //else if outID = out1x2ID then
+        //    let oddsData = value?d?oddsdata?back.["E-" + outID + "-" + hzID + "-0-0-0"]
+        //    let historyData, pinnacleOdds, outcomeID = value?d?history?back, oddsData?odds.[pinnacleID], oddsData?OutcomeID
+        //    getStartingClosingOdds3 historyData pinnacleOdds outcomeID
+        else None
     )
 
 let parseFootballMatchResponse (outID, hzID) id content =
@@ -216,8 +283,8 @@ let parseFootballMatchResponse (outID, hzID) id content =
         let oddsData = value?d?oddsdata?back.["E-" + outID + "-" + hzID + "-0-0-0"]
         let historyData, pinnacleOdds, outcomeID = value?d?history?back, oddsData?odds.[pinnacleID], oddsData?OutcomeID
         match outID with
-        | "1" -> getStartingClosingOdds3 historyData pinnacleOdds outcomeID
-        | "3" -> getStartingClosingOdds2 historyData pinnacleOdds outcomeID
+        //| "1" -> getStartingClosingOdds3 historyData pinnacleOdds outcomeID
+        //| "3" -> getStartingClosingOdds2 historyData pinnacleOdds outcomeID
         | _ -> None
     )
 
@@ -266,15 +333,19 @@ let extractMatches (document:HtmlDocument) =
         xeid |><| matchUrl
     )
 
-let extractOdds (sportID, outID, hzID) (matchID, matchRelativeUrl) =
+let extractOdds (sportID, outIDs, hzID) (matchID, matchRelativeUrl) =
     let matchUrl = "http://www.oddsportal.com/" + matchRelativeUrl
     let xhash = parseMainMatchPage matchUrl
-    xhash ||> (fun (hash, (score1, score2)) ->
-        let matchData = "/feed/match/1-" + sportID + "-" + matchID + "-" + outID + "-" + hzID + "-" + hash + ".dat"
-        let matchDataUrl = "https://fb.oddsportal.com" + matchData + "?_=" + fromUnixTimestamp()
-        let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" "https://www.oddsportal.com/"
-        let pinnacleOdds = parseFootballMatchResponse (outID, hzID) matchData matchContent
-        pinnacleOdds |>> (fun odds -> { ID = matchID; Url = matchUrl; Score = { Home = score1; Away = score2 }; Odds = odds })
+    xhash |>> (fun (hash, (score1, score2)) ->
+        let odds =
+            outIDs |> List.choose (fun outID ->
+                let matchData = "/feed/match/1-" + sportID + "-" + matchID + "-" + outID + "-" + hzID + "-" + hash + ".dat"
+                let matchDataUrl = "https://fb.oddsportal.com" + matchData + "?_=" + fromUnixTimestamp()
+                let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" "https://www.oddsportal.com/"
+                let odds = parseFootballMatchResponseNew outID matchData matchContent
+                odds |>> (fun values -> { OutcomeID = outID; Values = values })
+            ) |> List.toArray
+        { ID = matchID; Url = matchUrl; Score = { Home = score1; Away = score2 }; Odds = odds }
     )
 
 type MatchResult = Home | Draw | Away
@@ -282,14 +353,14 @@ let getMatchResult ({ Home = home; Away = away }:MatchScore) =
     if home > away then Home else if home = away then Draw else Away
 
 let getProbabilities = function
-    | X3 { Home = home; Draw = draw; Away = away } ->
-        let homeProb, drawProb, awayProb = 1.f / home, 1.f / draw, 1.f / away
-        let sumProb = homeProb + drawProb + awayProb
-        homeProb / sumProb
-    | X2 { Home = home; Away = away } ->
-        let homeProb, awayProb = 1.f / home, 1.f / away
-        let sumProb = homeProb + awayProb
-        homeProb / sumProb
+    | X3 { O1 = o1; O0 = o0; O2 = o2 } ->
+        let o1Prob, o0Prob, o2Prob = 1.f / o1, 1.f / o0, 1.f / o2
+        let sumProb = o1Prob + o0Prob + o2Prob
+        o1Prob / sumProb
+    | X2 { O1 = o1; O2 = o2 } ->
+        let o1Prob, o2Prob = 1.f / o1, 1.f / o2
+        let sumProb = o1Prob + o2Prob
+        o1Prob / sumProb
 let checkEffectiveMarketHypothese fileNames =
     let matches =
         fileNames
@@ -300,22 +371,34 @@ let checkEffectiveMarketHypothese fileNames =
         |> Array.concat
     printfn "Count %d" matches.Length
 
-    let mutable startingHomeSum = 0.f
-    let mutable closingHomeSum = 0.f
-    let mutable realHomeSum = 0.f
+    let mutable startingO1Sum = 0.f
+    let mutable closingO1Sum = 0.f
     for m in matches do
         //printfn "%A" m
-        let { Starting = starting; Closing = closing } = m.Odds
-        let result = getMatchResult m.Score
-        let realHome = if result = Home then 1.f else 0.f
-        let startingHomeProb = getProbabilities starting
-        let closingHomeProb = getProbabilities closing
-        realHomeSum <- realHomeSum + realHome
-        startingHomeSum <- startingHomeSum + startingHomeProb
-        closingHomeSum <- closingHomeSum + closingHomeProb
-        //printfn "Starting %f, Closing %f, Real %f" startingHomeProb closingHomeProb realHome
-        printfn "StartingSum %f, ClosingSum %f" (realHomeSum - startingHomeSum) (realHomeSum - closingHomeSum)
-        printfn ""
+        let odds = m.Odds |> Array.tryFind (fun out -> out.OutcomeID = outOverUnderID)
+        odds |>> (fun odd ->
+            let min =
+                odd.Values
+                |> Array.rev
+                |> Array.filter (fun value -> value.Value.IsSome)
+                |> Array.head
+            match min with
+            | { Value = Some value; Odds = { Starting = X2 { O1 = s1; O2 = s2 }; Closing = X2 { O1 = c1; O2 = c2 } } } ->
+                printfn "Score (%A:%A) Value %A Starting %A Closing %A" m.Score.Home m.Score.Away value s2 c2
+                let result = m.Score.Home + m.Score.Away |> float32
+                let getMoney o =
+                    if result < value then o - 1.f
+                    else if result = value then 0.f
+                    else -1.f
+                //let startingO1Prob = getProbabilities starting
+                //let closingO1Prob = getProbabilities closing
+                startingO1Sum <- startingO1Sum + (getMoney s2)
+                closingO1Sum <- closingO1Sum + (getMoney c2)
+                //printfn "Starting %f, Closing %f, Real %f" startingO1Prob closingO1Prob realO1
+                printfn "StartingSum %f, ClosingSum %f" startingO1Sum closingO1Sum
+                printfn ""
+            | _ -> ()
+        ) |> ignore
 
 // ("jytwvQhq", 5, "RFL1819.json"), ("hdM4QuuS", 5, "RFL1718.json"), ("dSBJYVTs", 5, "RFL1617.json"),
 // ("GQkWIAQ7", 5, "RFL1516.json"), ("Kh7n2gWp", 5, "RFL1415.json"), ("ITC1yoVJ", 5, "RFL1314.json")
@@ -325,7 +408,7 @@ let checkEffectiveMarketHypothese fileNames =
 // ("Uanezsbs", 30, "MLB19.json"), ("r3414Mwe", 58, "MLB18.json"), ("bwFloypH", 58, "MLB17.json"), ("67blnzDc", 57, "MLB16.json"), ("QgQMkPOM", 57, "MLB15.json"), ("Y9I8VpDI", 57, "MLB14.json")
 
 
-let fetchLeagueDataAndSaveToFile sportID outID (leagueID, pageCount, fileName) =
+let fetchLeagueDataAndSaveToFile sportID outIDs (leagueID, pageCount, fileName) =
     let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + sportID + "/" + leagueID + "/X0/1/0/"
     let matches =
         [1..pageCount]
@@ -338,7 +421,9 @@ let fetchLeagueDataAndSaveToFile sportID outID (leagueID, pageCount, fileName) =
                 let html = value?d?html.AsString()
                 let document = HtmlDocument()
                 document.LoadHtml(html)
-                extractMatches document |> List.map (extractOdds (sportID, outID, "1"))
+                let matches = extractMatches document
+                let odds = matches |> List.map (extractOdds (sportID, outIDs, "1"))
+                odds
             ) |> defArg []
         )
         |> List.concat |> List.choose id |> List.toArray
@@ -347,7 +432,94 @@ let fetchLeagueDataAndSaveToFile sportID outID (leagueID, pageCount, fileName) =
 
 [<EntryPoint>]
 let main argv =
-    fetchLeagueDataAndSaveToFile baseballID outOverUnderID ("Y9I8VpDI", 57, "MLB14.json")
-    //checkEffectiveMarketHypothese ["MLB19.json";"MLB18.json";"MLB17.json";"MLB16.json";"MLB15.json";"MLB14.json"]
+    //fetchLeagueDataAndSaveToFile baseballID [outHomeAwayID; outOverUnderID] ("bwFloypH", 58, "MLB17.json")
+    //checkEffectiveMarketHypothese ["MLB18.json";"MLB17.json"]
+    //let network = new DeepBeliefNetwork(new BernoulliFunction(), 1024, 50, 10);
+    //let weights = new GaussianWeights(network)
+    //weights.Randomize()
+    //network.UpdateVisibleWeights()
 
+    //let teacher = new BackPropagationLearning(network, LearningRate = 0.1, Momentum = 0.9)
+    //double[][] inputs, outputs;
+    //Main.Database.Training.GetInstances(out inputs, out outputs);
+    //[0..49]
+    //|> List.iter (fun i ->
+    //    let error = teacher.RunEpoch(inputs, outputs)
+    //    printfn "%f" error
+    //)
+
+
+    let inputs, outputs =
+        [|"MLBF18.json";"MLBF17.json"|]
+        |> Array.map (fun fileName ->
+            let leagueData = Compact.deserializeFile<LeagueData> fileName
+            leagueData.Matches
+        )
+        |> Array.concat
+        |> Array.choose (fun m ->
+            m.Odds
+            |> Array.tryFind (fun o -> o.OutcomeID = outHomeAwayID)
+            ||> (fun odds ->
+                match odds.Values with
+                | [| { Value = None; Odds = { Starting = starting; Closing = closing } }|] ->
+                    let result = getMatchResult m.Score
+                    let realHome = if result = Home then 1 else 0
+                    let startingHomeProb = getProbabilities starting
+                    let closingHomeProb = getProbabilities closing
+                    let homeProbDiff = (closingHomeProb - startingHomeProb) / startingHomeProb
+                    //printfn "%f %f %d" startingHomeProb homeProbDiff realHome
+                    if startingHomeProb < 0.1f then None
+                    else Some([|double(closingHomeProb); double(homeProbDiff)|], realHome)
+                | _ -> None
+            )
+        ) |> Array.unzip
+        //|> Array.groupBy (fun (prob, _) -> prob)
+        //|> Array.sortBy (fun (prob, _) -> prob)
+        //|> Array.filter (fun (_, arr) -> (Array.length arr) >= 5)
+        //|> Array.map (fun (prob, arr) -> (prob, arr |> Array.map (fun (_, r) -> r) |> Array.average))
+        //|> Array.map (fun (prob, real) -> [|double(prob); double(real)|])
+    ScatterplotBox.Show("MLB", inputs, outputs).SetSymbolSize(2.f).Hold();
+
+
+    let matches =
+        [|"MLBF18.json";"MLBF17.json"|]
+        |> Array.map (fun fileName ->
+            let leagueData = Compact.deserializeFile<LeagueData> fileName
+            leagueData.Matches
+        ) |> Array.concat
+
+    let mutable startingO1Sum = 0.f
+    let mutable closingO1Sum = 0.f
+    let mutable count = 0
+    for m in matches do
+        //printfn "%A" m
+        m.Odds
+        |> Array.tryFind (fun out -> out.OutcomeID = outHomeAwayID)
+        |>> (fun odd ->
+            match odd.Values with
+            | [|{ Value = None;
+                  Odds = { Starting = X2 { O1 = s1; O2 = s2 } as starting;
+                           Closing = X2 { O1 = c1; O2 = c2 } as closing } }|] ->
+                let startingO1Prob = getProbabilities starting
+                let closingO1Prob = getProbabilities closing
+                if closingO1Prob >= 0.35f then ()
+                else if closingO1Prob > 0.3f then
+                    printfn "Score (%A:%A) Starting %A Closing %A" m.Score.Home m.Score.Away s2 c2
+                    let result = getMatchResult m.Score
+                    let getMoney r o = if result = r then o - 1.f else -1.f
+                    startingO1Sum <- startingO1Sum + (getMoney Home s1)
+                    closingO1Sum <- closingO1Sum + (getMoney Home c1)
+                    count <- count + 1
+                    printfn "StartingSum %f, ClosingSum %f" startingO1Sum closingO1Sum
+                else
+                    printfn "Score (%A:%A) Starting %A Closing %A" m.Score.Home m.Score.Away s2 c2
+                    let result = getMatchResult m.Score
+                    let getMoney r o = if result = r then o - 1.f else -1.f
+                    startingO1Sum <- startingO1Sum + (getMoney Away s2)
+                    closingO1Sum <- closingO1Sum + (getMoney Away c2)
+                    count <- count + 1
+                    printfn "StartingSum %f, ClosingSum %f" startingO1Sum closingO1Sum
+            | _ -> ()
+        ) |> ignore
+    printfn "All %d Bet %d" matches.Length count
     0
