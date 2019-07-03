@@ -461,7 +461,6 @@ let main argv =
     //    printfn "%f" error
     //)
 
-
     //let inputs, outputs =
     //    [|"MLBF18.json";"MLBF17.json"|]
     //    |> Array.map (fun fileName ->
@@ -492,7 +491,6 @@ let main argv =
     //    //|> Array.map (fun (prob, arr) -> (prob, arr |> Array.map (fun (_, r) -> r) |> Array.average))
     //    //|> Array.map (fun (prob, real) -> [|double(prob); double(real)|])
     //ScatterplotBox.Show("MLB", inputs, outputs).SetSymbolSize(2.f).Hold();
-
 
     let matches =
         [|"MLBF18.json";"MLBF17.json"|]
