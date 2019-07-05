@@ -216,6 +216,7 @@ let fetchLeagueDataAndSaveToFile sportID outIDs (leagueID, pageCount, fileName) 
     let matches =
         [1..pageCount]
         |> List.map (fun pageNum ->
+            Console.WriteLine(pageNum)
             let leagueRelativeUrlNum = leagueRelativeUrl + pageNum.ToString() + "/"
             let url = "https://fb.oddsportal.com" + leagueRelativeUrlNum + "?_=" + fromUnixTimestamp()
             let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/"
