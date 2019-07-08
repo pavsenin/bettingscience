@@ -2,5 +2,5 @@
 
 [<EntryPoint>]
 let main argv = 
-    Analytics.check "MLB18.json"
+    Analytics.check "MLB17.json"
     0
