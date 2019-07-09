@@ -10,9 +10,8 @@ open System.Net
 
 let oddsportalHost = "www.oddsportal.com"
 
-let soccerID = "1"
-let baseballID = "6"
-let esportsID = "36"
+let soccerID = "1", "2"
+let baseballID = "6", "1"
 
 let out1x2ID = "1"
 let outOverUnderID = "2"
@@ -54,12 +53,22 @@ let getStarting2 (history:JsonValue) (value:JsonValue) =
         let s2 = extractStartingOdds history.[o2]
         merge2 s1 s2
     )
-let getClosing2 (value:JsonValue) =
+let getStarting3 (history:JsonValue) (value:JsonValue) =
+    let outcomes = getStringOutcomes3 value?OutcomeID
+    outcomes ||> (fun (o1, o0, o2) ->
+        let s1 = extractStartingOdds history.[o1]
+        let s0 = extractStartingOdds history.[o0]
+        let s2 = extractStartingOdds history.[o2]
+        merge3 s1 s0 s2
+    )
+let getClosing getOutcomes (value:JsonValue) =
     match value?odds with
     | JsonValue.Record books ->
         let book = books |> Array.tryFind (fun (key, _) -> key = pinnacleID)
-        book ||> (fun (_, value) -> getFloatOutcomes2 value)
+        book ||> (fun (_, value) -> getOutcomes value)
     | _ -> None
+let getClosing2 = getClosing getFloatOutcomes2
+let getClosing3 = getClosing getFloatOutcomes3
 let getHomeAwayOdds (value:JsonValue) =
     let starting =
         let oddsData = value?d?oddsdata?back
@@ -81,6 +90,31 @@ let getHomeAwayOdds (value:JsonValue) =
             Odds = {
                 Starting = X2 { O1 = s1; O2 = s2 };
                 Closing = X2 { O1 = c1; O2 = c2 }
+            }
+        }|]
+    | _ -> None
+
+let get1x2Odds (value:JsonValue) =
+    let starting =
+        let oddsData = value?d?oddsdata?back
+        let history = value?d?history?back
+        match oddsData with
+        | JsonValue.Record data ->
+            data |> Array.tryPick (fun (_, value) -> getStarting3 history value)
+        | _ -> None
+    let closing =
+        let oddsData = value?d?oddsdata?back
+        match oddsData with
+        | JsonValue.Record data ->
+            data |> Array.tryPick (fun (_, value) -> getClosing3 value)
+        | _ -> None
+    match starting, closing with
+    | Some (s1, s0, s2), Some (c1, c0, c2) ->
+        Some [|{
+            Value = None;
+            Odds = {
+                Starting = X3 { O1 = s1; O0 = s0; O2 = s2 };
+                Closing = X3 { O1 = c1; O0 = c0; O2 = c2 }
             }
         }|]
     | _ -> None
@@ -127,6 +161,7 @@ let parseMatchResponse outID id content =
         if outID = outOverUnderID then getHandicapOdds value
         else if outID = outAsianHandicapID then getHandicapOdds value
         else if outID = outHomeAwayID then getHomeAwayOdds value
+        else if outID = out1x2ID then get1x2Odds value
         else None
     )
 
@@ -191,9 +226,9 @@ let extractMatches (document:HtmlDocument) =
         | _ -> None
     document.DocumentNode.SelectNodes("/table/tbody/tr") |> List.ofSeq |> List.choose getMatchData
 
-let extractMatchOdds (sportID, outIDs) (matchID, matchRelativeUrl) =
+let extractMatchOdds (sportID, dataID) outIDs (matchID, matchRelativeUrl) =
     let getOddsData hash outID =
-        let matchData = "/feed/match/1-" + sportID + "-" + matchID + "-" + outID + "-1-" + hash + ".dat"
+        let matchData = "/feed/match/1-" + sportID + "-" + matchID + "-" + outID + "-" + dataID + "-" + hash + ".dat"
         let matchDataUrl = "https://fb.oddsportal.com" + matchData + "?_=" + fromUnixTimestamp()
         let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" "https://www.oddsportal.com/"
         let odds = parseMatchResponse outID matchData matchContent
@@ -205,14 +240,14 @@ let extractMatchOdds (sportID, outIDs) (matchID, matchRelativeUrl) =
     let xhash = parseMainMatchPage matchUrl
     xhash |>> getMatchData matchUrl
 
-let fetchLeagueDataAndSaveToFile sportID outIDs (leagueID, pageCount, fileName) =
+let fetchLeagueDataAndSaveToFile (sportID, dataID) outIDs (leagueID, pageCount, fileName) =
     let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + sportID + "/" + leagueID + "/X0/1/0/"
     let fetchOdds (json:JsonValue) =
         let html = json?d?html.AsString()
         let document = HtmlDocument()
         document.LoadHtml(html)
         let matches = extractMatches document
-        matches |> List.map (extractMatchOdds (sportID, outIDs))
+        matches |> List.map (extractMatchOdds (sportID, dataID) outIDs)
     let matches =
         [1..pageCount]
         |> List.map (fun pageNum ->
