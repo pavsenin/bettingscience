@@ -45,10 +45,16 @@ type MatchData = {
     ID : string
     [<JsonProperty(PropertyName = "url")>]
     Url : string
+    [<JsonProperty(PropertyName = "teamHome")>]
+    TeamHome : string
+    [<JsonProperty(PropertyName = "teamAway")>]
+    TeamAway : string
     [<JsonProperty(PropertyName = "time")>]
     Time : int
     [<JsonProperty(PropertyName = "score")>]
     Score:MatchScore
+    [<JsonProperty(PropertyName = "periods")>]
+    Periods:MatchScore array
     [<JsonProperty(PropertyName = "odds")>]
     Odds:MatchOutcomes array
 }

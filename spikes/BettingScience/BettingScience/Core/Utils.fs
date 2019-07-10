@@ -8,6 +8,11 @@ let defArg defaultValue arg = defaultArg arg defaultValue
 let (|>>) v f = try v |> Option.map f with | _ -> None
 let (||>) v f = try v |> Option.bind f with | _ -> None
 
+let toInt value =
+    match Int32.TryParse value with
+    | true, v -> v
+    | false, _ -> -1
+
 let merge2 x1 x2 =
     match x1, x2 with
     | Some v1, Some v2 -> Some (v1, v2)
@@ -33,5 +38,6 @@ let fetchContent (url:string) host referer =
 
 let asString (value:JsonValue) = value.AsString()
 let asFloat (value:JsonValue) = float32(value.AsFloat())
+
 let getAttribute (node:HtmlNode) func =
     node.Attributes |> List.ofSeq |> List.tryFind func

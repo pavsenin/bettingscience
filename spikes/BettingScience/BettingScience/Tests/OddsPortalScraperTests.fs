@@ -14,8 +14,14 @@ type InternetTests() =
             Some {
                 ID = "Of9rIjv8";
                 Url = "http://www.oddsportal.com/baseball/usa/mlb-2018/cincinnati-reds-pittsburgh-pirates-Of9rIjv8/";
+                TeamHome = "Cincinnati Reds";
+                TeamAway = "Pittsburgh Pirates";
                 Time = 1538334600;
                 Score = { Home = 5; Away = 6 };
+                Periods = [|
+                    { Home = 1; Away = 0 }; { Home = 2; Away = 0 }; { Home = 0; Away = 0 }; { Home = 0; Away = 0 }; { Home = 1; Away = 2 };
+                    { Home = 1; Away = 2 }; { Home = 0; Away = 1 }; { Home = 0; Away = 0 }; { Home = 0; Away = 0 }; { Home = 0; Away = 1 }
+                |]
                 Odds = [|
                     { OutcomeID = "3";
                     Values = [|{ Value = None; Odds = { Starting = X2 {O1 = 1.78f; O2 = 2.18f}; Closing = X2 {O1 = 1.81f; O2 = 2.14f}} } |]};
@@ -49,8 +55,11 @@ type InternetTests() =
             Some {
                 ID = "6mrwJVoQ";
                 Url = "http://www.oddsportal.com/soccer/russia/premier-league-2018-2019/dynamo-moscow-arsenal-tula-6mrwJVoQ/";
+                TeamHome = "Dynamo Moscow";
+                TeamAway = "Arsenal Tula";
                 Time = 1558868400;
                 Score = { Home = 3; Away = 3 };
+                Periods = [| { Home = 2; Away = 1 }; { Home = 1; Away = 2 } |]
                 Odds = [|
                     { OutcomeID = "1";
                     Values = [| { Value = None; Odds = {Starting = X3 {O1 = 2.19f; O0 = 3.32f; O2 = 3.41f }; Closing = X3 {O1 = 1.74f; O0 = 3.73f; O2 = 5.17f } } }|] };
