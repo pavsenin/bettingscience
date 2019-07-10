@@ -45,7 +45,6 @@ let extractStartingOdds (history:JsonValue) =
             asFloat odds
         )
     | _ -> None
-
 let getStarting2 (history:JsonValue) (value:JsonValue) =
     let outcomes = getStringOutcomes2 value?OutcomeID
     outcomes ||> (fun (o1, o2) ->
@@ -69,6 +68,7 @@ let getClosing getOutcomes (value:JsonValue) =
     | _ -> None
 let getClosing2 = getClosing getFloatOutcomes2
 let getClosing3 = getClosing getFloatOutcomes3
+
 let getHomeAwayOdds (value:JsonValue) =
     let starting =
         let oddsData = value?d?oddsdata?back
@@ -93,7 +93,6 @@ let getHomeAwayOdds (value:JsonValue) =
             }
         }|]
     | _ -> None
-
 let get1x2Odds (value:JsonValue) =
     let starting =
         let oddsData = value?d?oddsdata?back
@@ -118,7 +117,6 @@ let get1x2Odds (value:JsonValue) =
             }
         }|]
     | _ -> None
-
 let getHandicapOdds value =
     let history = value?d?history?back
     let oddsData = value?d?oddsdata?back
@@ -154,7 +152,6 @@ let extractJsonFromResponse filePath (response:string) =
         Some json
     else
         None
-
 let parseMatchResponse outID id content =
     let json = extractJsonFromResponse id content
     json ||> (fun value ->
@@ -164,7 +161,6 @@ let parseMatchResponse outID id content =
         else if outID = out1x2ID then get1x2Odds value
         else None
     )
-
 let parseMainMatchPage url =
     let extractXHashKey (text:string) =
         let endText = "\",\""
@@ -210,7 +206,6 @@ let parseMainMatchPage url =
     match xhash, score, time with
     | Some x1, Some x2, Some x3 -> Some (x1, x2, x3)
     | _ -> None
-
 let extractMatches (document:HtmlDocument) =
     let getMatchUrl node =
         getAttribute node (fun attr -> attr.Name = "class" && attr.Value = "name table-participant") |>> (fun _ ->
@@ -225,12 +220,11 @@ let extractMatches (document:HtmlDocument) =
         | Some v1, Some v2 -> Some (v1, v2)
         | _ -> None
     document.DocumentNode.SelectNodes("/table/tbody/tr") |> List.ofSeq |> List.choose getMatchData
-
 let extractMatchOdds (sportID, dataID) outIDs (matchID, matchRelativeUrl) =
     let getOddsData hash outID =
         let matchData = "/feed/match/1-" + sportID + "-" + matchID + "-" + outID + "-" + dataID + "-" + hash + ".dat"
         let matchDataUrl = "https://fb.oddsportal.com" + matchData + "?_=" + fromUnixTimestamp()
-        let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" "https://www.oddsportal.com/"
+        let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" oddsportalHost
         let odds = parseMatchResponse outID matchData matchContent
         odds |>> (fun values -> { OutcomeID = outID; Values = values })
     let getMatchData matchUrl (hash, (score1, score2), time) =
@@ -240,25 +234,24 @@ let extractMatchOdds (sportID, dataID) outIDs (matchID, matchRelativeUrl) =
     let xhash = parseMainMatchPage matchUrl
     xhash |>> getMatchData matchUrl
 
+let extractLeagueMatches (json:JsonValue) =
+    let html = json?d?html.AsString()
+    let document = HtmlDocument()
+    document.LoadHtml(html)
+    extractMatches document
+let fetchLeagueMatches leagueRelativeUrl pageNum =
+    let leagueRelativeUrlNum = leagueRelativeUrl + pageNum.ToString() + "/"
+    let url = "https://fb.oddsportal.com" + leagueRelativeUrlNum + "?_=" + fromUnixTimestamp()
+    let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/"
+    let json = extractJsonFromResponse leagueRelativeUrlNum content
+    json |>> extractLeagueMatches |> defArg []
 let fetchLeagueDataAndSaveToFile (sportID, dataID) outIDs (leagueID, pageCount, fileName) =
     let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + sportID + "/" + leagueID + "/X0/1/0/"
-    let fetchOdds (json:JsonValue) =
-        let html = json?d?html.AsString()
-        let document = HtmlDocument()
-        document.LoadHtml(html)
-        let matches = extractMatches document
-        matches |> List.map (extractMatchOdds (sportID, dataID) outIDs)
     let matches =
         [1..pageCount]
-        |> List.map (fun pageNum ->
-            Console.WriteLine(pageNum)
-            let leagueRelativeUrlNum = leagueRelativeUrl + pageNum.ToString() + "/"
-            let url = "https://fb.oddsportal.com" + leagueRelativeUrlNum + "?_=" + fromUnixTimestamp()
-            let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/"
-            let json = extractJsonFromResponse leagueRelativeUrlNum content
-            json |>> fetchOdds |> defArg []
-        )
-        |> List.concat |> List.choose id |> List.toArray
-    let leagueData = { ID = leagueID; Matches = matches }
+        |> List.map (fun pageNum -> fetchLeagueMatches leagueRelativeUrl pageNum)
+        |> List.concat
+    let matchesOdds = matches |> List.map (extractMatchOdds (sportID, dataID) outIDs) |> List.choose id |> List.toArray
+    let leagueData = { ID = leagueID; Matches = matchesOdds }
     Compact.serializeToFile fileName leagueData
 
