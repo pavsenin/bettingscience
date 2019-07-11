@@ -12,6 +12,7 @@ let oddsportalHost = "www.oddsportal.com"
 
 let soccerID = "1", "2"
 let baseballID = "6", "1"
+let basketballID = "3", "1"
 
 let out1x2ID = "1"
 let outOverUnderID = "2"
