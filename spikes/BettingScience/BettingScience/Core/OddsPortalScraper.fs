@@ -196,13 +196,13 @@ let parseMainMatchPage url =
             let index1, index2 = node.InnerText.IndexOf("(") + 1, node.InnerText.IndexOf(")")
             let data = node.InnerText.Substring(index1, index2 - index1)
             match data.Split(',') with
+            | [||] -> None
             | array ->
                 array |> Array.map (fun p ->
                     match p.Split(':') with
                     | [|x1; x2|] -> toInt x1, toInt x2
                     | _ -> -1, -1)
                 |> Some
-            | _ -> None
         else
             None
     let time =

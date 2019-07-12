@@ -362,5 +362,117 @@ type InternetTests() =
                     |]}
                 |]}
         Assert.That(actual, Is.EqualTo(expected))
+    [<Test>]
+    member this.ScrapBasketNBA1819League() =
+        let leagueID, pageCount = ("C2416Q6r", 2)
+        let (sportID, _) = basketballID
+        let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + sportID + "/" + leagueID + "/X0/1/0/"
+        let actual =
+            [1..pageCount]
+            |> List.map (fun pageNum -> fetchLeagueMatches leagueRelativeUrl pageNum)
+            |> List.concat
+        let expected =
+            [
+                ("fFwk0uQp", "/basketball/usa/nba/golden-state-warriors-toronto-raptors-fFwk0uQp/");
+                ("ribDVziK", "/basketball/usa/nba/toronto-raptors-golden-state-warriors-ribDVziK/");
+                ("WY1z5noK", "/basketball/usa/nba/golden-state-warriors-toronto-raptors-WY1z5noK/");
+                ("IVcW5SVD", "/basketball/usa/nba/golden-state-warriors-toronto-raptors-IVcW5SVD/");
+                ("4S9lsqgD", "/basketball/usa/nba/toronto-raptors-golden-state-warriors-4S9lsqgD/");
+                ("QyBprPw7", "/basketball/usa/nba/toronto-raptors-golden-state-warriors-QyBprPw7/");
+                ("tpirxifr", "/basketball/usa/nba/toronto-raptors-milwaukee-bucks-tpirxifr/");
+                ("MBhD4Nl0", "/basketball/usa/nba/milwaukee-bucks-toronto-raptors-MBhD4Nl0/");
+                ("StchdiX2", "/basketball/usa/nba/toronto-raptors-milwaukee-bucks-StchdiX2/");
+                ("6XedeBn9", "/basketball/usa/nba/portland-trail-blazers-golden-state-warriors-6XedeBn9/");
+                ("0z56Ymud", "/basketball/usa/nba/toronto-raptors-milwaukee-bucks-0z56Ymud/");
+                ("vR3AX7f2", "/basketball/usa/nba/portland-trail-blazers-golden-state-warriors-vR3AX7f2/");
+                ("48BczAAq", "/basketball/usa/nba/milwaukee-bucks-toronto-raptors-48BczAAq/");
+                ("IBF1ZTPk", "/basketball/usa/nba/golden-state-warriors-portland-trail-blazers-IBF1ZTPk/");
+                ("8xQRuWnM", "/basketball/usa/nba/milwaukee-bucks-toronto-raptors-8xQRuWnM/");
+                ("nTOVvj2S", "/basketball/usa/nba/golden-state-warriors-portland-trail-blazers-nTOVvj2S/");
+                ("tAnyogRP", "/basketball/usa/nba/toronto-raptors-philadelphia-76ers-tAnyogRP/");
+                ("GrurspQi", "/basketball/usa/nba/denver-nuggets-portland-trail-blazers-GrurspQi/");
+                ("EksYeXdP", "/basketball/usa/nba/houston-rockets-golden-state-warriors-EksYeXdP/");
+                ("xdxkLeH0", "/basketball/usa/nba/portland-trail-blazers-denver-nuggets-xdxkLeH0/");
+                ("ALS5Pkik", "/basketball/usa/nba/philadelphia-76ers-toronto-raptors-ALS5Pkik/");
+                ("xUN0DL9g", "/basketball/usa/nba/golden-state-warriors-houston-rockets-xUN0DL9g/");
+                ("EXiz0L4g", "/basketball/usa/nba/milwaukee-bucks-boston-celtics-EXiz0L4g/");
+                ("UJvMlomH", "/basketball/usa/nba/denver-nuggets-portland-trail-blazers-UJvMlomH/");
+                ("j70egopo", "/basketball/usa/nba/toronto-raptors-philadelphia-76ers-j70egopo/");
+                ("IoOGA3gG", "/basketball/usa/nba/houston-rockets-golden-state-warriors-IoOGA3gG/");
+                ("GxxFyOkf", "/basketball/usa/nba/boston-celtics-milwaukee-bucks-GxxFyOkf/");
+                ("zy8bwRcN", "/basketball/usa/nba/portland-trail-blazers-denver-nuggets-zy8bwRcN/");
+                ("O2uNZ1K6", "/basketball/usa/nba/philadelphia-76ers-toronto-raptors-O2uNZ1K6/");
+                ("OOOCBqvA", "/basketball/usa/nba/houston-rockets-golden-state-warriors-OOOCBqvA/");
+                ("fPj1v7rH", "/basketball/usa/nba/portland-trail-blazers-denver-nuggets-fPj1v7rH/");
+                ("KAr6wpLs", "/basketball/usa/nba/boston-celtics-milwaukee-bucks-KAr6wpLs/");
+                ("AayJzr50", "/basketball/usa/nba/philadelphia-76ers-toronto-raptors-AayJzr50/");
+                ("GYicumTA", "/basketball/usa/nba/denver-nuggets-portland-trail-blazers-GYicumTA/");
+                ("ALK8CPO3", "/basketball/usa/nba/golden-state-warriors-houston-rockets-ALK8CPO3/");
+                ("Ovczq6cK", "/basketball/usa/nba/milwaukee-bucks-boston-celtics-Ovczq6cK/");
+                ("MBhgtTD4", "/basketball/usa/nba/denver-nuggets-portland-trail-blazers-MBhgtTD4/");
+                ("xnwBx4zl", "/basketball/usa/nba/toronto-raptors-philadelphia-76ers-xnwBx4zl/");
+                ("SdV3D59c", "/basketball/usa/nba/golden-state-warriors-houston-rockets-SdV3D59c/");
+                ("I7wJJkU8", "/basketball/usa/nba/milwaukee-bucks-boston-celtics-I7wJJkU8/");
+                ("vVcLS3hP", "/basketball/usa/nba/denver-nuggets-san-antonio-spurs-vVcLS3hP/");
+                ("I1dvrQCQ", "/basketball/usa/nba/toronto-raptors-philadelphia-76ers-I1dvrQCQ/");
+                ("ddgpi3ks", "/basketball/usa/nba/los-angeles-clippers-golden-state-warriors-ddgpi3ks/");
+                ("Y9dq1vE5", "/basketball/usa/nba/san-antonio-spurs-denver-nuggets-Y9dq1vE5/");
+                ("EFSqNLbr", "/basketball/usa/nba/golden-state-warriors-los-angeles-clippers-EFSqNLbr/");
+                ("b1yzcGW8", "/basketball/usa/nba/houston-rockets-utah-jazz-b1yzcGW8/");
+                ("Wl245nOJ", "/basketball/usa/nba/portland-trail-blazers-oklahoma-city-thunder-Wl245nOJ/");
+                ("niaaXe8T", "/basketball/usa/nba/denver-nuggets-san-antonio-spurs-niaaXe8T/");
+                ("WfHKen4E", "/basketball/usa/nba/philadelphia-76ers-brooklyn-nets-WfHKen4E/");
+                ("IB7ryv94", "/basketball/usa/nba/toronto-raptors-orlando-magic-IB7ryv94/");
+                ("65RBf5B1", "/basketball/usa/nba/utah-jazz-houston-rockets-65RBf5B1/");
+                ("bahS2T3L", "/basketball/usa/nba/detroit-pistons-milwaukee-bucks-bahS2T3L/");
+                ("pdQFgPQ7", "/basketball/usa/nba/oklahoma-city-thunder-portland-trail-blazers-pdQFgPQ7/");
+                ("C6Y2dRtk", "/basketball/usa/nba/orlando-magic-toronto-raptors-C6Y2dRtk/");
+                ("Otx7eode", "/basketball/usa/nba/los-angeles-clippers-golden-state-warriors-Otx7eode/");
+                ("GzmX1mJR", "/basketball/usa/nba/indiana-pacers-boston-celtics-GzmX1mJR/");
+                ("CrjG5VJ2", "/basketball/usa/nba/utah-jazz-houston-rockets-CrjG5VJ2/");
+                ("vkxglUlS", "/basketball/usa/nba/detroit-pistons-milwaukee-bucks-vkxglUlS/");
+                ("YBJcI838", "/basketball/usa/nba/san-antonio-spurs-denver-nuggets-YBJcI838/");
+                ("IqZbc7Rr", "/basketball/usa/nba/brooklyn-nets-philadelphia-76ers-IqZbc7Rr/");
+                ("QofK4kZ8", "/basketball/usa/nba/oklahoma-city-thunder-portland-trail-blazers-QofK4kZ8/");
+                ("pWELqlcq", "/basketball/usa/nba/indiana-pacers-boston-celtics-pWELqlcq/");
+                ("WnDTsSRe", "/basketball/usa/nba/orlando-magic-toronto-raptors-WnDTsSRe/");
+                ("AwCXtns2", "/basketball/usa/nba/los-angeles-clippers-golden-state-warriors-AwCXtns2/");
+                ("K8gO39lF", "/basketball/usa/nba/san-antonio-spurs-denver-nuggets-K8gO39lF/");
+                ("OMDPr8Ck", "/basketball/usa/nba/brooklyn-nets-philadelphia-76ers-OMDPr8Ck/");
+                ("hYZtiW49", "/basketball/usa/nba/houston-rockets-utah-jazz-hYZtiW49/");
+                ("2gprWUSq", "/basketball/usa/nba/milwaukee-bucks-detroit-pistons-2gprWUSq/");
+                ("pIZnVlrj", "/basketball/usa/nba/boston-celtics-indiana-pacers-pIZnVlrj/");
+                ("WOYpjjKF", "/basketball/usa/nba/portland-trail-blazers-oklahoma-city-thunder-WOYpjjKF/");
+                ("QoYlkAZL", "/basketball/usa/nba/denver-nuggets-san-antonio-spurs-QoYlkAZL/");
+                ("d6tYhhzc", "/basketball/usa/nba/toronto-raptors-orlando-magic-d6tYhhzc/");
+                ("zcuxhCk3", "/basketball/usa/nba/golden-state-warriors-los-angeles-clippers-zcuxhCk3/");
+                ("r3hjU8cd", "/basketball/usa/nba/philadelphia-76ers-brooklyn-nets-r3hjU8cd/");
+                ("I3J6kJT4", "/basketball/usa/nba/houston-rockets-utah-jazz-I3J6kJT4/");
+                ("QDYjYHbU", "/basketball/usa/nba/milwaukee-bucks-detroit-pistons-QDYjYHbU/");
+                ("dfIAlwqB", "/basketball/usa/nba/portland-trail-blazers-oklahoma-city-thunder-dfIAlwqB/");
+                ("lORkg1Uu", "/basketball/usa/nba/boston-celtics-indiana-pacers-lORkg1Uu/");
+                ("QTMEmcbH", "/basketball/usa/nba/denver-nuggets-san-antonio-spurs-QTMEmcbH/");
+                ("zuU1jaEb", "/basketball/usa/nba/golden-state-warriors-los-angeles-clippers-zuU1jaEb/");
+                ("MyQciuah", "/basketball/usa/nba/toronto-raptors-orlando-magic-MyQciuah/");
+                ("SEQghLqn", "/basketball/usa/nba/philadelphia-76ers-brooklyn-nets-SEQghLqn/");
+                ("G4MXYd6T", "/basketball/usa/nba/denver-nuggets-minnesota-timberwolves-G4MXYd6T/");
+                ("IJ3UZxiN", "/basketball/usa/nba/los-angeles-clippers-utah-jazz-IJ3UZxiN/");
+                ("zeEPzJyH", "/basketball/usa/nba/portland-trail-blazers-sacramento-kings-zeEPzJyH/");
+                ("d4FLyaMA", "/basketball/usa/nba/atlanta-hawks-indiana-pacers-d4FLyaMA/");
+                ("SUAHxu74", "/basketball/usa/nba/brooklyn-nets-miami-heat-SUAHxu74/");
+                ("lvCDwLib", "/basketball/usa/nba/charlotte-hornets-orlando-magic-lvCDwLib/");
+                ("v9UMGcpo", "/basketball/usa/nba/memphis-grizzlies-golden-state-warriors-v9UMGcpo/");
+                ("x0reLwxU", "/basketball/usa/nba/milwaukee-bucks-oklahoma-city-thunder-x0reLwxU/");
+                ("6FM8v1xh", "/basketball/usa/nba/new-york-knicks-detroit-pistons-6FM8v1xh/");
+                ("hCI4usNo", "/basketball/usa/nba/philadelphia-76ers-chicago-bulls-hCI4usNo/");
+                ("dlRcMJMN", "/basketball/usa/nba/san-antonio-spurs-dallas-mavericks-dlRcMJMN/");
+                ("IcSgNa7H", "/basketball/usa/nba/los-angeles-lakers-portland-trail-blazers-IcSgNa7H/");
+                ("OzTkOuhB", "/basketball/usa/nba/oklahoma-city-thunder-houston-rockets-OzTkOuhB/");
+                ("AXOoPLx5", "/basketball/usa/nba/utah-jazz-denver-nuggets-AXOoPLx5/");
+                ("S8ZtQ1Nb", "/basketball/usa/nba/dallas-mavericks-phoenix-suns-S8ZtQ1Nb/");
+                ("lIzwRs8h", "/basketball/usa/nba/chicago-bulls-new-york-knicks-lIzwRs8h/");
+                ("jo3t2ezG", "/basketball/usa/nba/minnesota-timberwolves-toronto-raptors-jo3t2ezG/");
+                ("KrWYRNhn", "/basketball/usa/nba/new-orleans-pelicans-golden-state-warriors-KrWYRNhn/")]
+        Assert.That(actual, Is.EqualTo(expected))
 
 
