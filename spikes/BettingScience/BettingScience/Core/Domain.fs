@@ -23,8 +23,8 @@ type Outcome3Odds = {
 }
 type OutcomeOdds = X2 of Outcome2Odds | X3 of Outcome3Odds
 type OddsData = {
-    [<JsonProperty(PropertyName = "starting")>]
-    Starting : OutcomeOdds
+    [<JsonProperty(PropertyName = "opening")>]
+    Opening : OutcomeOdds
     [<JsonProperty(PropertyName = "closing")>]
     Closing : OutcomeOdds
 }

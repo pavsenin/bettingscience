@@ -136,24 +136,24 @@ type InternetTests() =
                 |]
                 Odds = [|
                     { OutcomeID = "3";
-                    Values = [|{ Value = None; Odds = { Starting = X2 {O1 = 1.78f; O2 = 2.18f}; Closing = X2 {O1 = 1.81f; O2 = 2.14f}} } |]};
+                    Values = [|{ Value = None; Odds = { Opening = X2 {O1 = 1.78f; O2 = 2.18f}; Closing = X2 {O1 = 1.81f; O2 = 2.14f}} } |]};
                     { OutcomeID = "2";
                     Values =
                     [|
-                        { Value = Some 8.5f; Odds = {Starting = X2 {O1 = 1.61f; O2 = 2.45f}; Closing = X2 {O1 = 1.61f; O2 = 2.48f } } };
-                        { Value = Some 9.0f; Odds = {Starting = X2 {O1 = 1.73f; O2 = 2.20f;}; Closing = X2 {O1 = 1.75f; O2 = 2.21f } } };
-                        { Value = Some 9.5f; Odds = {Starting = X2 {O1 = 1.95f; O2 = 1.95f;}; Closing = X2 {O1 = 1.94f; O2 = 1.96f } } };
-                        { Value = Some 10.0f; Odds = {Starting = X2 {O1 = 2.11f; O2 = 1.79f;}; Closing = X2 {O1 = 2.12f; O2 = 1.81f } } };
-                        { Value = Some 10.5f; Odds = {Starting = X2 {O1 = 2.27f; O2 = 1.69f;}; Closing = X2 {O1 = 2.27f; O2 = 1.71f } } }
+                        { Value = Some 8.5f; Odds = {Opening = X2 {O1 = 1.61f; O2 = 2.45f}; Closing = X2 {O1 = 1.61f; O2 = 2.48f } } };
+                        { Value = Some 9.0f; Odds = {Opening = X2 {O1 = 1.73f; O2 = 2.20f;}; Closing = X2 {O1 = 1.75f; O2 = 2.21f } } };
+                        { Value = Some 9.5f; Odds = {Opening = X2 {O1 = 1.95f; O2 = 1.95f;}; Closing = X2 {O1 = 1.94f; O2 = 1.96f } } };
+                        { Value = Some 10.0f; Odds = {Opening = X2 {O1 = 2.11f; O2 = 1.79f;}; Closing = X2 {O1 = 2.12f; O2 = 1.81f } } };
+                        { Value = Some 10.5f; Odds = {Opening = X2 {O1 = 2.27f; O2 = 1.69f;}; Closing = X2 {O1 = 2.27f; O2 = 1.71f } } }
                     |]};
                     { OutcomeID = "5";
                     Values =
                     [|
-                        { Value = Some -2.5f; Odds = {Starting = X2 {O1 = 3.43f; O2 = 1.34f;}; Closing = X2 {O1 = 3.48f; O2 = 1.33f } } };
-                        { Value = Some -2.0f; Odds = {Starting = X2 {O1 = 3.12f; O2 = 1.40f;}; Closing = X2 {O1 = 3.17f; O2 = 1.39f } } };
-                        { Value = Some -1.5f; Odds = {Starting = X2 {O1 = 2.58f; O2 = 1.57f;}; Closing = X2 {O1 = 2.62f; O2 = 1.56f } } };
-                        { Value = Some -1.0f; Odds = {Starting = X2 {O1 = 2.12f; O2 = 1.79f;}; Closing = X2 {O1 = 2.17f; O2 = 1.76f } } };
-                        { Value = Some 1.5f; Odds = {Starting = X2 {O1 = 1.47f; O2 = 2.86f;}; Closing = X2 {O1 = 1.48f; O2 = 2.83f } } }
+                        { Value = Some -2.5f; Odds = {Opening = X2 {O1 = 3.43f; O2 = 1.34f;}; Closing = X2 {O1 = 3.48f; O2 = 1.33f } } };
+                        { Value = Some -2.0f; Odds = {Opening = X2 {O1 = 3.12f; O2 = 1.40f;}; Closing = X2 {O1 = 3.17f; O2 = 1.39f } } };
+                        { Value = Some -1.5f; Odds = {Opening = X2 {O1 = 2.58f; O2 = 1.57f;}; Closing = X2 {O1 = 2.62f; O2 = 1.56f } } };
+                        { Value = Some -1.0f; Odds = {Opening = X2 {O1 = 2.12f; O2 = 1.79f;}; Closing = X2 {O1 = 2.17f; O2 = 1.76f } } };
+                        { Value = Some 1.5f; Odds = {Opening = X2 {O1 = 1.47f; O2 = 2.86f;}; Closing = X2 {O1 = 1.48f; O2 = 2.83f } } }
                     |]}
                 |]}
         Assert.That(actual, Is.EqualTo(expected))
@@ -285,26 +285,26 @@ type InternetTests() =
                 Periods = [| { Home = 2; Away = 1 }; { Home = 1; Away = 2 } |]
                 Odds = [|
                     { OutcomeID = "1";
-                    Values = [| { Value = None; Odds = { Starting = X3 {O1 = 2.19f; O0 = 3.32f; O2 = 3.41f }; Closing = X3 {O1 = 1.74f; O0 = 3.73f; O2 = 5.17f } } }|] };
+                    Values = [| { Value = None; Odds = { Opening = X3 {O1 = 2.19f; O0 = 3.32f; O2 = 3.41f }; Closing = X3 {O1 = 1.74f; O0 = 3.73f; O2 = 5.17f } } }|] };
                     { OutcomeID = "2";
                     Values =
                     [|
-                        { Value = Some 1.75f; Odds = { Starting = X2 {O1 = 1.53f; O2 = 2.41f;}; Closing = X2 {O1 = 1.43f; O2 = 2.82f } } };
-                        { Value = Some 2.0f; Odds = { Starting = X2 {O1 = 1.75f; O2 = 2.07f;}; Closing = X2 {O1 = 1.58f; O2 = 2.42f } } };
-                        { Value = Some 2.25f; Odds = { Starting = X2 {O1 = 2.07f; O2 = 1.76f;}; Closing = X2 {O1 = 1.88f; O2 = 2.0f } } };
-                        { Value = Some 2.5f; Odds = { Starting = X2 {O1 = 2.35f; O2 = 1.56f;}; Closing = X2 {O1 = 2.15f; O2 = 1.75f } } };
-                        { Value = Some 2.75f; Odds = { Starting = X2 {O1 = 2.81f; O2 = 1.37f;}; Closing = X2 {O1 = 2.51f; O2 = 1.54f } } }
+                        { Value = Some 1.75f; Odds = { Opening = X2 {O1 = 1.53f; O2 = 2.41f;}; Closing = X2 {O1 = 1.43f; O2 = 2.82f } } };
+                        { Value = Some 2.0f; Odds = { Opening = X2 {O1 = 1.75f; O2 = 2.07f;}; Closing = X2 {O1 = 1.58f; O2 = 2.42f } } };
+                        { Value = Some 2.25f; Odds = { Opening = X2 {O1 = 2.07f; O2 = 1.76f;}; Closing = X2 {O1 = 1.88f; O2 = 2.0f } } };
+                        { Value = Some 2.5f; Odds = { Opening = X2 {O1 = 2.35f; O2 = 1.56f;}; Closing = X2 {O1 = 2.15f; O2 = 1.75f } } };
+                        { Value = Some 2.75f; Odds = { Opening = X2 {O1 = 2.81f; O2 = 1.37f;}; Closing = X2 {O1 = 2.51f; O2 = 1.54f } } }
                     |]};
                     { OutcomeID = "5";
                     Values =
                     [|
-                        { Value = Some -1.25f; Odds = { Starting = X2 {O1 = 3.06f; O2 = 1.38f;}; Closing = X2 {O1 = 2.94f; O2 = 1.41f } } };
-                        { Value = Some -1.0f; Odds = { Starting = X2 {O1 = 3.29f; O2 = 1.28f;}; Closing = X2 {O1 = 2.48f; O2 = 1.57f } } };
-                        { Value = Some -0.75f; Odds = { Starting = X2 {O1 = 2.62f; O2 = 1.46f;}; Closing = X2 {O1 = 1.99f; O2 = 1.91f } } };
-                        { Value = Some -0.5f; Odds = { Starting = X2 {O1 = 2.17f; O2 = 1.69f;}; Closing = X2 {O1 = 1.73f; O2 = 2.21f } } };
-                        { Value = Some -0.25f; Odds = { Starting = X2 {O1 = 1.88f; O2 = 1.96f;}; Closing = X2 {O1 = 1.49f; O2 = 2.69f } } };
-                        { Value = Some 0.0f; Odds = { Starting = X2 {O1 = 1.54f; O2 = 2.44f;}; Closing = X2 {O1 = 1.30f; O2 = 3.48f } } };
-                        { Value = Some 0.25f; Odds = { Starting = X2 {O1 = 1.37f; O2 = 2.88f;}; Closing = X2 {O1 = 1.34f; O2 = 2.99f } } }
+                        { Value = Some -1.25f; Odds = { Opening = X2 {O1 = 3.06f; O2 = 1.38f;}; Closing = X2 {O1 = 2.94f; O2 = 1.41f } } };
+                        { Value = Some -1.0f; Odds = { Opening = X2 {O1 = 3.29f; O2 = 1.28f;}; Closing = X2 {O1 = 2.48f; O2 = 1.57f } } };
+                        { Value = Some -0.75f; Odds = { Opening = X2 {O1 = 2.62f; O2 = 1.46f;}; Closing = X2 {O1 = 1.99f; O2 = 1.91f } } };
+                        { Value = Some -0.5f; Odds = { Opening = X2 {O1 = 2.17f; O2 = 1.69f;}; Closing = X2 {O1 = 1.73f; O2 = 2.21f } } };
+                        { Value = Some -0.25f; Odds = { Opening = X2 {O1 = 1.88f; O2 = 1.96f;}; Closing = X2 {O1 = 1.49f; O2 = 2.69f } } };
+                        { Value = Some 0.0f; Odds = { Opening = X2 {O1 = 1.54f; O2 = 2.44f;}; Closing = X2 {O1 = 1.30f; O2 = 3.48f } } };
+                        { Value = Some 0.25f; Odds = { Opening = X2 {O1 = 1.37f; O2 = 2.88f;}; Closing = X2 {O1 = 1.34f; O2 = 2.99f } } }
                     |]}
                 |]}
         Assert.That(actual, Is.EqualTo(expected))
@@ -329,41 +329,41 @@ type InternetTests() =
                 |];
                 Odds =
                 [|
-                    { OutcomeID = "3"; Values = [|{ Value = None; Odds = { Starting = X2 {O1 = 1.57f; O2 = 2.57f;}; Closing = X2 {O1 = 1.63f; O2 = 2.43f } } }|] };
+                    { OutcomeID = "3"; Values = [|{ Value = None; Odds = { Opening = X2 {O1 = 1.57f; O2 = 2.57f;}; Closing = X2 {O1 = 1.63f; O2 = 2.43f } } }|] };
                     { OutcomeID = "2";
                     Values =
                     [|
-                        { Value = Some 223.0f; Odds = { Starting = X2 {O1 = 1.75f; O2 = 2.19f }; Closing = X2 {O1 = 1.76f; O2 = 2.20f } } };
-                        { Value = Some 223.5f; Odds = { Starting = X2 {O1 = 1.79f; O2 = 2.13f;}; Closing = X2 {O1 = 1.80f; O2 = 2.13f } } };
-                        { Value = Some 224.0f; Odds = { Starting = X2 {O1 = 1.83f; O2 = 2.08f;}; Closing = X2 {O1 = 1.81f; O2 = 2.12f } } };
-                        { Value = Some 224.5f; Odds = { Starting = X2 {O1 = 1.79f; O2 = 2.10f;}; Closing = X2 {O1 = 1.82f; O2 = 2.11f } } };
-                        { Value = Some 225.0f; Odds = { Starting = X2 {O1 = 1.84f; O2 = 2.04f;}; Closing = X2 {O1 = 1.87f; O2 = 2.04f } } };
-                        { Value = Some 225.5f; Odds = { Starting = X2 {O1 = 1.88f; O2 = 1.99f;}; Closing = X2 {O1 = 1.92f; O2 = 1.99f } } };
-                        { Value = Some 226.0f; Odds = { Starting = X2 {O1 = 1.93f; O2 = 1.93f;}; Closing = X2 {O1 = 1.97f; O2 = 1.93f } } };
-                        { Value = Some 226.5f; Odds = { Starting = X2 {O1 = 1.99f; O2 = 1.88f;}; Closing = X2 {O1 = 2.03f; O2 = 1.88f } } };
-                        { Value = Some 227.0f; Odds = { Starting = X2 {O1 = 2.05f; O2 = 1.83f;}; Closing = X2 {O1 = 2.09f; O2 = 1.83f } } };
-                        { Value = Some 227.5f; Odds = { Starting = X2 {O1 = 2.12f; O2 = 1.78f;}; Closing = X2 {O1 = 2.16f; O2 = 1.78f } } };
-                        { Value = Some 228.0f; Odds = { Starting = X2 {O1 = 2.15f; O2 = 1.79f;}; Closing = X2 {O1 = 2.18f; O2 = 1.77f } } };
-                        { Value = Some 228.5f; Odds = { Starting = X2 {O1 = 2.13f; O2 = 1.80f;}; Closing = X2 {O1 = 2.13f; O2 = 1.80f } } };
-                        { Value = Some 229.0f; Odds = { Starting = X2 {O1 = 2.20f; O2 = 1.76f;}; Closing = X2 {O1 = 2.20f; O2 = 1.76f } } }
+                        { Value = Some 223.0f; Odds = { Opening = X2 {O1 = 1.75f; O2 = 2.19f }; Closing = X2 {O1 = 1.76f; O2 = 2.20f } } };
+                        { Value = Some 223.5f; Odds = { Opening = X2 {O1 = 1.79f; O2 = 2.13f;}; Closing = X2 {O1 = 1.80f; O2 = 2.13f } } };
+                        { Value = Some 224.0f; Odds = { Opening = X2 {O1 = 1.83f; O2 = 2.08f;}; Closing = X2 {O1 = 1.81f; O2 = 2.12f } } };
+                        { Value = Some 224.5f; Odds = { Opening = X2 {O1 = 1.79f; O2 = 2.10f;}; Closing = X2 {O1 = 1.82f; O2 = 2.11f } } };
+                        { Value = Some 225.0f; Odds = { Opening = X2 {O1 = 1.84f; O2 = 2.04f;}; Closing = X2 {O1 = 1.87f; O2 = 2.04f } } };
+                        { Value = Some 225.5f; Odds = { Opening = X2 {O1 = 1.88f; O2 = 1.99f;}; Closing = X2 {O1 = 1.92f; O2 = 1.99f } } };
+                        { Value = Some 226.0f; Odds = { Opening = X2 {O1 = 1.93f; O2 = 1.93f;}; Closing = X2 {O1 = 1.97f; O2 = 1.93f } } };
+                        { Value = Some 226.5f; Odds = { Opening = X2 {O1 = 1.99f; O2 = 1.88f;}; Closing = X2 {O1 = 2.03f; O2 = 1.88f } } };
+                        { Value = Some 227.0f; Odds = { Opening = X2 {O1 = 2.05f; O2 = 1.83f;}; Closing = X2 {O1 = 2.09f; O2 = 1.83f } } };
+                        { Value = Some 227.5f; Odds = { Opening = X2 {O1 = 2.12f; O2 = 1.78f;}; Closing = X2 {O1 = 2.16f; O2 = 1.78f } } };
+                        { Value = Some 228.0f; Odds = { Opening = X2 {O1 = 2.15f; O2 = 1.79f;}; Closing = X2 {O1 = 2.18f; O2 = 1.77f } } };
+                        { Value = Some 228.5f; Odds = { Opening = X2 {O1 = 2.13f; O2 = 1.80f;}; Closing = X2 {O1 = 2.13f; O2 = 1.80f } } };
+                        { Value = Some 229.0f; Odds = { Opening = X2 {O1 = 2.20f; O2 = 1.76f;}; Closing = X2 {O1 = 2.20f; O2 = 1.76f } } }
                     |]};
                     { OutcomeID = "5";
                     Values =
                     [|
-                        { Value = Some -6.0f; Odds = { Starting = X2 {O1 = 2.25f; O2 = 1.72f;}; Closing = X2 {O1 = 2.27f; O2 = 1.71f } } };
-                        { Value = Some -5.5f; Odds = { Starting = X2 {O1 = 2.24f; O2 = 1.73f;}; Closing = X2 {O1 = 2.34f; O2 = 1.68f } } };
-                        { Value = Some -5.0f; Odds = { Starting = X2 {O1 = 2.14f; O2 = 1.79f;}; Closing = X2 {O1 = 2.30f; O2 = 1.69f } } };
-                        { Value = Some -4.5f; Odds = { Starting = X2 {O1 = 2.04f; O2 = 1.87f;}; Closing = X2 {O1 = 2.18f; O2 = 1.77f } } };
-                        { Value = Some -4.0f; Odds = { Starting = X2 {O1 = 1.95f; O2 = 1.95f;}; Closing = X2 {O1 = 2.09f; O2 = 1.83f } } };
-                        { Value = Some -3.5f; Odds = { Starting = X2 {O1 = 1.88f; O2 = 2.03f;}; Closing = X2 {O1 = 1.99f; O2 = 1.92f } } };
-                        { Value = Some -3.0f; Odds = { Starting = X2 {O1 = 1.79f; O2 = 2.14f;}; Closing = X2 {O1 = 1.91f; O2 = 2.0f } } };
-                        { Value = Some -2.5f; Odds = { Starting = X2 {O1 = 1.74f; O2 = 2.23f;}; Closing = X2 {O1 = 1.84f; O2 = 2.08f } } };
-                        { Value = Some -2.0f; Odds = { Starting = X2 {O1 = 1.73f; O2 = 2.24f;}; Closing = X2 {O1 = 1.76f; O2 = 2.19f } } }
+                        { Value = Some -6.0f; Odds = { Opening = X2 {O1 = 2.25f; O2 = 1.72f;}; Closing = X2 {O1 = 2.27f; O2 = 1.71f } } };
+                        { Value = Some -5.5f; Odds = { Opening = X2 {O1 = 2.24f; O2 = 1.73f;}; Closing = X2 {O1 = 2.34f; O2 = 1.68f } } };
+                        { Value = Some -5.0f; Odds = { Opening = X2 {O1 = 2.14f; O2 = 1.79f;}; Closing = X2 {O1 = 2.30f; O2 = 1.69f } } };
+                        { Value = Some -4.5f; Odds = { Opening = X2 {O1 = 2.04f; O2 = 1.87f;}; Closing = X2 {O1 = 2.18f; O2 = 1.77f } } };
+                        { Value = Some -4.0f; Odds = { Opening = X2 {O1 = 1.95f; O2 = 1.95f;}; Closing = X2 {O1 = 2.09f; O2 = 1.83f } } };
+                        { Value = Some -3.5f; Odds = { Opening = X2 {O1 = 1.88f; O2 = 2.03f;}; Closing = X2 {O1 = 1.99f; O2 = 1.92f } } };
+                        { Value = Some -3.0f; Odds = { Opening = X2 {O1 = 1.79f; O2 = 2.14f;}; Closing = X2 {O1 = 1.91f; O2 = 2.0f } } };
+                        { Value = Some -2.5f; Odds = { Opening = X2 {O1 = 1.74f; O2 = 2.23f;}; Closing = X2 {O1 = 1.84f; O2 = 2.08f } } };
+                        { Value = Some -2.0f; Odds = { Opening = X2 {O1 = 1.73f; O2 = 2.24f;}; Closing = X2 {O1 = 1.76f; O2 = 2.19f } } }
                     |]}
                 |]}
         Assert.That(actual, Is.EqualTo(expected))
     [<Test>]
-    member this.ScrapBasketNBA1819League() =
+    member this.ScrapBasketballNBA1819League() =
         let leagueID, pageCount = ("C2416Q6r", 2)
         let (sportID, _) = basketballID
         let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + sportID + "/" + leagueID + "/X0/1/0/"

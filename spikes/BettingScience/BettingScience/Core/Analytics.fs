@@ -32,7 +32,7 @@ let check fileName =
             if home > away then Home else if home = away then Draw else Away
         match odd.Values with
         | [|{ Value = None;
-                Odds = { Starting = X2 { O1 = s1; O2 = s2 } as starting;
+                Odds = { Opening = X2 { O1 = s1; O2 = s2 } as starting;
                         Closing = X2 { O1 = c1; O2 = c2 } as closing } }|] ->
             printfn "Score (%A:%A) Starting %A Closing %A" score.Home score.Away s2 c2
             let startingProb = getProbabilitiesO2 starting
@@ -52,8 +52,7 @@ let check fileName =
         let value = odd.Values |> Array.tryFind (fun ({ Value = h }:MatchOdds) -> match h with | Some hv -> hv <> float32(int(hv)) | _ -> false)
         match value with
         | Some { Value = Some handicap;
-                Odds = { Starting = X2 { O1 = s1; O2 = s2 } as starting;
-                        Closing = X2 { O1 = c1; O2 = c2 } as closing } } ->
+                Odds = { Opening = X2 { O1 = s1; O2 = s2 }; Closing = X2 { O1 = c1; O2 = c2 } } } ->
             let result = getMatchResult handicap score
             printfn "Score (%A:%A) Starting %A Closing %A %A %A" score.Home score.Away s2 c2 handicap result
             //let startingProb = getProbabilitiesO2 starting
