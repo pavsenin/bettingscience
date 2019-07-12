@@ -21,6 +21,8 @@ let outAsianHandicapID = "5"
 
 let pinnacleID = "18"
 
+let getBook bookID books = books |> Array.tryFind (fun (key, _) -> key = bookID)
+
 let getOutcomes3 asFunc = function
     | JsonValue.Array [|o1; o0; o2|] ->
         Some(asFunc o1, asFunc o0, asFunc o2)
@@ -36,11 +38,12 @@ let getOutcomes2 asFunc = function
 let getStringOutcomes3, getFloatOutcomes3 = getOutcomes3 asString, getOutcomes3 asFloat
 let getStringOutcomes2, getFloatOutcomes2 = getOutcomes2 asString, getOutcomes2 asFloat
 
-let getOdds getOutcomes (value:JsonValue) =
-    match value with
-    | JsonValue.Record books ->
-        let book = books |> Array.tryFind (fun (key, _) -> key = pinnacleID)
-        book ||> (fun (_, value) -> getOutcomes value)
+let getOdds getOutcomes (odds:JsonValue, time:JsonValue) =
+    match odds, time with
+    | JsonValue.Record booksOdds, JsonValue.Record booksTime ->
+        let bookOdds = getBook pinnacleID booksOdds
+        let bookTime = getBook pinnacleID booksTime
+        bookOdds ||> (fun (_, value) -> getOutcomes value)
     | _ -> None
 let getOdds2 = getOdds getFloatOutcomes2
 let getOdds3 = getOdds getFloatOutcomes3
@@ -49,19 +52,22 @@ let getOutcomesOdds getFunc getData (value:JsonValue) =
     let oddsData = value?d?oddsdata?back
     match oddsData with
     | JsonValue.Record data ->
-        data |> Array.tryPick (fun (_, value) -> getFunc (getData value))
+        data |> Array.tryPick (fun (_, value) ->
+            let odds, time = getData value
+            getFunc (odds, time)
+        )
     | _ -> None
 
 let getHomeAwayOdds value =
-    let starting = getOutcomesOdds getOdds2 (fun (value:JsonValue) -> value?opening_odds) value
-    let closing = getOutcomesOdds getOdds2 (fun (value:JsonValue) -> value?odds) value
+    let starting = getOutcomesOdds getOdds2 (fun (value:JsonValue) -> value?opening_odds, value?opening_change_time) value
+    let closing = getOutcomesOdds getOdds2 (fun (value:JsonValue) -> value?odds, value?change_time) value
     match starting, closing with
     | Some (s1, s2), Some (c1, c2) ->
         Some [|{ Value = None; Odds = { Opening = X2 { O1 = s1; O2 = s2 }; Closing = X2 { O1 = c1; O2 = c2 } } }|]
     | _ -> None
 let get1x2Odds (value:JsonValue) =
-    let starting = getOutcomesOdds getOdds3 (fun (value:JsonValue) -> value?opening_odds) value
-    let closing = getOutcomesOdds getOdds3 (fun (value:JsonValue) -> value?odds) value
+    let starting = getOutcomesOdds getOdds3 (fun (value:JsonValue) -> value?opening_odds, value?opening_change_time) value
+    let closing = getOutcomesOdds getOdds3 (fun (value:JsonValue) -> value?odds, value?change_time) value
     match starting, closing with
     | Some (s1, s0, s2), Some (c1, c0, c2) ->
         Some [|{ Value = None; Odds = { Opening = X3 { O1 = s1; O0 = s0; O2 = s2 }; Closing = X3 { O1 = c1; O0 = c0; O2 = c2 } } }|]
@@ -72,8 +78,8 @@ let getHandicapOdds value =
     | JsonValue.Record data ->
         data |> Array.choose (fun (_, innerValue) ->
             let handicap = innerValue?handicapValue
-            let starting = getOdds2 innerValue?opening_odds
-            let closing = getOdds2 innerValue?odds
+            let starting = getOdds2 (innerValue?opening_odds, innerValue?opening_change_time)
+            let closing = getOdds2 (innerValue?odds, innerValue?change_time)
             match starting, closing with
             | Some (so1, so2), Some (co1, co2) ->
                 Some (asFloat handicap, (so1, so2), (co1, co2))

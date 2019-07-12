@@ -2,7 +2,6 @@
 
 [<EntryPoint>]
 let main argv =
-    // score basket OT
     // crossed odds
     // odds time
 
