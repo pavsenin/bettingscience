@@ -130,17 +130,29 @@ let parseMainMatchPage url =
     document.LoadHtml(html)
     let xhash = document.DocumentNode.SelectNodes("/html/body/script") |> List.ofSeq |> Seq.tryPick (fun script -> extractXHashKey script.InnerText)
     let score =
-        let node = document.DocumentNode.SelectSingleNode("/html/body/div/div/div/div/div/div/div/div/div/div[@xeid]/p/strong")
-        if node <> null then
-            match node.InnerText.Split(':') with
+        let getScore (text:string) =
+            match text.Split(':') with
             | [|x1; x2|] -> Some(int(x1), int(x2))
             | _ -> None
+        let node = document.DocumentNode.SelectSingleNode("/html/body/div/div/div/div/div/div/div/div/div/div[@xeid]/p/strong")
+        if node <> null then
+            let scoreText = node.InnerText
+            if scoreText.IndexOf("OT") > 0 then
+                match scoreText.Split([|"OT"|], StringSplitOptions.RemoveEmptyEntries) with
+                | [|x1; x2|] ->
+                        let score = getScore (x1.Trim())
+                        let scoreWithoutOT = getScore (x2.Trim([|' '; '('; ')'|]))
+                        score |>> (fun s -> s, scoreWithoutOT)
+                | _ -> None
+            else
+                let score = getScore scoreText
+                score |>> (fun s -> s, None)
         else
             None
     let periods =
         let node = document.DocumentNode.SelectSingleNode("/html/body/div/div/div/div/div/div/div/div/div/div[@xeid]/p")
         if node <> null then
-            let index1, index2 = node.InnerText.IndexOf("(") + 1, node.InnerText.IndexOf(")")
+            let index1, index2 = node.InnerText.LastIndexOf("(") + 1, node.InnerText.LastIndexOf(")")
             let data = node.InnerText.Substring(index1, index2 - index1)
             match data.Split(',') with
             | [||] -> None
@@ -198,10 +210,12 @@ let extractMatchOdds (sportID, dataID) outIDs (matchID, matchRelativeUrl) =
         let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" oddsportalHost
         let odds = parseMatchResponse outID matchData matchContent
         odds |>> (fun values -> { OutcomeID = outID; Values = values })
-    let getMatchData matchUrl (hash, (teamHome, teamAway), (score1, score2), periodsData, time) =
+    let getMatchData matchUrl (hash, (teamHome, teamAway), ((score1, score2), scoreWithoutOT), periodsData, time) =
         let odds = outIDs |> List.choose (getOddsData hash) |> List.toArray
         let periods = periodsData |> Array.map (fun (ph, pa) -> { Home = ph; Away = pa })
-        { ID = matchID; Url = matchUrl; TeamHome = teamHome; TeamAway = teamAway; Time = time; Score = { Home = score1; Away = score2 }; Periods = periods; Odds = odds }
+        let scoreOT = scoreWithoutOT |>> (fun (s1, s2) -> { Home = s1; Away = s2 })
+        { ID = matchID; Url = matchUrl; TeamHome = teamHome; TeamAway = teamAway; Time = time;
+        Score = { Home = score1; Away = score2 }; ScoreWithoutOT = scoreOT; Periods = periods; Odds = odds }
     let matchUrl = "http://www.oddsportal.com/" + matchRelativeUrl
     let mainData = parseMainMatchPage matchUrl
     mainData |>> getMatchData matchUrl

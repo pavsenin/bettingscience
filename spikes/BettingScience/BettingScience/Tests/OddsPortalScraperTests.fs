@@ -130,6 +130,7 @@ type InternetTests() =
                 TeamAway = "Pittsburgh Pirates";
                 Time = 1538334600;
                 Score = { Home = 5; Away = 6 };
+                ScoreWithoutOT = None;
                 Periods = [|
                     { Home = 1; Away = 0 }; { Home = 2; Away = 0 }; { Home = 0; Away = 0 }; { Home = 0; Away = 0 }; { Home = 1; Away = 2 };
                     { Home = 1; Away = 2 }; { Home = 0; Away = 1 }; { Home = 0; Away = 0 }; { Home = 0; Away = 0 }; { Home = 0; Away = 1 }
@@ -282,6 +283,7 @@ type InternetTests() =
                 TeamAway = "Arsenal Tula";
                 Time = 1558868400;
                 Score = { Home = 3; Away = 3 };
+                ScoreWithoutOT = None;
                 Periods = [| { Home = 2; Away = 1 }; { Home = 1; Away = 2 } |]
                 Odds = [|
                     { OutcomeID = "1";
@@ -321,6 +323,7 @@ type InternetTests() =
                 TeamAway = "Boston Celtics";
                 Time = 1551229200;
                 Score = { Home = 118; Away = 95 };
+                ScoreWithoutOT = None;
                 Periods = [|
                     { Home = 30; Away = 32 };
                     { Home = 36; Away = 13 };
@@ -474,5 +477,28 @@ type InternetTests() =
                 ("jo3t2ezG", "/basketball/usa/nba/minnesota-timberwolves-toronto-raptors-jo3t2ezG/");
                 ("KrWYRNhn", "/basketball/usa/nba/new-orleans-pelicans-golden-state-warriors-KrWYRNhn/")]
         Assert.That(actual, Is.EqualTo(expected))
+    [<Test>]
+    member this.ScrapBasketballMatchWithOT() =
+        let matchID = "ChPLtsAp"
+        let matchUrl = "basketball/usa/nba/atlanta-hawks-minnesota-timberwolves-" + matchID + "/"
+        let actual = extractMatchOdds basketballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
+        match actual with
+        | Some({
+                ID = "ChPLtsAp";
+                Url = "http://www.oddsportal.com/basketball/usa/nba/atlanta-hawks-minnesota-timberwolves-ChPLtsAp/";
+                TeamHome = "Atlanta Hawks";
+                TeamAway = "Minnesota Timberwolves";
+                Time = 1551313800;
+                Score = { Home = 131; Away = 123 };
+                ScoreWithoutOT = Some { Home = 118; Away = 118 };
+                Periods = [|
+                    { Home = 33; Away = 40 };
+                    { Home = 27; Away = 28 };
+                    { Home = 26; Away = 27 };
+                    { Home = 32; Away = 23 };
+                    { Home = 13; Away = 5 }
+                |];
+          }) -> ()
+        | _ -> failwith "Incorrect data"
 
 

@@ -53,6 +53,8 @@ type MatchData = {
     Time : int
     [<JsonProperty(PropertyName = "score")>]
     Score:MatchScore
+    [<JsonProperty(PropertyName = "scoreWithoutOT")>]
+    ScoreWithoutOT:MatchScore option
     [<JsonProperty(PropertyName = "periods")>]
     Periods:MatchScore array
     [<JsonProperty(PropertyName = "odds")>]
