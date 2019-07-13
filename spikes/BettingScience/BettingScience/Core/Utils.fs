@@ -15,11 +15,11 @@ let toInt value =
 
 let merge2 x1 x2 =
     match x1, x2 with
-    | Some v1, Some v2 -> Some (v1, v2)
+    | Some (o1, o2), Some (t1, t2) -> Some ((o1, t1), (o2, t2))
     | _ -> None
-let merge3 x1 x2 x3 =
-    match x1, x2, x3 with
-    | Some v1, Some v2, Some v3 -> Some (v1, v2, v3)
+let merge3 x1 x2 =
+    match x1, x2 with
+    | Some (o1, o0, o2), Some (t1, t0, t2) -> Some ((o1, t1), (o0, t0), (o2, t2))
     | _ -> None
 
 let fromUnixTimestamp() =
@@ -38,6 +38,7 @@ let fetchContent (url:string) host referer =
 
 let asString (value:JsonValue) = value.AsString()
 let asFloat (value:JsonValue) = float32(value.AsFloat())
+let asInt (value:JsonValue) = value.AsInteger()
 
 let getAttribute (node:HtmlNode) func =
     node.Attributes |> List.ofSeq |> List.tryFind func

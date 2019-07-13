@@ -35,18 +35,21 @@ let getOutcomes2 asFunc = function
     | JsonValue.Record _ as value ->
         Some(asFunc value.["0"], asFunc value.["1"])
     | _ -> None
-let getStringOutcomes3, getFloatOutcomes3 = getOutcomes3 asString, getOutcomes3 asFloat
-let getStringOutcomes2, getFloatOutcomes2 = getOutcomes2 asString, getOutcomes2 asFloat
+let getStringOutcomes3, getFloatOutcomes3, getIntOutcomes3 = getOutcomes3 asString, getOutcomes3 asFloat, getOutcomes3 asInt
+let getStringOutcomes2, getFloatOutcomes2, getIntOutcomes2 = getOutcomes2 asString, getOutcomes2 asFloat, getOutcomes2 asInt
 
 let getOdds getOutcomes (odds:JsonValue, time:JsonValue) =
     match odds, time with
     | JsonValue.Record booksOdds, JsonValue.Record booksTime ->
         let bookOdds = getBook pinnacleID booksOdds
         let bookTime = getBook pinnacleID booksTime
-        bookOdds ||> (fun (_, value) -> getOutcomes value)
+        match bookOdds, bookTime with
+        | Some (_, odds), Some (_, time) ->
+            getOutcomes odds time
+        | _ -> None
     | _ -> None
-let getOdds2 = getOdds getFloatOutcomes2
-let getOdds3 = getOdds getFloatOutcomes3
+let getOdds2 = getOdds (fun odds time -> merge2 (getFloatOutcomes2 odds) (getIntOutcomes2 time))  
+let getOdds3 = getOdds (fun odds time -> merge3 (getFloatOutcomes3 odds) (getIntOutcomes3 time))  
 
 let getOutcomesOdds getFunc getData (value:JsonValue) =
     let oddsData = value?d?oddsdata?back

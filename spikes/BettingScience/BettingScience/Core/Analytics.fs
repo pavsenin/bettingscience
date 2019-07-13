@@ -8,13 +8,13 @@ open System
 type MatchResult = Home | Draw | Away
 
 let getProbabilities value = function
-    | X3 { O1 = o1; O0 = o0; O2 = o2 } ->
+    | X3 { O1 = (o1, _); O0 = (o0, _); O2 = (o2, _) } ->
         let o1Prob, o0Prob, o2Prob = 1.f / o1, 1.f / o0, 1.f / o2
         let sumProb = o1Prob + o0Prob + o2Prob
         if value = "o1" then o1Prob / sumProb
         else if value = "o2" then o2Prob / sumProb
         else o0Prob / sumProb
-    | X2 { O1 = o1; O2 = o2 } ->
+    | X2 { O1 = (o1, _); O2 = (o2, _) } ->
         let o1Prob, o2Prob = 1.f / o1, 1.f / o2
         let sumProb = o1Prob + o2Prob
         if value = "o1" then o1Prob / sumProb
@@ -32,8 +32,8 @@ let check fileName =
             if home > away then Home else if home = away then Draw else Away
         match odd.Values with
         | [|{ Value = None;
-                Odds = { Opening = X2 { O1 = s1; O2 = s2 } as starting;
-                        Closing = X2 { O1 = c1; O2 = c2 } as closing } }|] ->
+                Odds = { Opening = X2 { O1 = (s1, _); O2 = (s2, _) } as starting;
+                        Closing = X2 { O1 = (c1, _); O2 = (c2, _) } as closing } }|] ->
             printfn "Score (%A:%A) Starting %A Closing %A" score.Home score.Away s2 c2
             let startingProb = getProbabilitiesO2 starting
             let closingProb = getProbabilitiesO2 closing
@@ -52,7 +52,7 @@ let check fileName =
         let value = odd.Values |> Array.tryFind (fun ({ Value = h }:MatchOdds) -> match h with | Some hv -> hv <> float32(int(hv)) | _ -> false)
         match value with
         | Some { Value = Some handicap;
-                Odds = { Opening = X2 { O1 = s1; O2 = s2 }; Closing = X2 { O1 = c1; O2 = c2 } } } ->
+                Odds = { Opening = X2 { O1 = (s1, _); O2 = (s2, _) }; Closing = X2 { O1 = (c1, _); O2 = (c2, _) } } } ->
             let result = getMatchResult handicap score
             printfn "Score (%A:%A) Starting %A Closing %A %A %A" score.Home score.Away s2 c2 handicap result
             //let startingProb = getProbabilitiesO2 starting

@@ -9,17 +9,17 @@ type MatchScore = {
 }
 type Outcome2Odds = {
     [<JsonProperty(PropertyName = "o1")>]
-    O1 : float32
+    O1 : float32 * int
     [<JsonProperty(PropertyName = "o2")>]
-    O2 : float32
+    O2 : float32 * int
 }
 type Outcome3Odds = {
     [<JsonProperty(PropertyName = "o1")>]
-    O1 : float32
+    O1 : float32 * int
     [<JsonProperty(PropertyName = "o0")>]
-    O0 : float32
+    O0 : float32 * int
     [<JsonProperty(PropertyName = "o2")>]
-    O2 : float32
+    O2 : float32 * int
 }
 type OutcomeOdds = X2 of Outcome2Odds | X3 of Outcome3Odds
 type OddsData = {
