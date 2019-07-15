@@ -17,7 +17,7 @@ let basketballID = "3", "1"
 let out1x2ID, outOverUnderID, outHomeAwayID, outAsianHandicapID = "1", "2", "3", "5"
 
 let pinnacleID, _1xbetID, asianoddsID, _188betID, bet365ID, betfairID, bwinID, marafonID, winlineID, dafabetID, sbobetID =
-    "18", "417", "476", "56", "419", "429", "2", "381", "454", "147", "75"
+    "18", "417", "476", "56", "16", "429", "2", "381", "454", "147", "75"
 let bookIDs = [|
     pinnacleID; // sbobetID; dafabetID; _188betID;
     betfairID; // asianoddsID;

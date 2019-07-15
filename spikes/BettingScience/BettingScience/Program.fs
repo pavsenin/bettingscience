@@ -17,26 +17,27 @@ let main argv =
     //    OddsPortalScraper.fetchLeagueDataAndSaveToFile basketballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] file
     //)
 
-    [("YX6FFOQa", 5, "RPL1213.json")]
-    |> List.iter (fun file ->
-        OddsPortalScraper.fetchLeagueDataAndSaveToFile soccerID [out1x2ID; outOverUnderID; outAsianHandicapID] file
-    )
+    //[("YX6FFOQa", 5, "RPL1213.json")]
+    //|> List.iter (fun file ->
+    //    OddsPortalScraper.fetchLeagueDataAndSaveToFile soccerID [out1x2ID; outOverUnderID; outAsianHandicapID] file
+    //)
 
     //let state = {
     //    OpeningScore = AX2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
     //    ClosingScore = AX2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
     //}
-    //["RPL1819.json"; "RPL1718.json"; "RPL1617.json"; "RPL1516.json"; "RPL1415.json"; "RPL1314.json"; "RPL1213.json"]
-    //|> List.iter (fun file ->
-    //    [pinnacleID; betfairID; bet365ID; marafonID]
-    //    |> List.iter (fun bookID ->
-    //        let state = {
-    //            BookID = bookID;
-    //            Opening = AX3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
-    //            Closing = AX3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
-    //        }
-    //        let result = analyze OddsPortalScraper.out1x2ID state file
-    //        printfn "%s %s %A" file bookID result
-    //    )
-    //)
+    ["../../../data/soccer/rpl/RPL1819.json"; "../../../data/soccer/rpl/RPL1718.json"; "../../../data/soccer/rpl/RPL1617.json";
+     "../../../data/soccer/rpl/RPL1516.json"; "../../../data/soccer/rpl/RPL1415.json"; "../../../data/soccer/rpl/RPL1314.json"]
+    |> List.iter (fun file ->
+        [pinnacleID; betfairID; bet365ID; marafonID]
+        |> List.iter (fun bookID ->
+            let state = {
+                BookID = bookID;
+                Opening = AX3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
+                Closing = AX3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
+            }
+            let result = analyze OddsPortalScraper.out1x2ID state file
+            printfn "%s %s %A" file bookID result
+        )
+    )
     0

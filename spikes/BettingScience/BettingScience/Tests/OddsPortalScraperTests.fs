@@ -2376,5 +2376,35 @@ type InternetTests() =
                 |];
           }) -> ()
         | _ -> failwith "Incorrect data"
+    [<Test>]
+    member this.ScrapSoccerMatchFromBet365() =
+        let matchID = "OIyXBXea"
+        let matchUrl = "soccer/russia/premier-league-2014-2015/arsenal-tula-akhmat-grozny-" + matchID + "/"
+        let bookIDs = [| bet365ID |]
+        let actual = extractMatchOdds bookIDs soccerID [out1x2ID] (matchID, matchUrl)
+        match actual with
+        | Some({
+                ID = "OIyXBXea";
+                Url = "http://www.oddsportal.com/soccer/russia/premier-league-2014-2015/arsenal-tula-akhmat-grozny-OIyXBXea/";
+                Score = { Home = 1; Away = 1 };
+                ScoreWithoutOT = None;
+                Periods = [|
+                    { Home = 1; Away = 1 };
+                    { Home = 0; Away = 0 }
+                |];
+                Odds = [|{
+                    OutcomeID = "1";
+                    Values = [|{
+                        Value = None;
+                        BookOdds = [|{
+                            BookID = "16";
+                            Odds = { Opening = X3 { O1 = (2.88f, 1431443386); O0 = (3.2f, 1431443386); O2 = (2.5f, 1431443386) };
+                                     Closing = X3 { O1 = (2.38f, 1431763683); O0 = (3.2f, 1431443386); O2 = (3.f, 1431763683) }
+                            }
+                        }|]
+                    }|]
+                }|]
+            }) -> ()
+        | _ -> failwith "Incorrect data"
 
 
