@@ -54,6 +54,7 @@
     <Compile Include="Core\OddsPortalScraper.fs" />
     <Compile Include="Core\Analytics.fs" />
     <Compile Include="Tests\OddsPortalScraperTests.fs" />
+	<Compile Include="Tests\AnalyticsTests.fs" />
     <Compile Include="Program.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
