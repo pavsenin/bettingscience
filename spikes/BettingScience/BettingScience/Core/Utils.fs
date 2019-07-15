@@ -13,15 +13,6 @@ let toInt value =
     | true, v -> v
     | false, _ -> -1
 
-let merge2 x1 x2 =
-    match x1, x2 with
-    | Some (o1, o2), Some (t1, t2) -> Some ((o1, t1), (o2, t2))
-    | _ -> None
-let merge3 x1 x2 =
-    match x1, x2 with
-    | Some (o1, o0, o2), Some (t1, t0, t2) -> Some ((o1, t1), (o0, t0), (o2, t2))
-    | _ -> None
-
 let fromUnixTimestamp() =
     let origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
     let time = DateTime.UtcNow.Subtract origin
@@ -39,6 +30,7 @@ let fetchContent (url:string) host referer =
 let asString (value:JsonValue) = value.AsString()
 let asFloat (value:JsonValue) = float32(value.AsFloat())
 let asInt (value:JsonValue) = value.AsInteger()
+let asBool (value:JsonValue) = value.AsBoolean()
 
 let getAttribute (node:HtmlNode) func =
     node.Attributes |> List.ofSeq |> List.tryFind func

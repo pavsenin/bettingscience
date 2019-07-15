@@ -5,7 +5,6 @@ open Domain
 
 [<TestFixture>]
 type InternetTests() =
-    (*
     [<Test>]
     member this.ScrapBaseballMLB18League() =
         let leagueID, pageCount = ("r3414Mwe", 2)
@@ -122,42 +121,358 @@ type InternetTests() =
     member this.ScrapBaseballMLB18Match() =
         let matchID = "Of9rIjv8"
         let matchUrl = "baseball/usa/mlb-2018/cincinnati-reds-pittsburgh-pirates-" + matchID + "/"
-        let actual = extractMatchOdds baseballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
+        let bookIDs = [|
+            pinnacleID; sbobetID; dafabetID; _188betID;
+            asianoddsID; betfairID;
+            bet365ID; bwinID;
+            _1xbetID; marafonID; winlineID;
+        |]
+        let actual = extractMatchOdds bookIDs baseballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
         let expected =
-            Some {
-                ID = "Of9rIjv8";
-                Url = "http://www.oddsportal.com/baseball/usa/mlb-2018/cincinnati-reds-pittsburgh-pirates-Of9rIjv8/";
-                TeamHome = "Cincinnati Reds";
-                TeamAway = "Pittsburgh Pirates";
-                Time = 1538334600;
-                Score = { Home = 5; Away = 6 };
-                ScoreWithoutOT = None;
-                Periods = [|
-                    { Home = 1; Away = 0 }; { Home = 2; Away = 0 }; { Home = 0; Away = 0 }; { Home = 0; Away = 0 }; { Home = 1; Away = 2 };
-                    { Home = 1; Away = 2 }; { Home = 0; Away = 1 }; { Home = 0; Away = 0 }; { Home = 0; Away = 0 }; { Home = 0; Away = 1 }
-                |]
-                Odds = [|
-                    { OutcomeID = "3";
-                    Values = [|{ Value = None; Odds = { Opening = X2 {O1 = 1.78f; O2 = 2.18f}; Closing = X2 {O1 = 1.81f; O2 = 2.14f}} } |]};
-                    { OutcomeID = "2";
-                    Values =
-                    [|
-                        { Value = Some 8.5f; Odds = {Opening = X2 {O1 = 1.61f; O2 = 2.45f}; Closing = X2 {O1 = 1.61f; O2 = 2.48f } } };
-                        { Value = Some 9.0f; Odds = {Opening = X2 {O1 = 1.73f; O2 = 2.20f;}; Closing = X2 {O1 = 1.75f; O2 = 2.21f } } };
-                        { Value = Some 9.5f; Odds = {Opening = X2 {O1 = 1.95f; O2 = 1.95f;}; Closing = X2 {O1 = 1.94f; O2 = 1.96f } } };
-                        { Value = Some 10.0f; Odds = {Opening = X2 {O1 = 2.11f; O2 = 1.79f;}; Closing = X2 {O1 = 2.12f; O2 = 1.81f } } };
-                        { Value = Some 10.5f; Odds = {Opening = X2 {O1 = 2.27f; O2 = 1.69f;}; Closing = X2 {O1 = 2.27f; O2 = 1.71f } } }
-                    |]};
-                    { OutcomeID = "5";
-                    Values =
-                    [|
-                        { Value = Some -2.5f; Odds = {Opening = X2 {O1 = 3.43f; O2 = 1.34f;}; Closing = X2 {O1 = 3.48f; O2 = 1.33f } } };
-                        { Value = Some -2.0f; Odds = {Opening = X2 {O1 = 3.12f; O2 = 1.40f;}; Closing = X2 {O1 = 3.17f; O2 = 1.39f } } };
-                        { Value = Some -1.5f; Odds = {Opening = X2 {O1 = 2.58f; O2 = 1.57f;}; Closing = X2 {O1 = 2.62f; O2 = 1.56f } } };
-                        { Value = Some -1.0f; Odds = {Opening = X2 {O1 = 2.12f; O2 = 1.79f;}; Closing = X2 {O1 = 2.17f; O2 = 1.76f } } };
-                        { Value = Some 1.5f; Odds = {Opening = X2 {O1 = 1.47f; O2 = 2.86f;}; Closing = X2 {O1 = 1.48f; O2 = 2.83f } } }
-                    |]}
-                |]}
+            Some({
+                 ID = "Of9rIjv8";
+                 Url =
+                  "http://www.oddsportal.com/baseball/usa/mlb-2018/cincinnati-reds-pittsburgh-pirates-Of9rIjv8/";
+                 TeamHome = "Cincinnati Reds";
+                 TeamAway = "Pittsburgh Pirates";
+                 Time = 1538334600;
+                 Score = {Home = 5;
+                          Away = 6;};
+                 ScoreWithoutOT = None;
+                 Periods =
+                  [|{Home = 1;
+                     Away = 0;}; {Home = 2;
+                                  Away = 0;}; {Home = 0;
+                                               Away = 0;}; {Home = 0;
+                                                            Away = 0;}; {Home = 1;
+                                                                         Away = 2;}; {Home = 1;
+                                                                                      Away = 2;};
+                    {Home = 0;
+                     Away = 1;}; {Home = 0;
+                                  Away = 0;}; {Home = 0;
+                                               Away = 0;}; {Home = 0;
+                                                            Away = 1;}|];
+                 Odds =
+                  [|{OutcomeID = "3";
+                     Values =
+                      [|{Value = None;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.77999997f, 1538315769);
+                                                   O2 = (2.18000007f, 1538315769);};
+                                     Closing = X2 {O1 = (1.80999994f, 1538322295);
+                                                   O2 = (2.1400001f, 1538322295);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (1.75f, 1538318850);
+                                                   O2 = (2.1400001f, 1538318850);};
+                                     Closing = X2 {O1 = (1.77999997f, 1538322477);
+                                                   O2 = (2.1099999f, 1538322477);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X2 {O1 = (1.75999999f, 1538317073);
+                                                   O2 = (2.11999989f, 1538317073);};
+                                     Closing = X2 {O1 = (1.75999999f, 1538317073);
+                                                   O2 = (2.11999989f, 1538317073);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (1.77999997f, 1538316217);
+                                                   O2 = (2.0f, 1538316217);};
+                                     Closing = X2 {O1 = (1.79999995f, 1538327176);
+                                                   O2 = (2.0f, 1538327176);};};};
+                            {BookID = "429";
+                             Odds = {Opening = X2 {O1 = (1.73000002f, 1538319251);
+                                                   O2 = (2.1500001f, 1538319251);};
+                                     Closing = X2 {O1 = (1.75f, 1538323462);
+                                                   O2 = (2.0999999f, 1538323462);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.72000003f, 1538317638);
+                                                   O2 = (2.1500001f, 1538317638);};
+                                     Closing = X2 {O1 = (1.77999997f, 1538321539);
+                                                   O2 = (2.04999995f, 1538321539);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.03999996f, 1538277086);
+                                                   O2 = (1.89999998f, 1538277086);};
+                                     Closing = X2 {O1 = (1.83000004f, 1538322619);
+                                                   O2 = (2.0999999f, 1538322619);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.04999995f, 1538276911);
+                                                   O2 = (1.88f, 1538276911);};
+                                     Closing = X2 {O1 = (1.82000005f, 1538322565);
+                                                   O2 = (2.11999989f, 1538322565);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (1.98000002f, 1538301911);
+                                                   O2 = (1.83000004f, 1538301911);};
+                                     Closing = X2 {O1 = (1.75f, 1538323018);
+                                                   O2 = (2.07999992f, 1538323018);};};}|];}|];};
+                    {OutcomeID = "2";
+                     Values =
+                      [|{Value = Some 7.5f;
+                         BookOdds =
+                          [|{BookID = "454";
+                             Odds = {Opening = X2 {O1 = (1.50999999f, 1538314010);
+                                                   O2 = (2.46000004f, 1538314010);};
+                                     Closing = X2 {O1 = (1.41999996f, 1538329316);
+                                                   O2 = (2.58999991f, 1538329316);};};}|];};
+                        {Value = Some 8.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.61000001f, 1538315769);
+                                                   O2 = (2.45000005f, 1538315769);};
+                                     Closing = X2 {O1 = (1.61000001f, 1538334566);
+                                                   O2 = (2.48000002f, 1538334566);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.60000002f, 1538317638);
+                                                   O2 = (2.3499999f, 1538317638);};
+                                     Closing = X2 {O1 = (1.64999998f, 1538322475);
+                                                   O2 = (2.25f, 1538322475);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.65999997f, 1538317066);
+                                                   O2 = (2.25f, 1538317066);};
+                                     Closing = X2 {O1 = (1.70000005f, 1538334041);
+                                                   O2 = (2.18000007f, 1538334041);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.65999997f, 1538316790);
+                                                   O2 = (2.25f, 1538316790);};
+                                     Closing = X2 {O1 = (1.63999999f, 1538334599);
+                                                   O2 = (2.28999996f, 1538334599);};};}|];};
+                        {Value = Some 9.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.73000002f, 1538315769);
+                                                   O2 = (2.20000005f, 1538315769);};
+                                     Closing = X2 {O1 = (1.75f, 1538334566);
+                                                   O2 = (2.21000004f, 1538334566);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.96000004f, 1538277086);
+                                                   O2 = (1.96000004f, 1538277086);};
+                                     Closing = X2 {O1 = (1.85000002f, 1538334041);
+                                                   O2 = (2.0f, 1538334041);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.96000004f, 1538276911);
+                                                   O2 = (1.96000004f, 1538276911);};
+                                     Closing = X2 {O1 = (1.79999995f, 1538334599);
+                                                   O2 = (2.05999994f, 1538334599);};};}|];};
+                        {Value = Some 9.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1538315769);
+                                                   O2 = (1.95000005f, 1538315769);};
+                                     Closing = X2 {O1 = (1.94000006f, 1538334566);
+                                                   O2 = (1.96000004f, 1538334566);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1538318850);
+                                                   O2 = (1.90999997f, 1538318850);};
+                                     Closing = X2 {O1 = (1.99000001f, 1538334573);
+                                                   O2 = (1.87f, 1538334573);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X2 {O1 = (1.92999995f, 1538317073);
+                                                   O2 = (1.92999995f, 1538317073);};
+                                     Closing = X2 {O1 = (2.03999996f, 1538322264);
+                                                   O2 = (1.82000005f, 1538322264);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (1.96000004f, 1538316334);
+                                                   O2 = (1.79999995f, 1538316334);};
+                                     Closing = X2 {O1 = (1.88f, 1538333820);
+                                                   O2 = (1.88f, 1538333820);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.90999997f, 1538317638);
+                                                   O2 = (1.90999997f, 1538317638);};
+                                     Closing = X2 {O1 = (2.0f, 1538322475);
+                                                   O2 = (1.83000004f, 1538322475);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.96000004f, 1538316228);
+                                                   O2 = (1.96000004f, 1538316228);};
+                                     Closing = X2 {O1 = (2.01999998f, 1538334041);
+                                                   O2 = (1.89999998f, 1538334041);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.96000004f, 1538315946);
+                                                   O2 = (1.96000004f, 1538315946);};
+                                     Closing = X2 {O1 = (2.01999998f, 1538333897);
+                                                   O2 = (1.89999998f, 1538333897);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (2.1099999f, 1538314010);
+                                                   O2 = (1.73000002f, 1538314010);};
+                                     Closing = X2 {O1 = (1.97000003f, 1538329316);
+                                                   O2 = (1.84000003f, 1538329316);};};}|];};
+                        {Value = Some 10.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.1099999f, 1538315769);
+                                                   O2 = (1.78999996f, 1538315769);};
+                                     Closing = X2 {O1 = (2.11999989f, 1538334566);
+                                                   O2 = (1.80999994f, 1538334566);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.1099999f, 1538317066);
+                                                   O2 = (1.75999999f, 1538317066);};
+                                     Closing = X2 {O1 = (2.19000006f, 1538334041);
+                                                   O2 = (1.71000004f, 1538334041);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.1099999f, 1538316790);
+                                                   O2 = (1.75999999f, 1538316790);};
+                                     Closing = X2 {O1 = (2.1400001f, 1538334599);
+                                                   O2 = (1.74000001f, 1538334599);};};}|];};
+                        {Value = Some 10.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.26999998f, 1538315769);
+                                                   O2 = (1.69000006f, 1538315769);};
+                                     Closing = X2 {O1 = (2.26999998f, 1538334566);
+                                                   O2 = (1.71000004f, 1538334566);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (2.20000005f, 1538317638);
+                                                   O2 = (1.70000005f, 1538317638);};
+                                     Closing = X2 {O1 = (2.25f, 1538322475);
+                                                   O2 = (1.64999998f, 1538322475);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.25f, 1538317066);
+                                                   O2 = (1.65999997f, 1538317066);};
+                                     Closing = X2 {O1 = (2.32999992f, 1538334041);
+                                                   O2 = (1.62f, 1538334041);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.25f, 1538316790);
+                                                   O2 = (1.65999997f, 1538316790);};
+                                     Closing = X2 {O1 = (2.23000002f, 1538334599);
+                                                   O2 = (1.66999996f, 1538334599);};};}|];};
+                        {Value = Some 11.5f;
+                         BookOdds =
+                          [|{BookID = "454";
+                             Odds = {Opening = X2 {O1 = (2.94000006f, 1538314010);
+                                                   O2 = (1.33000004f, 1538314010);};
+                                     Closing = X2 {O1 = (2.72000003f, 1538329316);
+                                                   O2 = (1.38999999f, 1538329316);};};}|];}|];};
+                    {OutcomeID = "5";
+                     Values =
+                      [|{Value = Some -4.5f;
+                         BookOdds = [|{BookID = "454";
+                                       Odds = {Opening = X2 {O1 = (5.0999999f, 1538315512);
+                                                             O2 = (1.12f, 1538315512);};
+                                               Closing = X2 {O1 = (5.0999999f, 1538329316);
+                                                             O2 = (1.12f, 1538329316);};};}|];};
+                        {Value = Some -2.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (3.43000007f, 1538316188);
+                                                   O2 = (1.34000003f, 1538316188);};
+                                     Closing = X2 {O1 = (3.48000002f, 1538322362);
+                                                   O2 = (1.33000004f, 1538321116);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (3.57999992f, 1538317066);
+                                                   O2 = (1.30999994f, 1538317066);};
+                                     Closing = X2 {O1 = (3.5999999f, 1538334041);
+                                                   O2 = (1.29999995f, 1538320084);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (3.57999992f, 1538316790);
+                                                   O2 = (1.30999994f, 1538316790);};
+                                     Closing = X2 {O1 = (3.5999999f, 1538333897);
+                                                   O2 = (1.29999995f, 1538319792);};};}|];};
+                        {Value = Some -2.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (3.11999989f, 1538316188);
+                                                   O2 = (1.39999998f, 1538316188);};
+                                     Closing = X2 {O1 = (3.17000008f, 1538322362);
+                                                   O2 = (1.38999999f, 1538321116);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (3.20000005f, 1538317066);
+                                                   O2 = (1.37f, 1538317066);};
+                                     Closing = X2 {O1 = (3.24000001f, 1538320084);
+                                                   O2 = (1.37f, 1538317066);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (3.20000005f, 1538316790);
+                                                   O2 = (1.37f, 1538316790);};
+                                     Closing = X2 {O1 = (3.25f, 1538319792);
+                                                   O2 = (1.36000001f, 1538319792);};};}|];};
+                        {Value = Some -1.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.57999992f, 1538316188);
+                                                   O2 = (1.57000005f, 1538316188);};
+                                     Closing = X2 {O1 = (2.61999989f, 1538322362);
+                                                   O2 = (1.55999994f, 1538322362);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (2.49000001f, 1538318850);
+                                                   O2 = (1.54999995f, 1538318850);};
+                                     Closing = X2 {O1 = (2.52999997f, 1538322477);
+                                                   O2 = (1.52999997f, 1538322477);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X2 {O1 = (2.49000001f, 1538317073);
+                                                   O2 = (1.54999995f, 1538317073);};
+                                     Closing = X2 {O1 = (2.49000001f, 1538317073);
+                                                   O2 = (1.54999995f, 1538317073);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.6400001f, 1538316228);
+                                                   O2 = (1.55999994f, 1538316228);};
+                                     Closing = X2 {O1 = (2.61999989f, 1538334041);
+                                                   O2 = (1.57000005f, 1538325366);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.6400001f, 1538315946);
+                                                   O2 = (1.55999994f, 1538315946);};
+                                     Closing = X2 {O1 = (2.61999989f, 1538333897);
+                                                   O2 = (1.57000005f, 1538325096);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (2.79999995f, 1538314010);
+                                                   O2 = (1.36000001f, 1538314010);};
+                                     Closing = X2 {O1 = (2.49000001f, 1538329316);
+                                                   O2 = (1.5f, 1538329316);};};}|];};
+                        {Value = Some -1.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.11999989f, 1538316188);
+                                                   O2 = (1.78999996f, 1538316188);};
+                                     Closing = X2 {O1 = (2.17000008f, 1538322362);
+                                                   O2 = (1.75999999f, 1538322362);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (2.1099999f, 1538318850);
+                                                   O2 = (1.77999997f, 1538318850);};
+                                     Closing = X2 {O1 = (2.1400001f, 1538322477);
+                                                   O2 = (1.75f, 1538322477);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (2.01999998f, 1538316334);
+                                                   O2 = (1.77999997f, 1538316334);};
+                                     Closing = X2 {O1 = (2.04999995f, 1538322432);
+                                                   O2 = (1.75f, 1538322432);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.1099999f, 1538317066);
+                                                   O2 = (1.75999999f, 1538317066);};
+                                     Closing = X2 {O1 = (2.1400001f, 1538325366);
+                                                   O2 = (1.74000001f, 1538325366);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.1099999f, 1538316790);
+                                                   O2 = (1.75999999f, 1538316790);};
+                                     Closing = X2 {O1 = (2.1400001f, 1538325096);
+                                                   O2 = (1.74000001f, 1538325096);};};}|];};
+                        {Value = Some 1.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.62f, 1538317066);
+                                                   O2 = (2.33999991f, 1538317066);};
+                                     Closing = X2 {O1 = (1.63f, 1538328613);
+                                                   O2 = (2.30999994f, 1538328613);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.62f, 1538316790);
+                                                   O2 = (2.33999991f, 1538316790);};
+                                     Closing = X2 {O1 = (1.63f, 1538328297);
+                                                   O2 = (2.30999994f, 1538328297);};};}|];};
+                        {Value = Some 1.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.47000003f, 1538318683);
+                                                   O2 = (2.8599999f, 1538318683);};
+                                     Closing = X2 {O1 = (1.48000002f, 1538333781);
+                                                   O2 = (2.82999992f, 1538334566);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.63999999f, 1538277086);
+                                                   O2 = (2.44000006f, 1538277086);};
+                                     Closing = X2 {O1 = (1.48000002f, 1538319729);
+                                                   O2 = (2.6500001f, 1538319729);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.63999999f, 1538276911);
+                                                   O2 = (2.44000006f, 1538276911);};
+                                     Closing = X2 {O1 = (1.48000002f, 1538319677);
+                                                   O2 = (2.6500001f, 1538319677);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (1.59000003f, 1538314010);
+                                                   O2 = (2.31999993f, 1538314010);};
+                                     Closing = X2 {O1 = (1.42999995f, 1538315532);
+                                                   O2 = (2.56999993f, 1538329316);};};}|];}|];}|];})
         Assert.That(actual, Is.EqualTo(expected))
     [<Test>]
     member this.ScrapSoccerRPL1819League() =
@@ -275,101 +590,1629 @@ type InternetTests() =
     member this.ScrapSoccerRPL1819Match() =
         let matchID = "6mrwJVoQ"
         let matchUrl = "soccer/russia/premier-league-2018-2019/dynamo-moscow-arsenal-tula-" + matchID + "/"
-        let actual = extractMatchOdds soccerID [out1x2ID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
+        let bookIDs = [|
+            pinnacleID; sbobetID; dafabetID; _188betID;
+            asianoddsID; betfairID;
+            bet365ID; bwinID;
+            _1xbetID; marafonID; winlineID;
+        |]
+        let actual = extractMatchOdds bookIDs soccerID [out1x2ID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
         let expected =
-            Some {
-                ID = "6mrwJVoQ";
-                Url = "http://www.oddsportal.com/soccer/russia/premier-league-2018-2019/dynamo-moscow-arsenal-tula-6mrwJVoQ/";
-                TeamHome = "Dynamo Moscow";
-                TeamAway = "Arsenal Tula";
-                Time = 1558868400;
-                Score = { Home = 3; Away = 3 };
-                ScoreWithoutOT = None;
-                Periods = [| { Home = 2; Away = 1 }; { Home = 1; Away = 2 } |]
-                Odds = [|
-                    { OutcomeID = "1";
-                    Values = [| { Value = None; Odds = { Opening = X3 {O1 = 2.19f; O0 = 3.32f; O2 = 3.41f }; Closing = X3 {O1 = 1.74f; O0 = 3.73f; O2 = 5.17f } } }|] };
-                    { OutcomeID = "2";
-                    Values =
-                    [|
-                        { Value = Some 1.75f; Odds = { Opening = X2 {O1 = 1.53f; O2 = 2.41f;}; Closing = X2 {O1 = 1.43f; O2 = 2.82f } } };
-                        { Value = Some 2.0f; Odds = { Opening = X2 {O1 = 1.75f; O2 = 2.07f;}; Closing = X2 {O1 = 1.58f; O2 = 2.42f } } };
-                        { Value = Some 2.25f; Odds = { Opening = X2 {O1 = 2.07f; O2 = 1.76f;}; Closing = X2 {O1 = 1.88f; O2 = 2.0f } } };
-                        { Value = Some 2.5f; Odds = { Opening = X2 {O1 = 2.35f; O2 = 1.56f;}; Closing = X2 {O1 = 2.15f; O2 = 1.75f } } };
-                        { Value = Some 2.75f; Odds = { Opening = X2 {O1 = 2.81f; O2 = 1.37f;}; Closing = X2 {O1 = 2.51f; O2 = 1.54f } } }
-                    |]};
-                    { OutcomeID = "5";
-                    Values =
-                    [|
-                        { Value = Some -1.25f; Odds = { Opening = X2 {O1 = 3.06f; O2 = 1.38f;}; Closing = X2 {O1 = 2.94f; O2 = 1.41f } } };
-                        { Value = Some -1.0f; Odds = { Opening = X2 {O1 = 3.29f; O2 = 1.28f;}; Closing = X2 {O1 = 2.48f; O2 = 1.57f } } };
-                        { Value = Some -0.75f; Odds = { Opening = X2 {O1 = 2.62f; O2 = 1.46f;}; Closing = X2 {O1 = 1.99f; O2 = 1.91f } } };
-                        { Value = Some -0.5f; Odds = { Opening = X2 {O1 = 2.17f; O2 = 1.69f;}; Closing = X2 {O1 = 1.73f; O2 = 2.21f } } };
-                        { Value = Some -0.25f; Odds = { Opening = X2 {O1 = 1.88f; O2 = 1.96f;}; Closing = X2 {O1 = 1.49f; O2 = 2.69f } } };
-                        { Value = Some 0.0f; Odds = { Opening = X2 {O1 = 1.54f; O2 = 2.44f;}; Closing = X2 {O1 = 1.30f; O2 = 3.48f } } };
-                        { Value = Some 0.25f; Odds = { Opening = X2 {O1 = 1.37f; O2 = 2.88f;}; Closing = X2 {O1 = 1.34f; O2 = 2.99f } } }
-                    |]}
-                |]}
+            Some({ID = "6mrwJVoQ";
+                 Url =
+                  "http://www.oddsportal.com/soccer/russia/premier-league-2018-2019/dynamo-moscow-arsenal-tula-6mrwJVoQ/";
+                 TeamHome = "Dynamo Moscow";
+                 TeamAway = "Arsenal Tula";
+                 Time = 1558868400;
+                 Score = {Home = 3;
+                          Away = 3;};
+                 ScoreWithoutOT = None;
+                 Periods = [|{Home = 2;
+                              Away = 1;}; {Home = 1;
+                                           Away = 2;}|];
+                 Odds =
+                  [|{OutcomeID = "1";
+                     Values =
+                      [|{Value = None;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X3 {O1 = (2.19000006f, 1558695617);
+                                                   O0 = (3.31999993f, 1558695617);
+                                                   O2 = (3.41000009f, 1558695617);};
+                                     Closing = X3 {O1 = (1.74000001f, 1558868299);
+                                                   O0 = (3.73000002f, 1558868356);
+                                                   O2 = (5.17000008f, 1558868299);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X3 {O1 = (1.96000004f, 1558702313);
+                                                   O0 = (3.25f, 1558702313);
+                                                   O2 = (3.79999995f, 1558702313);};
+                                     Closing = X3 {O1 = (1.75999999f, 1558868353);
+                                                   O0 = (3.5999999f, 1558867753);
+                                                   O2 = (4.30000019f, 1558868353);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X3 {O1 = (2.02999997f, 1558728375);
+                                                   O0 = (3.20000005f, 1558728375);
+                                                   O2 = (3.20000005f, 1558728375);};
+                                     Closing = X3 {O1 = (1.77999997f, 1558868344);
+                                                   O0 = (3.3499999f, 1558867844);
+                                                   O2 = (4.55000019f, 1558868344);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X3 {O1 = (2.02999997f, 1558715262);
+                                                   O0 = (3.29999995f, 1558715262);
+                                                   O2 = (3.5f, 1558715262);};
+                                     Closing = X3 {O1 = (1.75999999f, 1558868221);
+                                                   O0 = (3.3499999f, 1558868221);
+                                                   O2 = (4.5999999f, 1558868221);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X3 {O1 = (2.18000007f, 1558696415);
+                                                   O0 = (3.32999992f, 1558696415);
+                                                   O2 = (3.43000007f, 1558696415);};
+                                     Closing = X3 {O1 = (1.75999999f, 1558868306);
+                                                   O0 = (3.73000002f, 1558868354);
+                                                   O2 = (5.4000001f, 1558868354);};};};
+                            {BookID = "429";
+                             Odds = {Opening = X3 {O1 = (2.1500001f, 1558330018);
+                                                   O0 = (3.0999999f, 1558330018);
+                                                   O2 = (3.20000005f, 1558330018);};
+                                     Closing = X3 {O1 = (1.79999995f, 1558867397);
+                                                   O0 = (3.4000001f, 1558867397);
+                                                   O2 = (4.5999999f, 1558867397);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X3 {O1 = (2.20000005f, 1558617468);
+                                                   O0 = (3.0999999f, 1558617468);
+                                                   O2 = (3.0f, 1558617468);};
+                                     Closing = X3 {O1 = (1.72000003f, 1558867763);
+                                                   O0 = (3.5999999f, 1558867763);
+                                                   O2 = (5.0f, 1558867763);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X3 {O1 = (2.3499999f, 1558427878);
+                                                   O0 = (3.25f, 1558427878);
+                                                   O2 = (3.0f, 1558427878);};
+                                     Closing = X3 {O1 = (1.83000004f, 1558858668);
+                                                   O0 = (3.4000001f, 1558858668);
+                                                   O2 = (4.4000001f, 1558858668);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X3 {O1 = (2.75f, 1557689303);
+                                                   O0 = (3.0999999f, 1557689303);
+                                                   O2 = (2.76999998f, 1557689303);};
+                                     Closing = X3 {O1 = (1.78999996f, 1558868176);
+                                                   O0 = (3.5999999f, 1558868176);
+                                                   O2 = (4.76000023f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X3 {O1 = (2.25f, 1558333900);
+                                                   O0 = (3.24000001f, 1558333900);
+                                                   O2 = (3.38000011f, 1558333900);};
+                                     Closing = X3 {O1 = (1.74000001f, 1558868344);
+                                                   O0 = (3.6400001f, 1558868344);
+                                                   O2 = (5.0f, 1558868344);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X3 {O1 = (2.74000001f, 1558007539);
+                                                   O0 = (3.0999999f, 1558007539);
+                                                   O2 = (2.75999999f, 1558007539);};
+                                     Closing = X3 {O1 = (1.83000004f, 1558867835);
+                                                   O0 = (3.5f, 1558867835);
+                                                   O2 = (4.59000015f, 1558867835);};};}|];}|];};
+                    {OutcomeID = "2";
+                     Values =
+                      [|{Value = Some 0.5f;
+                         BookOdds =
+                          [|{BookID = "429";
+                             Odds = {Opening = X2 {O1 = (1.04999995f, 1558330018);
+                                                   O2 = (8.0f, 1558330018);};
+                                     Closing = X2 {O1 = (1.07000005f, 1558868012);
+                                                   O2 = (8.0f, 1558868012);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (1.10000002f, 1558631192);
+                                                   O2 = (7.5f, 1558631192);};
+                                     Closing = X2 {O1 = (1.08000004f, 1558724880);
+                                                   O2 = (8.5f, 1558857622);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.07000005f, 1558427878);
+                                                   O2 = (7.0f, 1558427878);};
+                                     Closing = X2 {O1 = (1.07000005f, 1558705148);
+                                                   O2 = (7.0f, 1558868279);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.08000004f, 1557689303);
+                                                   O2 = (8.0f, 1557689303);};
+                                     Closing = X2 {O1 = (1.00999999f, 1558866638);
+                                                   O2 = (10.0f, 1558867599);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.01999998f, 1558652652);
+                                                   O2 = (8.80000019f, 1558652652);};
+                                     Closing = X2 {O1 = (1.00999999f, 1558861258);
+                                                   O2 = (10.25f, 1558868344);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (1.07000005f, 1558329115);
+                                                   O2 = (6.46999979f, 1558329115);};
+                                     Closing = X2 {O1 = (1.05999994f, 1558860891);
+                                                   O2 = (6.84000015f, 1558863593);};};}|];};
+                        {Value = Some 1.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.13f, 1557689303);
+                                                   O2 = (5.9000001f, 1557689303);};
+                                     Closing = X2 {O1 = (1.04999995f, 1558866638);
+                                                   O2 = (7.9000001f, 1558867599);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.07000005f, 1558652652);
+                                                   O2 = (6.75f, 1558652652);};
+                                     Closing = X2 {O1 = (1.04999995f, 1558866058);
+                                                   O2 = (8.0f, 1558868344);};};}|];};
+                        {Value = Some 1.5f;
+                         BookOdds =
+                          [|{BookID = "429";
+                             Odds = {Opening = X2 {O1 = (1.33000004f, 1558330018);
+                                                   O2 = (3.0f, 1558330018);};
+                                     Closing = X2 {O1 = (1.36000001f, 1558867397);
+                                                   O2 = (3.0999999f, 1558867397);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (1.39999998f, 1558631192);
+                                                   O2 = (2.75f, 1558631192);};
+                                     Closing = X2 {O1 = (1.36000001f, 1558724880);
+                                                   O2 = (3.0f, 1558724880);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.36000001f, 1558427878);
+                                                   O2 = (2.9000001f, 1558427878);};
+                                     Closing = X2 {O1 = (1.36000001f, 1558868279);
+                                                   O2 = (2.8499999f, 1558868279);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.42999995f, 1557689303);
+                                                   O2 = (2.79999995f, 1557689303);};
+                                     Closing = X2 {O1 = (1.32000005f, 1558867366);
+                                                   O2 = (3.20000005f, 1558867366);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.38f, 1558652652);
+                                                   O2 = (2.9000001f, 1558652652);};
+                                     Closing = X2 {O1 = (1.32000005f, 1558867869);
+                                                   O2 = (3.20000005f, 1558867869);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (1.37f, 1558329115);
+                                                   O2 = (2.75999999f, 1558329115);};
+                                     Closing = X2 {O1 = (1.34000003f, 1558863593);
+                                                   O2 = (2.91000009f, 1558863593);};};}|];};
+                        {Value = Some 1.75f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.52999997f, 1558695616);
+                                                   O2 = (2.41000009f, 1558695616);};
+                                     Closing = X2 {O1 = (1.42999995f, 1558868356);
+                                                   O2 = (2.81999993f, 1558868356);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.52999997f, 1558696415);
+                                                   O2 = (2.41000009f, 1558696415);};
+                                     Closing = X2 {O1 = (1.42999995f, 1558868354);
+                                                   O2 = (2.81999993f, 1558868354);};};}|];};
+                        {Value = Some 2.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.75f, 1558695616);
+                                                   O2 = (2.06999993f, 1558695616);};
+                                     Closing = X2 {O1 = (1.58000004f, 1558868356);
+                                                   O2 = (2.42000008f, 1558868356);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.75f, 1558696473);
+                                                   O2 = (2.06999993f, 1558696473);};
+                                     Closing = X2 {O1 = (1.58000004f, 1558868354);
+                                                   O2 = (2.42000008f, 1558868354);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.70000005f, 1557689303);
+                                                   O2 = (2.1500001f, 1557689303);};
+                                     Closing = X2 {O1 = (1.54999995f, 1558868176);
+                                                   O2 = (2.42000008f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.66999996f, 1558652652);
+                                                   O2 = (2.18000007f, 1558652652);};
+                                     Closing = X2 {O1 = (1.53999996f, 1558868344);
+                                                   O2 = (2.45000005f, 1558868344);};};}|];};
+                        {Value = Some 2.25f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.06999993f, 1558695616);
+                                                   O2 = (1.75999999f, 1558695616);};
+                                     Closing = X2 {O1 = (1.88f, 1558868356);
+                                                   O2 = (2.0f, 1558868356);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (2.1099999f, 1558695742);
+                                                   O2 = (1.79999995f, 1558695742);};
+                                     Closing = X2 {O1 = (1.90999997f, 1558867753);
+                                                   O2 = (1.99000001f, 1558867753);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X2 {O1 = (1.98000002f, 1558720002);
+                                                   O2 = (1.91999996f, 1558720002);};
+                                     Closing = X2 {O1 = (1.94000006f, 1558867658);
+                                                   O2 = (1.96000004f, 1558867658);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (1.99000001f, 1558715262);
+                                                   O2 = (1.90999997f, 1558715262);};
+                                     Closing = X2 {O1 = (1.90999997f, 1558868332);
+                                                   O2 = (1.99000001f, 1558868332);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (2.07999992f, 1558696473);
+                                                   O2 = (1.77999997f, 1558696473);};
+                                     Closing = X2 {O1 = (1.92999995f, 1558868354);
+                                                   O2 = (2.0f, 1558868354);};};}|];};
+                        {Value = Some 2.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.3499999f, 1558695617);
+                                                   O2 = (1.55999994f, 1558695617);};
+                                     Closing = X2 {O1 = (2.1500001f, 1558868356);
+                                                   O2 = (1.75f, 1558868356);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (2.25f, 1558856643);
+                                                   O2 = (1.70000005f, 1558856643);};
+                                     Closing = X2 {O1 = (2.21000004f, 1558860723);
+                                                   O2 = (1.72000003f, 1558860723);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (2.3499999f, 1558696473);
+                                                   O2 = (1.55999994f, 1558696473);};
+                                     Closing = X2 {O1 = (2.20000005f, 1558862513);
+                                                   O2 = (1.75f, 1558868354);};};};
+                            {BookID = "429";
+                             Odds = {Opening = X2 {O1 = (2.20000005f, 1558330018);
+                                                   O2 = (1.60000002f, 1558330018);};
+                                     Closing = X2 {O1 = (2.1500001f, 1558867397);
+                                                   O2 = (1.66999996f, 1558867397);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (2.25f, 1558680264);
+                                                   O2 = (1.62f, 1558680264);};
+                                     Closing = X2 {O1 = (2.0999999f, 1558867509);
+                                                   O2 = (1.70000005f, 1558867509);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (2.0999999f, 1558427878);
+                                                   O2 = (1.64999998f, 1558427878);};
+                                     Closing = X2 {O1 = (2.0999999f, 1558867716);
+                                                   O2 = (1.64999998f, 1558867716);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.24000001f, 1557689303);
+                                                   O2 = (1.64999998f, 1557689303);};
+                                     Closing = X2 {O1 = (2.16000009f, 1558868176);
+                                                   O2 = (1.76999998f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.33999991f, 1558333900);
+                                                   O2 = (1.66999996f, 1558333900);};
+                                     Closing = X2 {O1 = (2.1500001f, 1558868344);
+                                                   O2 = (1.77999997f, 1558868344);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (2.25f, 1558329115);
+                                                   O2 = (1.63f, 1558329115);};
+                                     Closing = X2 {O1 = (2.13000011f, 1558863593);
+                                                   O2 = (1.69000006f, 1558863593);};};}|];};
+                        {Value = Some 2.75f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.80999994f, 1558695617);
+                                                   O2 = (1.37f, 1558695617);};
+                                     Closing = X2 {O1 = (2.50999999f, 1558868356);
+                                                   O2 = (1.53999996f, 1558868356);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (2.79999995f, 1558696473);
+                                                   O2 = (1.37f, 1558696473);};
+                                     Closing = X2 {O1 = (2.50999999f, 1558868354);
+                                                   O2 = (1.53999996f, 1558868354);};};}|];};
+                        {Value = Some 3.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (3.20000005f, 1557689303);
+                                                   O2 = (1.35000002f, 1557689303);};
+                                     Closing = X2 {O1 = (3.07999992f, 1558867366);
+                                                   O2 = (1.37f, 1558867366);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (3.53999996f, 1558652652);
+                                                   O2 = (1.28999996f, 1558652652);};
+                                     Closing = X2 {O1 = (3.07999992f, 1558867869);
+                                                   O2 = (1.36000001f, 1558866058);};};}|];};
+                        {Value = Some 3.5f;
+                         BookOdds =
+                          [|{BookID = "429";
+                             Odds = {Opening = X2 {O1 = (4.0f, 1558330018);
+                                                   O2 = (1.20000005f, 1558330018);};
+                                     Closing = X2 {O1 = (4.0999999f, 1558867397);
+                                                   O2 = (1.22000003f, 1558867397);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (4.32999992f, 1558631192);
+                                                   O2 = (1.20000005f, 1558631192);};
+                                     Closing = X2 {O1 = (3.75f, 1558867763);
+                                                   O2 = (1.25f, 1558867763);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (3.79999995f, 1558427878);
+                                                   O2 = (1.22000003f, 1558427878);};
+                                     Closing = X2 {O1 = (3.79999995f, 1558868279);
+                                                   O2 = (1.22000003f, 1558868279);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (4.0f, 1557689303);
+                                                   O2 = (1.25f, 1557689303);};
+                                     Closing = X2 {O1 = (3.79999995f, 1558866638);
+                                                   O2 = (1.24000001f, 1558866638);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (4.30000019f, 1558652652);
+                                                   O2 = (1.20000005f, 1558652652);};
+                                     Closing = X2 {O1 = (3.79999995f, 1558866058);
+                                                   O2 = (1.24000001f, 1558866058);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (3.78999996f, 1558329115);
+                                                   O2 = (1.21000004f, 1558329115);};
+                                     Closing = X2 {O1 = (3.54999995f, 1558863593);
+                                                   O2 = (1.24000001f, 1558863593);};};}|];};
+                        {Value = Some 4.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (6.30000019f, 1557689303);
+                                                   O2 = (1.12f, 1557689303);};
+                                     Closing = X2 {O1 = (6.44999981f, 1558868176);
+                                                   O2 = (1.08000004f, 1558861961);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (7.4000001f, 1558652652);
+                                                   O2 = (1.05999994f, 1558652652);};
+                                     Closing = X2 {O1 = (6.44999981f, 1558867745);
+                                                   O2 = (1.08000004f, 1558861614);};};}|];};
+                        {Value = Some 4.5f;
+                         BookOdds =
+                          [|{BookID = "429";
+                             Odds = {Opening = X2 {O1 = (8.0f, 1558330018);
+                                                   O2 = (1.04999995f, 1558330018);};
+                                     Closing = X2 {O1 = (8.0f, 1558863798);
+                                                   O2 = (1.07000005f, 1558863798);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (10.0f, 1558631192);
+                                                   O2 = (1.05999994f, 1558631192);};
+                                     Closing = X2 {O1 = (8.0f, 1558867763);
+                                                   O2 = (1.08000004f, 1558867763);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (7.0f, 1558427878);
+                                                   O2 = (1.07000005f, 1558427878);};
+                                     Closing = X2 {O1 = (7.0f, 1558868279);
+                                                   O2 = (1.07000005f, 1558868279);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (7.5999999f, 1557689303);
+                                                   O2 = (1.09000003f, 1557689303);};
+                                     Closing = X2 {O1 = (7.19999981f, 1558868176);
+                                                   O2 = (1.04999995f, 1558861961);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (8.10000038f, 1558652652);
+                                                   O2 = (1.02999997f, 1558652652);};
+                                     Closing = X2 {O1 = (7.19999981f, 1558867745);
+                                                   O2 = (1.04999995f, 1558861614);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (6.8499999f, 1558329115);
+                                                   O2 = (1.05999994f, 1558329115);};
+                                     Closing = X2 {O1 = (6.46999979f, 1558863593);
+                                                   O2 = (1.07000005f, 1558860891);};};}|];};
+                        {Value = Some 5.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (11.0f, 1557689303);
+                                                   O2 = (1.03999996f, 1557689303);};
+                                     Closing = X2 {O1 = (10.0f, 1558862921);
+                                                   O2 = (1.04999995f, 1558862921);};};}|];};
+                        {Value = Some 5.5f;
+                         BookOdds =
+                          [|{BookID = "419";
+                             Odds = {Opening = X2 {O1 = (21.0f, 1558631192);
+                                                   O2 = (1.00999999f, 1558631192);};
+                                     Closing = X2 {O1 = (19.0f, 1558724880);
+                                                   O2 = (1.01999998f, 1558724880);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (12.5f, 1558427878);
+                                                   O2 = (1.00999999f, 1558427878);};
+                                     Closing = X2 {O1 = (13.0f, 1558868279);
+                                                   O2 = (1.00999999f, 1558427878);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (13.5f, 1557689303);
+                                                   O2 = (1.01999998f, 1557689303);};
+                                     Closing = X2 {O1 = (12.0f, 1558862921);
+                                                   O2 = (1.02999997f, 1558728605);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (9.77000046f, 1558329115);
+                                                   O2 = (1.00999999f, 1558329115);};
+                                     Closing = X2 {O1 = (9.65999985f, 1558867835);
+                                                   O2 = (1.00999999f, 1558706476);};};}|];}|];};
+                    {OutcomeID = "5";
+                     Values =
+                      [|{Value = Some -3.5f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (16.0f, 1558858145);
+                                                   O2 = (1.00999999f, 1558858145);};
+                                     Closing = X2 {O1 = (15.0f, 1558867983);
+                                                   O2 = (1.00999999f, 1558858145);};};}|];};
+                        {Value = Some -3.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (14.5f, 1558858145);
+                                                   O2 = (1.01999998f, 1558858145);};
+                                     Closing = X2 {O1 = (14.0f, 1558867983);
+                                                   O2 = (1.01999998f, 1558867983);};};}|];};
+                        {Value = Some -2.5f;
+                         BookOdds =
+                          [|{BookID = "419";
+                             Odds = {Opening = X2 {O1 = (7.0f, 1558867507);
+                                                   O2 = (1.10000002f, 1558867507);};
+                                     Closing = X2 {O1 = (6.80000019f, 1558867634);
+                                                   O2 = (1.10000002f, 1558867507);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (14.0f, 1557689303);
+                                                   O2 = (1.01999998f, 1557689303);};
+                                     Closing = X2 {O1 = (6.30000019f, 1558868176);
+                                                   O2 = (1.07000005f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (9.30000019f, 1558652652);
+                                                   O2 = (1.01999998f, 1558652652);};
+                                     Closing = X2 {O1 = (6.19999981f, 1558868344);
+                                                   O2 = (1.07000005f, 1558867019);};};}|];};
+                        {Value = Some -2.25f;
+                         BookOdds =
+                          [|{BookID = "419";
+                             Odds = {Opening = X2 {O1 = (6.80000019f, 1558857681);
+                                                   O2 = (1.10000002f, 1558857681);};
+                                     Closing = X2 {O1 = (6.4000001f, 1558868152);
+                                                   O2 = (1.11000001f, 1558868152);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (8.60000038f, 1558700355);
+                                                   O2 = (1.04999995f, 1558700355);};
+                                     Closing = X2 {O1 = (6.3499999f, 1558867733);
+                                                   O2 = (1.11000001f, 1558867733);};};}|];};
+                        {Value = Some -2.0f;
+                         BookOdds =
+                          [|{BookID = "419";
+                             Odds = {Opening = X2 {O1 = (7.0f, 1558826654);
+                                                   O2 = (1.10000002f, 1558826654);};
+                                     Closing = X2 {O1 = (5.9000001f, 1558868152);
+                                                   O2 = (1.13f, 1558868152);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (12.5f, 1557689303);
+                                                   O2 = (1.02999997f, 1557689303);};
+                                     Closing = X2 {O1 = (5.44999981f, 1558868176);
+                                                   O2 = (1.12f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (8.39999962f, 1558652652);
+                                                   O2 = (1.03999996f, 1558652652);};
+                                     Closing = X2 {O1 = (5.3499999f, 1558868344);
+                                                   O2 = (1.12f, 1558867993);};};}|];};
+                        {Value = Some -1.75f;
+                         BookOdds =
+                          [|{BookID = "419";
+                             Odds = {Opening = X2 {O1 = (4.80000019f, 1558725133);
+                                                   O2 = (1.16999996f, 1558725133);};
+                                     Closing = X2 {O1 = (3.9000001f, 1558867763);
+                                                   O2 = (1.24000001f, 1558867763);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (5.4000001f, 1558280068);
+                                                   O2 = (1.14999998f, 1558280068);};
+                                     Closing = X2 {O1 = (3.96000004f, 1558868176);
+                                                   O2 = (1.24000001f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (5.80000019f, 1558652652);
+                                                   O2 = (1.11000001f, 1558652652);};
+                                     Closing = X2 {O1 = (3.81999993f, 1558868344);
+                                                   O2 = (1.23000002f, 1558868344);};};}|];};
+                        {Value = Some -1.5f;
+                         BookOdds =
+                          [|{BookID = "419";
+                             Odds = {Opening = X2 {O1 = (3.70000005f, 1558725133);
+                                                   O2 = (1.25999999f, 1558725133);};
+                                     Closing = X2 {O1 = (3.0999999f, 1558867633);
+                                                   O2 = (1.35000002f, 1558867633);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (5.69999981f, 1557689303);
+                                                   O2 = (1.13999999f, 1557689303);};
+                                     Closing = X2 {O1 = (3.1500001f, 1558868176);
+                                                   O2 = (1.33000004f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (4.55000019f, 1558652652);
+                                                   O2 = (1.17999995f, 1558652652);};
+                                     Closing = X2 {O1 = (3.0999999f, 1558868344);
+                                                   O2 = (1.34000003f, 1558868344);};};}|];};
+                        {Value = Some -1.25f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (3.05999994f, 1558867876);
+                                                   O2 = (1.38f, 1558867876);};
+                                     Closing = X2 {O1 = (2.94000006f, 1558868356);
+                                                   O2 = (1.40999997f, 1558868356);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (3.05999994f, 1558867872);
+                                                   O2 = (1.38f, 1558867872);};
+                                     Closing = X2 {O1 = (2.94000006f, 1558868354);
+                                                   O2 = (1.40999997f, 1558868354);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (3.29999995f, 1558725133);
+                                                   O2 = (1.32000005f, 1558725133);};
+                                     Closing = X2 {O1 = (2.75f, 1558867633);
+                                                   O2 = (1.41999996f, 1558867633);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (5.19999981f, 1557689303);
+                                                   O2 = (1.15999997f, 1557689303);};
+                                     Closing = X2 {O1 = (2.79999995f, 1558868176);
+                                                   O2 = (1.42999995f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (4.0999999f, 1558652652);
+                                                   O2 = (1.22000003f, 1558652652);};
+                                     Closing = X2 {O1 = (2.74000001f, 1558868344);
+                                                   O2 = (1.42999995f, 1558868344);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (2.82999992f, 1558858163);
+                                                   O2 = (1.36000001f, 1558858163);};
+                                     Closing = X2 {O1 = (2.75f, 1558867835);
+                                                   O2 = (1.38f, 1558862674);};};}|];};
+                        {Value = Some -1.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (3.28999996f, 1558699620);
+                                                   O2 = (1.27999997f, 1558699620);};
+                                     Closing = X2 {O1 = (2.48000002f, 1558868356);
+                                                   O2 = (1.57000005f, 1558868356);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (3.28999996f, 1558699603);
+                                                   O2 = (1.27999997f, 1558699603);};
+                                     Closing = X2 {O1 = (2.48000002f, 1558868354);
+                                                   O2 = (1.57000005f, 1558868354);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (2.8499999f, 1558725133);
+                                                   O2 = (1.39999998f, 1558725133);};
+                                     Closing = X2 {O1 = (2.36999989f, 1558868152);
+                                                   O2 = (1.54999995f, 1558868152);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (4.69999981f, 1557689303);
+                                                   O2 = (1.19000006f, 1557689303);};
+                                     Closing = X2 {O1 = (2.42000008f, 1558868176);
+                                                   O2 = (1.54999995f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (3.61999989f, 1558652652);
+                                                   O2 = (1.27999997f, 1558652652);};
+                                     Closing = X2 {O1 = (2.38000011f, 1558868344);
+                                                   O2 = (1.57000005f, 1558868344);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (2.69000006f, 1558700147);
+                                                   O2 = (1.38999999f, 1558700147);};
+                                     Closing = X2 {O1 = (2.47000003f, 1558867835);
+                                                   O2 = (1.5f, 1558867835);};};}|];};
+                        {Value = Some -0.75f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.61999989f, 1558695616);
+                                                   O2 = (1.46000004f, 1558695616);};
+                                     Closing = X2 {O1 = (1.99000001f, 1558868299);
+                                                   O2 = (1.90999997f, 1558868299);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (2.19000006f, 1558857487);
+                                                   O2 = (1.75999999f, 1558857487);};
+                                     Closing = X2 {O1 = (1.99000001f, 1558868332);
+                                                   O2 = (1.92999995f, 1558868332);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (2.6099999f, 1558696473);
+                                                   O2 = (1.46000004f, 1558696473);};
+                                     Closing = X2 {O1 = (1.99000001f, 1558868306);
+                                                   O2 = (1.92999995f, 1558868354);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (2.25f, 1558725133);
+                                                   O2 = (1.62f, 1558725133);};
+                                     Closing = X2 {O1 = (2.0f, 1558868152);
+                                                   O2 = (1.79999995f, 1558868152);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (3.38000011f, 1557689303);
+                                                   O2 = (1.32000005f, 1557689303);};
+                                     Closing = X2 {O1 = (2.04999995f, 1558868176);
+                                                   O2 = (1.86000001f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.72000003f, 1558652652);
+                                                   O2 = (1.46000004f, 1558652652);};
+                                     Closing = X2 {O1 = (1.96000004f, 1558868344);
+                                                   O2 = (1.84000003f, 1558868344);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (2.49000001f, 1558329115);
+                                                   O2 = (1.45000005f, 1558329115);};
+                                     Closing = X2 {O1 = (2.06999993f, 1558867835);
+                                                   O2 = (1.76999998f, 1558867835);};};}|];};
+                        {Value = Some -0.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.17000008f, 1558695616);
+                                                   O2 = (1.69000006f, 1558695616);};
+                                     Closing = X2 {O1 = (1.73000002f, 1558868356);
+                                                   O2 = (2.21000004f, 1558868299);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (2.03999996f, 1558732354);
+                                                   O2 = (1.88f, 1558732354);};
+                                     Closing = X2 {O1 = (1.76999998f, 1558868353);
+                                                   O2 = (2.17000008f, 1558868353);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X2 {O1 = (2.02999997f, 1558720002);
+                                                   O2 = (1.88999999f, 1558720002);};
+                                     Closing = X2 {O1 = (1.78999996f, 1558868344);
+                                                   O2 = (2.1400001f, 1558868344);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (2.03999996f, 1558715262);
+                                                   O2 = (1.88f, 1558715262);};
+                                     Closing = X2 {O1 = (1.75999999f, 1558868096);
+                                                   O2 = (2.19000006f, 1558868096);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (2.16000009f, 1558696473);
+                                                   O2 = (1.70000005f, 1558696473);};
+                                     Closing = X2 {O1 = (1.76999998f, 1558868354);
+                                                   O2 = (2.23000002f, 1558868354);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (2.0f, 1558724618);
+                                                   O2 = (1.85000002f, 1558724618);};
+                                     Closing = X2 {O1 = (1.76999998f, 1558868152);
+                                                   O2 = (2.0999999f, 1558868152);};};}|];};
+                        {Value = Some -0.25f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.88f, 1558695616);
+                                                   O2 = (1.96000004f, 1558695616);};
+                                     Closing = X2 {O1 = (1.49000001f, 1558868299);
+                                                   O2 = (2.69000006f, 1558868356);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.98000002f, 1558696473);
+                                                   O2 = (1.97000003f, 1558696473);};
+                                     Closing = X2 {O1 = (1.49000001f, 1558868306);
+                                                   O2 = (2.69000006f, 1558868354);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (1.98000002f, 1558696135);
+                                                   O2 = (1.88f, 1558696135);};
+                                     Closing = X2 {O1 = (1.51999998f, 1558867634);
+                                                   O2 = (2.42000008f, 1558867634);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.33999991f, 1557689303);
+                                                   O2 = (1.60000002f, 1557689303);};
+                                     Closing = X2 {O1 = (1.52999997f, 1558868176);
+                                                   O2 = (2.46000004f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.96000004f, 1558652652);
+                                                   O2 = (1.86000001f, 1558652652);};
+                                     Closing = X2 {O1 = (1.52999997f, 1558868344);
+                                                   O2 = (2.53999996f, 1558868344);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (1.88999999f, 1558329115);
+                                                   O2 = (1.91999996f, 1558329115);};
+                                     Closing = X2 {O1 = (1.55999994f, 1558867835);
+                                                   O2 = (2.33999991f, 1558867835);};};}|];};
+                        {Value = Some 0.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.53999996f, 1558695616);
+                                                   O2 = (2.44000006f, 1558695616);};
+                                     Closing = X2 {O1 = (1.29999995f, 1558867738);
+                                                   O2 = (3.48000002f, 1558867738);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.52999997f, 1558696415);
+                                                   O2 = (2.45000005f, 1558696415);};
+                                     Closing = X2 {O1 = (1.29999995f, 1558867753);
+                                                   O2 = (3.48000002f, 1558867753);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (1.39999998f, 1558725133);
+                                                   O2 = (2.8499999f, 1558725133);};
+                                     Closing = X2 {O1 = (1.32000005f, 1558868152);
+                                                   O2 = (3.29999995f, 1558868152);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.89999998f, 1557689303);
+                                                   O2 = (1.89999998f, 1557689303);};
+                                     Closing = X2 {O1 = (1.33000004f, 1558868176);
+                                                   O2 = (3.68000007f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.63f, 1558333900);
+                                                   O2 = (2.45000005f, 1558333900);};
+                                     Closing = X2 {O1 = (1.32000005f, 1558868344);
+                                                   O2 = (3.77999997f, 1558868344);};};}|];};
+                        {Value = Some 0.25f;
+                         BookOdds =
+                          [|{BookID = "419";
+                             Odds = {Opening = X2 {O1 = (1.29999995f, 1558725133);
+                                                   O2 = (3.45000005f, 1558725133);};
+                                     Closing = X2 {O1 = (1.25f, 1558868152);
+                                                   O2 = (3.79999995f, 1558868152);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.60000002f, 1557689303);
+                                                   O2 = (2.32999992f, 1557689303);};
+                                     Closing = X2 {O1 = (1.22000003f, 1558868176);
+                                                   O2 = (4.17999983f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.44000006f, 1558652652);
+                                                   O2 = (2.8599999f, 1558652652);};
+                                     Closing = X2 {O1 = (1.22000003f, 1558868344);
+                                                   O2 = (4.4000001f, 1558868344);};};}|];};
+                        {Value = Some 0.5f;
+                         BookOdds = [|{BookID = "419";
+                                       Odds = {Opening = X2 {O1 = (1.24000001f, 1558725133);
+                                                             O2 = (3.9000001f, 1558725133);};
+                                               Closing = X2 {O1 = (1.21000004f, 1558868152);
+                                                             O2 = (4.25f, 1558868152);};};}|];};
+                        {Value = Some 0.75f;
+                         BookOdds =
+                          [|{BookID = "419";
+                             Odds = {Opening = X2 {O1 = (1.15999997f, 1558725133);
+                                                   O2 = (5.25f, 1558725133);};
+                                     Closing = X2 {O1 = (1.13f, 1558868152);
+                                                   O2 = (5.9000001f, 1558868152);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.32000005f, 1557689303);
+                                                   O2 = (3.38000011f, 1557689303);};
+                                     Closing = X2 {O1 = (1.11000001f, 1558868176);
+                                                   O2 = (6.3499999f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.23000002f, 1558652652);
+                                                   O2 = (4.19999981f, 1558652652);};
+                                     Closing = X2 {O1 = (1.11000001f, 1558868344);
+                                                   O2 = (6.55000019f, 1558868344);};};}|];};
+                        {Value = Some 1.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.19000006f, 1557689303);
+                                                   O2 = (4.69999981f, 1557689303);};
+                                     Closing = X2 {O1 = (1.04999995f, 1558867366);
+                                                   O2 = (9.69999981f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.11000001f, 1558652652);
+                                                   O2 = (6.30000019f, 1558652652);};
+                                     Closing = X2 {O1 = (1.03999996f, 1558868344);
+                                                   O2 = (10.0f, 1558868344);};};}|];};
+                        {Value = Some 1.25f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.15999997f, 1557689303);
+                                                   O2 = (5.19999981f, 1557689303);};
+                                     Closing = X2 {O1 = (1.03999996f, 1558868176);
+                                                   O2 = (10.0f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.09000003f, 1558652652);
+                                                   O2 = (6.8499999f, 1558652652);};
+                                     Closing = X2 {O1 = (1.02999997f, 1558868344);
+                                                   O2 = (10.5f, 1558868344);};};}|];};
+                        {Value = Some 1.5f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.13999999f, 1557689303);
+                                                   O2 = (5.69999981f, 1557689303);};
+                                     Closing = X2 {O1 = (1.02999997f, 1558857905);
+                                                   O2 = (10.5f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.07000005f, 1558652652);
+                                                   O2 = (7.4000001f, 1558652652);};
+                                     Closing = X2 {O1 = (1.01999998f, 1558867993);
+                                                   O2 = (11.0f, 1558868344);};};}|];};
+                        {Value = Some 1.75f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.10000002f, 1557991398);
+                                                   O2 = (7.0f, 1557991398);};
+                                     Closing = X2 {O1 = (1.01999998f, 1558867366);
+                                                   O2 = (13.0f, 1558868176);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.03999996f, 1558652652);
+                                                   O2 = (8.60000038f, 1558652652);};
+                                     Closing = X2 {O1 = (1.00999999f, 1558868344);
+                                                   O2 = (11.25f, 1558868344);};};}|];};
+                        {Value = Some 2.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.02999997f, 1557689303);
+                                                   O2 = (12.5f, 1557689303);};
+                                     Closing = X2 {O1 = (1.00999999f, 1558822610);
+                                                   O2 = (11.0f, 1558867366);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.01999998f, 1558652652);
+                                                   O2 = (10.5f, 1558652652);};
+                                     Closing = X2 {O1 = (1.00999999f, 1558696077);
+                                                   O2 = (11.5f, 1558868344);};};}|];}|];}|];})
         Assert.That(actual, Is.EqualTo(expected))
-    *)
     [<Test>]
     member this.ScrapBasketballNBA1819Match() =
         let matchID = "juA7zL51"
         let matchUrl = "basketball/usa/nba/toronto-raptors-boston-celtics-" + matchID + "/"
-        let actual = extractMatchOdds basketballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
-        ()
-        (*
+        let bookIDs = [|
+            pinnacleID; sbobetID; dafabetID; _188betID;
+            asianoddsID; betfairID;
+            bet365ID; bwinID;
+            _1xbetID; marafonID; winlineID;
+        |]
+        let actual = extractMatchOdds bookIDs basketballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
         let expected =
-            Some {
-                ID = "juA7zL51";
-                Url = "http://www.oddsportal.com/basketball/usa/nba/toronto-raptors-boston-celtics-juA7zL51/";
-                TeamHome = "Toronto Raptors";
-                TeamAway = "Boston Celtics";
-                Time = 1551229200;
-                Score = { Home = 118; Away = 95 };
-                ScoreWithoutOT = None;
-                Periods = [|
-                    { Home = 30; Away = 32 };
-                    { Home = 36; Away = 13 };
-                    { Home = 29; Away = 23 };
-                    { Home = 23; Away = 27 }
-                |];
-                Odds =
-                [|
-                    { OutcomeID = "3"; Values = [|{ Value = None; Odds = { Opening = X2 {O1 = 1.57f; O2 = 2.57f;}; Closing = X2 {O1 = 1.63f; O2 = 2.43f } } }|] };
-                    { OutcomeID = "2";
-                    Values =
-                    [|
-                        { Value = Some 223.0f; Odds = { Opening = X2 {O1 = 1.75f; O2 = 2.19f }; Closing = X2 {O1 = 1.76f; O2 = 2.20f } } };
-                        { Value = Some 223.5f; Odds = { Opening = X2 {O1 = 1.79f; O2 = 2.13f;}; Closing = X2 {O1 = 1.80f; O2 = 2.13f } } };
-                        { Value = Some 224.0f; Odds = { Opening = X2 {O1 = 1.83f; O2 = 2.08f;}; Closing = X2 {O1 = 1.81f; O2 = 2.12f } } };
-                        { Value = Some 224.5f; Odds = { Opening = X2 {O1 = 1.79f; O2 = 2.10f;}; Closing = X2 {O1 = 1.82f; O2 = 2.11f } } };
-                        { Value = Some 225.0f; Odds = { Opening = X2 {O1 = 1.84f; O2 = 2.04f;}; Closing = X2 {O1 = 1.87f; O2 = 2.04f } } };
-                        { Value = Some 225.5f; Odds = { Opening = X2 {O1 = 1.88f; O2 = 1.99f;}; Closing = X2 {O1 = 1.92f; O2 = 1.99f } } };
-                        { Value = Some 226.0f; Odds = { Opening = X2 {O1 = 1.93f; O2 = 1.93f;}; Closing = X2 {O1 = 1.97f; O2 = 1.93f } } };
-                        { Value = Some 226.5f; Odds = { Opening = X2 {O1 = 1.99f; O2 = 1.88f;}; Closing = X2 {O1 = 2.03f; O2 = 1.88f } } };
-                        { Value = Some 227.0f; Odds = { Opening = X2 {O1 = 2.05f; O2 = 1.83f;}; Closing = X2 {O1 = 2.09f; O2 = 1.83f } } };
-                        { Value = Some 227.5f; Odds = { Opening = X2 {O1 = 2.12f; O2 = 1.78f;}; Closing = X2 {O1 = 2.16f; O2 = 1.78f } } };
-                        { Value = Some 228.0f; Odds = { Opening = X2 {O1 = 2.15f; O2 = 1.79f;}; Closing = X2 {O1 = 2.18f; O2 = 1.77f } } };
-                        { Value = Some 228.5f; Odds = { Opening = X2 {O1 = 2.13f; O2 = 1.80f;}; Closing = X2 {O1 = 2.13f; O2 = 1.80f } } };
-                        { Value = Some 229.0f; Odds = { Opening = X2 {O1 = 2.20f; O2 = 1.76f;}; Closing = X2 {O1 = 2.20f; O2 = 1.76f } } }
-                    |]};
-                    { OutcomeID = "5";
-                    Values =
-                    [|
-                        { Value = Some -6.0f; Odds = { Opening = X2 {O1 = 2.25f; O2 = 1.72f;}; Closing = X2 {O1 = 2.27f; O2 = 1.71f } } };
-                        { Value = Some -5.5f; Odds = { Opening = X2 {O1 = 2.24f; O2 = 1.73f;}; Closing = X2 {O1 = 2.34f; O2 = 1.68f } } };
-                        { Value = Some -5.0f; Odds = { Opening = X2 {O1 = 2.14f; O2 = 1.79f;}; Closing = X2 {O1 = 2.30f; O2 = 1.69f } } };
-                        { Value = Some -4.5f; Odds = { Opening = X2 {O1 = 2.04f; O2 = 1.87f;}; Closing = X2 {O1 = 2.18f; O2 = 1.77f } } };
-                        { Value = Some -4.0f; Odds = { Opening = X2 {O1 = 1.95f; O2 = 1.95f;}; Closing = X2 {O1 = 2.09f; O2 = 1.83f } } };
-                        { Value = Some -3.5f; Odds = { Opening = X2 {O1 = 1.88f; O2 = 2.03f;}; Closing = X2 {O1 = 1.99f; O2 = 1.92f } } };
-                        { Value = Some -3.0f; Odds = { Opening = X2 {O1 = 1.79f; O2 = 2.14f;}; Closing = X2 {O1 = 1.91f; O2 = 2.0f } } };
-                        { Value = Some -2.5f; Odds = { Opening = X2 {O1 = 1.74f; O2 = 2.23f;}; Closing = X2 {O1 = 1.84f; O2 = 2.08f } } };
-                        { Value = Some -2.0f; Odds = { Opening = X2 {O1 = 1.73f; O2 = 2.24f;}; Closing = X2 {O1 = 1.76f; O2 = 2.19f } } }
-                    |]}
-                |]}
+            Some({
+                 ID = "juA7zL51";
+                 Url =
+                  "http://www.oddsportal.com/basketball/usa/nba/toronto-raptors-boston-celtics-juA7zL51/";
+                 TeamHome = "Toronto Raptors";
+                 TeamAway = "Boston Celtics";
+                 Time = 1551229200;
+                 Score = {Home = 118;
+                          Away = 95;};
+                 ScoreWithoutOT = None;
+                 Periods = [|{Home = 30;
+                              Away = 32;}; {Home = 36;
+                                            Away = 13;}; {Home = 29;
+                                                          Away = 23;}; {Home = 23;
+                                                                        Away = 27;}|];
+                 Odds =
+                  [|{OutcomeID = "3";
+                     Values =
+                      [|{Value = None;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.57000005f, 1551126082);
+                                                   O2 = (2.56999993f, 1551126082);};
+                                     Closing = X2 {O1 = (1.63f, 1551228685);
+                                                   O2 = (2.43000007f, 1551228685);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X2 {O1 = (1.55999994f, 1551142715);
+                                                   O2 = (2.52999997f, 1551142715);};
+                                     Closing = X2 {O1 = (1.62f, 1551225619);
+                                                   O2 = (2.4000001f, 1551226163);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (1.55999994f, 1551152480);
+                                                   O2 = (2.5f, 1551152480);};
+                                     Closing = X2 {O1 = (1.61000001f, 1551228571);
+                                                   O2 = (2.38000011f, 1551228571);};};};
+                            {BookID = "429";
+                             Odds = {Opening = X2 {O1 = (1.57000005f, 1551153149);
+                                                   O2 = (2.5f, 1551153149);};
+                                     Closing = X2 {O1 = (1.63f, 1551220008);
+                                                   O2 = (2.45000005f, 1551226708);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (1.53999996f, 1551133751);
+                                                   O2 = (2.6500001f, 1551133751);};
+                                     Closing = X2 {O1 = (1.62f, 1551228753);
+                                                   O2 = (2.4000001f, 1551228753);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.54999995f, 1551153929);
+                                                   O2 = (2.5f, 1551153929);};
+                                     Closing = X2 {O1 = (1.60000002f, 1551226507);
+                                                   O2 = (2.4000001f, 1551228597);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.55999994f, 1551136192);
+                                                   O2 = (2.6099999f, 1551136192);};
+                                     Closing = X2 {O1 = (1.66999996f, 1551228836);
+                                                   O2 = (2.3599999f, 1551228836);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.55999994f, 1551145074);
+                                                   O2 = (2.5999999f, 1551145074);};
+                                     Closing = X2 {O1 = (1.64999998f, 1551228987);
+                                                   O2 = (2.38000011f, 1551228987);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (1.59000003f, 1551125841);
+                                                   O2 = (2.38000011f, 1551125841);};
+                                     Closing = X2 {O1 = (1.62f, 1551228248);
+                                                   O2 = (2.30999994f, 1551228248);};};}|];}|];};
+                    {OutcomeID = "2";
+                     Values =
+                      [|{Value = Some 218.5f;
+                         BookOdds =
+                          [|{BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.52999997f, 1551179531);
+                                                   O2 = (2.54999995f, 1551179531);};
+                                     Closing = X2 {O1 = (1.48000002f, 1551197017);
+                                                   O2 = (2.70000005f, 1551197017);};};}|];};
+                        {Value = Some 220.5f;
+                         BookOdds =
+                          [|{BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.62f, 1551179531);
+                                                   O2 = (2.3499999f, 1551179531);};
+                                     Closing = X2 {O1 = (1.57000005f, 1551197017);
+                                                   O2 = (2.45000005f, 1551197017);};};}|];};
+                        {Value = Some 222.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.62f, 1551136384);
+                                                   O2 = (2.20000005f, 1551136384);};
+                                     Closing = X2 {O1 = (1.62f, 1551227244);
+                                                   O2 = (2.16000009f, 1551227244);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.62f, 1551145074);
+                                                   O2 = (2.16000009f, 1551145074);};
+                                     Closing = X2 {O1 = (1.63f, 1551229123);
+                                                   O2 = (2.1400001f, 1551229123);};};}|];};
+                        {Value = Some 222.5f;
+                         BookOdds =
+                          [|{BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.75f, 1551179531);
+                                                   O2 = (2.0999999f, 1551179531);};
+                                     Closing = X2 {O1 = (1.66999996f, 1551204829);
+                                                   O2 = (2.25f, 1551197017);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.66999996f, 1551136384);
+                                                   O2 = (2.0999999f, 1551136384);};
+                                     Closing = X2 {O1 = (1.64999998f, 1551227244);
+                                                   O2 = (2.13000011f, 1551227244);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.65999997f, 1551145074);
+                                                   O2 = (2.1099999f, 1551145074);};
+                                     Closing = X2 {O1 = (1.65999997f, 1551229123);
+                                                   O2 = (2.1099999f, 1551229123);};};}|];};
+                        {Value = Some 223.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.69000006f, 1551136384);
+                                                   O2 = (2.07999992f, 1551136384);};
+                                     Closing = X2 {O1 = (1.69000006f, 1551227966);
+                                                   O2 = (2.08999991f, 1551227966);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.69000006f, 1551145074);
+                                                   O2 = (2.08999991f, 1551145074);};
+                                     Closing = X2 {O1 = (1.70000005f, 1551229123);
+                                                   O2 = (2.07999992f, 1551229123);};};}|];};
+                        {Value = Some 223.5f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.71000004f, 1551136384);
+                                                   O2 = (2.04999995f, 1551136384);};
+                                     Closing = X2 {O1 = (1.73000002f, 1551227966);
+                                                   O2 = (2.05999994f, 1551227966);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.73000002f, 1551145074);
+                                                   O2 = (2.05999994f, 1551145074);};
+                                     Closing = X2 {O1 = (1.74000001f, 1551229123);
+                                                   O2 = (2.03999996f, 1551229123);};};}|];};
+                        {Value = Some 224.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.74000001f, 1551136384);
+                                                   O2 = (2.01999998f, 1551136384);};
+                                     Closing = X2 {O1 = (1.75999999f, 1551227244);
+                                                   O2 = (2.03999996f, 1551227006);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.76999998f, 1551145074);
+                                                   O2 = (2.02999997f, 1551145074);};
+                                     Closing = X2 {O1 = (1.76999998f, 1551229123);
+                                                   O2 = (2.02999997f, 1551229123);};};}|];};
+                        {Value = Some 224.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.78999996f, 1551125604);
+                                                   O2 = (2.0999999f, 1551125604);};
+                                     Closing = X2 {O1 = (1.82000005f, 1551229121);
+                                                   O2 = (2.1099999f, 1551229121);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.78999996f, 1551129518);
+                                                   O2 = (2.0999999f, 1551129518);};
+                                     Closing = X2 {O1 = (1.82000005f, 1551229114);
+                                                   O2 = (2.1099999f, 1551229055);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.87f, 1551179531);
+                                                   O2 = (1.95000005f, 1551179531);};
+                                     Closing = X2 {O1 = (1.77999997f, 1551197017);
+                                                   O2 = (2.04999995f, 1551197017);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.76999998f, 1551136384);
+                                                   O2 = (2.0f, 1551136384);};
+                                     Closing = X2 {O1 = (1.79999995f, 1551227244);
+                                                   O2 = (2.00999999f, 1551227006);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.80999994f, 1551145074);
+                                                   O2 = (2.0f, 1551145074);};
+                                     Closing = X2 {O1 = (1.80999994f, 1551229123);
+                                                   O2 = (2.0f, 1551229123);};};}|];};
+                        {Value = Some 225.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.84000003f, 1551125604);
+                                                   O2 = (2.03999996f, 1551125604);};
+                                     Closing = X2 {O1 = (1.87f, 1551229121);
+                                                   O2 = (2.03999996f, 1551229121);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.84000003f, 1551129518);
+                                                   O2 = (2.03999996f, 1551129518);};
+                                     Closing = X2 {O1 = (1.87f, 1551229114);
+                                                   O2 = (2.03999996f, 1551229114);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.79999995f, 1551136384);
+                                                   O2 = (1.98000002f, 1551136384);};
+                                     Closing = X2 {O1 = (1.84000003f, 1551227604);
+                                                   O2 = (1.99000001f, 1551227244);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.85000002f, 1551145074);
+                                                   O2 = (1.97000003f, 1551145074);};
+                                     Closing = X2 {O1 = (1.85000002f, 1551229123);
+                                                   O2 = (1.97000003f, 1551229123);};};}|];};
+                        {Value = Some 225.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.88f, 1551125604);
+                                                   O2 = (1.99000001f, 1551125604);};
+                                     Closing = X2 {O1 = (1.91999996f, 1551229121);
+                                                   O2 = (1.99000001f, 1551229121);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X2 {O1 = (1.87f, 1551142358);
+                                                   O2 = (1.99000001f, 1551142358);};
+                                     Closing = X2 {O1 = (1.88999999f, 1551227781);
+                                                   O2 = (1.99000001f, 1551227781);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (1.88f, 1551152480);
+                                                   O2 = (1.98000002f, 1551152480);};
+                                     Closing = X2 {O1 = (1.88999999f, 1551227532);
+                                                   O2 = (1.99000001f, 1551227532);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.88f, 1551129518);
+                                                   O2 = (1.99000001f, 1551129518);};
+                                     Closing = X2 {O1 = (1.91999996f, 1551229114);
+                                                   O2 = (1.99000001f, 1551229114);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.83000004f, 1551136384);
+                                                   O2 = (1.95000005f, 1551136384);};
+                                     Closing = X2 {O1 = (1.88999999f, 1551227966);
+                                                   O2 = (1.95000005f, 1551227966);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.89999998f, 1551145074);
+                                                   O2 = (1.94000006f, 1551145074);};
+                                     Closing = X2 {O1 = (1.89999998f, 1551229123);
+                                                   O2 = (1.94000006f, 1551229123);};};}|];};
+                        {Value = Some 226.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.92999995f, 1551125604);
+                                                   O2 = (1.92999995f, 1551125604);};
+                                     Closing = X2 {O1 = (1.97000003f, 1551229121);
+                                                   O2 = (1.92999995f, 1551229121);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (1.92999995f, 1551133314);
+                                                   O2 = (1.92999995f, 1551133314);};
+                                     Closing = X2 {O1 = (1.92999995f, 1551229114);
+                                                   O2 = (1.95000005f, 1551229114);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X2 {O1 = (1.92999995f, 1551142358);
+                                                   O2 = (1.92999995f, 1551142358);};
+                                     Closing = X2 {O1 = (1.94000006f, 1551227781);
+                                                   O2 = (1.94000006f, 1551227781);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.92999995f, 1551129518);
+                                                   O2 = (1.92999995f, 1551129518);};
+                                     Closing = X2 {O1 = (1.97000003f, 1551229114);
+                                                   O2 = (1.95000005f, 1551229055);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (1.89999998f, 1551133751);
+                                                   O2 = (1.89999998f, 1551133751);};
+                                     Closing = X2 {O1 = (1.89999998f, 1551133751);
+                                                   O2 = (1.89999998f, 1551133751);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.90999997f, 1551136192);
+                                                   O2 = (1.90999997f, 1551136192);};
+                                     Closing = X2 {O1 = (1.92999995f, 1551227244);
+                                                   O2 = (1.92999995f, 1551227244);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.92999995f, 1551145074);
+                                                   O2 = (1.92999995f, 1551145074);};
+                                     Closing = X2 {O1 = (1.92999995f, 1551227352);
+                                                   O2 = (1.92999995f, 1551227352);};};}|];};
+                        {Value = Some 226.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.99000001f, 1551125605);
+                                                   O2 = (1.88f, 1551125605);};
+                                     Closing = X2 {O1 = (2.02999997f, 1551229121);
+                                                   O2 = (1.88f, 1551229121);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (2.00999999f, 1551142994);
+                                                   O2 = (1.87f, 1551142994);};
+                                     Closing = X2 {O1 = (1.98000002f, 1551227226);
+                                                   O2 = (1.89999998f, 1551227226);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (1.98000002f, 1551152480);
+                                                   O2 = (1.88f, 1551152480);};
+                                     Closing = X2 {O1 = (1.99000001f, 1551226931);
+                                                   O2 = (1.88999999f, 1551226931);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.99000001f, 1551129518);
+                                                   O2 = (1.88f, 1551129518);};
+                                     Closing = X2 {O1 = (2.02999997f, 1551229114);
+                                                   O2 = (1.89999998f, 1551227254);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1551153929);
+                                                   O2 = (1.87f, 1551153929);};
+                                     Closing = X2 {O1 = (1.90999997f, 1551197017);
+                                                   O2 = (1.90999997f, 1551197017);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1551136384);
+                                                   O2 = (1.83000004f, 1551136384);};
+                                     Closing = X2 {O1 = (1.94000006f, 1551227006);
+                                                   O2 = (1.89999998f, 1551227244);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1551145074);
+                                                   O2 = (1.88999999f, 1551145074);};
+                                     Closing = X2 {O1 = (1.96000004f, 1551229123);
+                                                   O2 = (1.88f, 1551229123);};};};
+                            {BookID = "454";
+                             Odds = {Opening = X2 {O1 = (1.92999995f, 1551125841);
+                                                   O2 = (1.88f, 1551125841);};
+                                     Closing = X2 {O1 = (1.94000006f, 1551200631);
+                                                   O2 = (1.87f, 1551200631);};};}|];};
+                        {Value = Some 227.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.04999995f, 1551125605);
+                                                   O2 = (1.83000004f, 1551125605);};
+                                     Closing = X2 {O1 = (2.08999991f, 1551229121);
+                                                   O2 = (1.83000004f, 1551229121);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (2.04999995f, 1551129518);
+                                                   O2 = (1.83000004f, 1551129518);};
+                                     Closing = X2 {O1 = (2.08999991f, 1551229114);
+                                                   O2 = (1.83000004f, 1551229114);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.98000002f, 1551136384);
+                                                   O2 = (1.79999995f, 1551136384);};
+                                     Closing = X2 {O1 = (1.97000003f, 1551227244);
+                                                   O2 = (1.85000002f, 1551227244);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.99000001f, 1551145074);
+                                                   O2 = (1.84000003f, 1551145074);};
+                                     Closing = X2 {O1 = (1.99000001f, 1551229123);
+                                                   O2 = (1.83000004f, 1551229123);};};}|];};
+                        {Value = Some 227.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.11999989f, 1551125605);
+                                                   O2 = (1.77999997f, 1551125605);};
+                                     Closing = X2 {O1 = (2.16000009f, 1551229121);
+                                                   O2 = (1.77999997f, 1551229121);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (2.05999994f, 1551196338);
+                                                   O2 = (1.79999995f, 1551196338);};
+                                     Closing = X2 {O1 = (2.08999991f, 1551226931);
+                                                   O2 = (1.78999996f, 1551226931);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (2.11999989f, 1551129518);
+                                                   O2 = (1.77999997f, 1551129518);};
+                                     Closing = X2 {O1 = (2.16000009f, 1551229114);
+                                                   O2 = (1.77999997f, 1551229114);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.0f, 1551136384);
+                                                   O2 = (1.76999998f, 1551136384);};
+                                     Closing = X2 {O1 = (2.0f, 1551227244);
+                                                   O2 = (1.80999994f, 1551227244);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.00999999f, 1551145074);
+                                                   O2 = (1.79999995f, 1551145074);};
+                                     Closing = X2 {O1 = (2.00999999f, 1551229123);
+                                                   O2 = (1.79999995f, 1551229123);};};}|];};
+                        {Value = Some 228.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.01999998f, 1551136384);
+                                                   O2 = (1.74000001f, 1551136384);};
+                                     Closing = X2 {O1 = (2.02999997f, 1551227244);
+                                                   O2 = (1.76999998f, 1551227244);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.03999996f, 1551145074);
+                                                   O2 = (1.75999999f, 1551145074);};
+                                     Closing = X2 {O1 = (2.03999996f, 1551229123);
+                                                   O2 = (1.75999999f, 1551229123);};};}|];};
+                        {Value = Some 228.5f;
+                         BookOdds =
+                          [|{BookID = "2";
+                             Odds = {Opening = X2 {O1 = (2.20000005f, 1551179531);
+                                                   O2 = (1.70000005f, 1551179531);};
+                                     Closing = X2 {O1 = (2.04999995f, 1551197017);
+                                                   O2 = (1.77999997f, 1551197017);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.04999995f, 1551136384);
+                                                   O2 = (1.71000004f, 1551136384);};
+                                     Closing = X2 {O1 = (2.05999994f, 1551227966);
+                                                   O2 = (1.73000002f, 1551227966);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.05999994f, 1551145074);
+                                                   O2 = (1.73000002f, 1551145074);};
+                                     Closing = X2 {O1 = (2.06999993f, 1551229123);
+                                                   O2 = (1.72000003f, 1551229123);};};}|];};
+                        {Value = Some 229.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.07999992f, 1551136384);
+                                                   O2 = (1.69000006f, 1551136384);};
+                                     Closing = X2 {O1 = (2.08999991f, 1551227966);
+                                                   O2 = (1.69000006f, 1551227966);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.08999991f, 1551145074);
+                                                   O2 = (1.69000006f, 1551145074);};
+                                     Closing = X2 {O1 = (2.1099999f, 1551229123);
+                                                   O2 = (1.67999995f, 1551229123);};};}|];};
+                        {Value = Some 229.5f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.0999999f, 1551136384);
+                                                   O2 = (1.66999996f, 1551136384);};
+                                     Closing = X2 {O1 = (2.1099999f, 1551227006);
+                                                   O2 = (1.65999997f, 1551227244);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.1099999f, 1551145074);
+                                                   O2 = (1.65999997f, 1551145074);};
+                                     Closing = X2 {O1 = (2.13000011f, 1551229123);
+                                                   O2 = (1.64999998f, 1551229123);};};}|];};
+                        {Value = Some 230.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.20000005f, 1551136384);
+                                                   O2 = (1.62f, 1551136384);};
+                                     Closing = X2 {O1 = (2.1400001f, 1551227244);
+                                                   O2 = (1.63f, 1551227244);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.16000009f, 1551145074);
+                                                   O2 = (1.62f, 1551145074);};
+                                     Closing = X2 {O1 = (2.16000009f, 1551229123);
+                                                   O2 = (1.62f, 1551229123);};};}|];};
+                        {Value = Some 230.5f;
+                         BookOdds =
+                          [|{BookID = "2";
+                             Odds = {Opening = X2 {O1 = (2.4000001f, 1551179531);
+                                                   O2 = (1.60000002f, 1551179531);};
+                                     Closing = X2 {O1 = (2.25f, 1551197017);
+                                                   O2 = (1.66999996f, 1551197017);};};}|];};
+                        {Value = Some 232.5f;
+                         BookOdds =
+                          [|{BookID = "2";
+                             Odds = {Opening = X2 {O1 = (2.6500001f, 1551179531);
+                                                   O2 = (1.5f, 1551179531);};
+                                     Closing = X2 {O1 = (2.45000005f, 1551197017);
+                                                   O2 = (1.57000005f, 1551197017);};};}|];};
+                        {Value = Some 234.5f;
+                         BookOdds =
+                          [|{BookID = "2";
+                             Odds = {Opening = X2 {O1 = (2.8499999f, 1551179531);
+                                                   O2 = (1.44000006f, 1551179531);};
+                                     Closing = X2 {O1 = (2.70000005f, 1551204829);
+                                                   O2 = (1.48000002f, 1551204829);};};}|];}|];};
+                    {OutcomeID = "5";
+                     Values =
+                      [|{Value = Some -7.5f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.29999995f, 1551136384);
+                                                   O2 = (1.55999994f, 1551136384);};
+                                     Closing = X2 {O1 = (2.47000003f, 1551228836);
+                                                   O2 = (1.49000001f, 1551228836);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.3599999f, 1551145074);
+                                                   O2 = (1.54999995f, 1551145074);};
+                                     Closing = X2 {O1 = (2.47000003f, 1551228660);
+                                                   O2 = (1.49000001f, 1551228660);};};}|];};
+                        {Value = Some -7.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.25f, 1551136384);
+                                                   O2 = (1.57000005f, 1551136384);};
+                                     Closing = X2 {O1 = (2.42000008f, 1551229199);
+                                                   O2 = (1.50999999f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.31999993f, 1551145074);
+                                                   O2 = (1.58000004f, 1551145074);};
+                                     Closing = X2 {O1 = (2.42000008f, 1551228987);
+                                                   O2 = (1.50999999f, 1551228987);};};}|];};
+                        {Value = Some -6.5f;
+                         BookOdds =
+                          [|{BookID = "2";
+                             Odds = {Opening = X2 {O1 = (2.4000001f, 1551179531);
+                                                   O2 = (1.60000002f, 1551179531);};
+                                     Closing = X2 {O1 = (2.5f, 1551204829);
+                                                   O2 = (1.54999995f, 1551204829);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.0999999f, 1551136384);
+                                                   O2 = (1.66999996f, 1551136384);};
+                                     Closing = X2 {O1 = (2.30999994f, 1551229199);
+                                                   O2 = (1.57000005f, 1551228836);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.23000002f, 1551145074);
+                                                   O2 = (1.63999999f, 1551145074);};
+                                     Closing = X2 {O1 = (2.30999994f, 1551228987);
+                                                   O2 = (1.57000005f, 1551228987);};};}|];};
+                        {Value = Some -6.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.04999995f, 1551136384);
+                                                   O2 = (1.71000004f, 1551136384);};
+                                     Closing = X2 {O1 = (2.27999997f, 1551229199);
+                                                   O2 = (1.60000002f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.17000008f, 1551145074);
+                                                   O2 = (1.69000006f, 1551145074);};
+                                     Closing = X2 {O1 = (2.27999997f, 1551228860);
+                                                   O2 = (1.60000002f, 1551228987);};};}|];};
+                        {Value = Some -5.5f;
+                         BookOdds =
+                          [|{BookID = "2";
+                             Odds = {Opening = X2 {O1 = (2.1500001f, 1551179531);
+                                                   O2 = (1.72000003f, 1551179531);};
+                                     Closing = X2 {O1 = (2.25f, 1551204829);
+                                                   O2 = (1.66999996f, 1551228597);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (2.0f, 1551136384);
+                                                   O2 = (1.76999998f, 1551136384);};
+                                     Closing = X2 {O1 = (2.19000006f, 1551229199);
+                                                   O2 = (1.65999997f, 1551228836);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.0999999f, 1551145074);
+                                                   O2 = (1.75f, 1551145074);};
+                                     Closing = X2 {O1 = (2.19000006f, 1551228860);
+                                                   O2 = (1.65999997f, 1551228987);};};}|];};
+                        {Value = Some -5.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.1400001f, 1551125413);
+                                                   O2 = (1.78999996f, 1551125413);};
+                                     Closing = X2 {O1 = (2.29999995f, 1551228685);
+                                                   O2 = (1.69000006f, 1551228685);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (2.08999991f, 1551129518);
+                                                   O2 = (1.83000004f, 1551129518);};
+                                     Closing = X2 {O1 = (2.29999995f, 1551228635);
+                                                   O2 = (1.69000006f, 1551228635);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1551136384);
+                                                   O2 = (1.83000004f, 1551136384);};
+                                     Closing = X2 {O1 = (2.1400001f, 1551229199);
+                                                   O2 = (1.71000004f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (2.03999996f, 1551145074);
+                                                   O2 = (1.80999994f, 1551145074);};
+                                     Closing = X2 {O1 = (2.1400001f, 1551228987);
+                                                   O2 = (1.71000004f, 1551228987);};};}|];};
+                        {Value = Some -4.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (2.03999996f, 1551125414);
+                                                   O2 = (1.87f, 1551125414);};
+                                     Closing = X2 {O1 = (2.18000007f, 1551228685);
+                                                   O2 = (1.76999998f, 1551228685);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (1.94000006f, 1551133314);
+                                                   O2 = (1.94000006f, 1551133314);};
+                                     Closing = X2 {O1 = (2.16000009f, 1551228756);
+                                                   O2 = (1.75999999f, 1551228756);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (2.00999999f, 1551152480);
+                                                   O2 = (1.87f, 1551152480);};
+                                     Closing = X2 {O1 = (2.1400001f, 1551228689);
+                                                   O2 = (1.76999998f, 1551228689);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (2.0f, 1551129518);
+                                                   O2 = (1.90999997f, 1551129518);};
+                                     Closing = X2 {O1 = (2.18000007f, 1551228635);
+                                                   O2 = (1.76999998f, 1551228756);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1551153929);
+                                                   O2 = (1.87f, 1551153929);};
+                                     Closing = X2 {O1 = (2.04999995f, 1551204829);
+                                                   O2 = (1.77999997f, 1551204829);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.90999997f, 1551136192);
+                                                   O2 = (1.90999997f, 1551136192);};
+                                     Closing = X2 {O1 = (2.06999993f, 1551229199);
+                                                   O2 = (1.76999998f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.98000002f, 1551145074);
+                                                   O2 = (1.88f, 1551145074);};
+                                     Closing = X2 {O1 = (2.06999993f, 1551228860);
+                                                   O2 = (1.76999998f, 1551228987);};};}|];};
+                        {Value = Some -4.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1551125413);
+                                                   O2 = (1.95000005f, 1551125413);};
+                                     Closing = X2 {O1 = (2.08999991f, 1551228685);
+                                                   O2 = (1.83000004f, 1551228685);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (1.92999995f, 1551151633);
+                                                   O2 = (1.97000003f, 1551151633);};
+                                     Closing = X2 {O1 = (2.06999993f, 1551228876);
+                                                   O2 = (1.83000004f, 1551228876);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X2 {O1 = (1.89999998f, 1551142715);
+                                                   O2 = (1.98000002f, 1551142715);};
+                                     Closing = X2 {O1 = (2.02999997f, 1551228833);
+                                                   O2 = (1.87f, 1551228833);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.90999997f, 1551129518);
+                                                   O2 = (2.0f, 1551129518);};
+                                     Closing = X2 {O1 = (2.08999991f, 1551228635);
+                                                   O2 = (1.87f, 1551228635);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.83000004f, 1551136384);
+                                                   O2 = (1.95000005f, 1551136384);};
+                                     Closing = X2 {O1 = (2.01999998f, 1551229199);
+                                                   O2 = (1.83000004f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.92999995f, 1551145074);
+                                                   O2 = (1.95000005f, 1551145074);};
+                                     Closing = X2 {O1 = (2.01999998f, 1551228860);
+                                                   O2 = (1.83000004f, 1551228987);};};}|];};
+                        {Value = Some -3.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.88f, 1551125414);
+                                                   O2 = (2.02999997f, 1551125414);};
+                                     Closing = X2 {O1 = (1.99000001f, 1551228685);
+                                                   O2 = (1.91999996f, 1551228685);};};};
+                            {BookID = "75";
+                             Odds = {Opening = X2 {O1 = (1.85000002f, 1551151633);
+                                                   O2 = (2.04999995f, 1551151633);};
+                                     Closing = X2 {O1 = (1.96000004f, 1551229114);
+                                                   O2 = (1.94000006f, 1551229114);};};};
+                            {BookID = "147";
+                             Odds = {Opening = X2 {O1 = (1.94000006f, 1551204293);
+                                                   O2 = (1.96000004f, 1551204293);};
+                                     Closing = X2 {O1 = (1.95000005f, 1551228833);
+                                                   O2 = (1.95000005f, 1551228833);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (1.85000002f, 1551152480);
+                                                   O2 = (2.02999997f, 1551152480);};
+                                     Closing = X2 {O1 = (1.97000003f, 1551228689);
+                                                   O2 = (1.92999995f, 1551228689);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.84000003f, 1551129518);
+                                                   O2 = (2.07999992f, 1551129518);};
+                                     Closing = X2 {O1 = (1.99000001f, 1551228635);
+                                                   O2 = (1.96000004f, 1551229174);};};};
+                            {BookID = "419";
+                             Odds = {Opening = X2 {O1 = (1.89999998f, 1551203910);
+                                                   O2 = (1.89999998f, 1551203910);};
+                                     Closing = X2 {O1 = (1.95000005f, 1551228695);
+                                                   O2 = (1.86000001f, 1551228695);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.83000004f, 1551179531);
+                                                   O2 = (2.0f, 1551179531);};
+                                     Closing = X2 {O1 = (1.90999997f, 1551204829);
+                                                   O2 = (1.90999997f, 1551204829);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.76999998f, 1551136384);
+                                                   O2 = (2.0f, 1551136384);};
+                                     Closing = X2 {O1 = (1.96000004f, 1551228836);
+                                                   O2 = (1.89999998f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.86000001f, 1551145074);
+                                                   O2 = (2.00999999f, 1551145074);};
+                                     Closing = X2 {O1 = (1.96000004f, 1551228660);
+                                                   O2 = (1.89999998f, 1551228987);};};}|];};
+                        {Value = Some -3.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.78999996f, 1551125414);
+                                                   O2 = (2.1400001f, 1551125414);};
+                                     Closing = X2 {O1 = (1.90999997f, 1551228685);
+                                                   O2 = (2.0f, 1551228685);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.75999999f, 1551129518);
+                                                   O2 = (2.19000006f, 1551129518);};
+                                     Closing = X2 {O1 = (1.90999997f, 1551228635);
+                                                   O2 = (2.0f, 1551228635);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.71000004f, 1551136384);
+                                                   O2 = (2.04999995f, 1551136384);};
+                                     Closing = X2 {O1 = (1.91999996f, 1551229199);
+                                                   O2 = (1.96000004f, 1551228836);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.78999996f, 1551145074);
+                                                   O2 = (2.06999993f, 1551145074);};
+                                     Closing = X2 {O1 = (1.91999996f, 1551228987);
+                                                   O2 = (1.96000004f, 1551228987);};};}|];};
+                        {Value = Some -2.5f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.74000001f, 1551125414);
+                                                   O2 = (2.23000002f, 1551125414);};
+                                     Closing = X2 {O1 = (1.84000003f, 1551228685);
+                                                   O2 = (2.07999992f, 1551228685);};};};
+                            {BookID = "56";
+                             Odds = {Opening = X2 {O1 = (1.71000004f, 1551152480);
+                                                   O2 = (2.20000005f, 1551152480);};
+                                     Closing = X2 {O1 = (1.80999994f, 1551228689);
+                                                   O2 = (2.08999991f, 1551228689);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.70000005f, 1551129518);
+                                                   O2 = (2.28999996f, 1551129518);};
+                                     Closing = X2 {O1 = (1.84000003f, 1551228635);
+                                                   O2 = (2.07999992f, 1551228693);};};};
+                            {BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.72000003f, 1551179531);
+                                                   O2 = (2.1500001f, 1551179531);};
+                                     Closing = X2 {O1 = (1.77999997f, 1551204829);
+                                                   O2 = (2.04999995f, 1551204829);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.66999996f, 1551136384);
+                                                   O2 = (2.0999999f, 1551136384);};
+                                     Closing = X2 {O1 = (1.85000002f, 1551229199);
+                                                   O2 = (2.01999998f, 1551228836);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.73000002f, 1551145074);
+                                                   O2 = (2.13000011f, 1551145074);};
+                                     Closing = X2 {O1 = (1.85000002f, 1551228987);
+                                                   O2 = (2.01999998f, 1551228660);};};}|];};
+                        {Value = Some -2.0f;
+                         BookOdds =
+                          [|{BookID = "18";
+                             Odds = {Opening = X2 {O1 = (1.73000002f, 1551204143);
+                                                   O2 = (2.24000001f, 1551204143);};
+                                     Closing = X2 {O1 = (1.75999999f, 1551228685);
+                                                   O2 = (2.19000006f, 1551228685);};};};
+                            {BookID = "476";
+                             Odds = {Opening = X2 {O1 = (1.73000002f, 1551204039);
+                                                   O2 = (2.24000001f, 1551204039);};
+                                     Closing = X2 {O1 = (1.75999999f, 1551228635);
+                                                   O2 = (2.19000006f, 1551228635);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.57000005f, 1551136384);
+                                                   O2 = (2.25f, 1551136384);};
+                                     Closing = X2 {O1 = (1.76999998f, 1551229199);
+                                                   O2 = (2.0999999f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.65999997f, 1551145074);
+                                                   O2 = (2.22000003f, 1551145074);};
+                                     Closing = X2 {O1 = (1.76999998f, 1551228987);
+                                                   O2 = (2.0999999f, 1551228987);};};}|];};
+                        {Value = Some -1.5f;
+                         BookOdds =
+                          [|{BookID = "2";
+                             Odds = {Opening = X2 {O1 = (1.62f, 1551179531);
+                                                   O2 = (2.3499999f, 1551179531);};
+                                     Closing = X2 {O1 = (1.66999996f, 1551228597);
+                                                   O2 = (2.25f, 1551228597);};};};
+                            {BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.53999996f, 1551136384);
+                                                   O2 = (2.3499999f, 1551136384);};
+                                     Closing = X2 {O1 = (1.72000003f, 1551229199);
+                                                   O2 = (2.1500001f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.61000001f, 1551145074);
+                                                   O2 = (2.28999996f, 1551145074);};
+                                     Closing = X2 {O1 = (1.72000003f, 1551228987);
+                                                   O2 = (2.1500001f, 1551228860);};};}|];};
+                        {Value = Some -1.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.5f, 1551136384);
+                                                   O2 = (2.5f, 1551136384);};
+                                     Closing = X2 {O1 = (1.65999997f, 1551228836);
+                                                   O2 = (2.22000003f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.57000005f, 1551145074);
+                                                   O2 = (2.33999991f, 1551145074);};
+                                     Closing = X2 {O1 = (1.65999997f, 1551228987);
+                                                   O2 = (2.22000003f, 1551228987);};};}|];};
+                        {Value = Some 1.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.41999996f, 1551136384);
+                                                   O2 = (2.70000005f, 1551136384);};
+                                     Closing = X2 {O1 = (1.55999994f, 1551229199);
+                                                   O2 = (2.4000001f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.46000004f, 1551145074);
+                                                   O2 = (2.6099999f, 1551145074);};
+                                     Closing = X2 {O1 = (1.54999995f, 1551229123);
+                                                   O2 = (2.42000008f, 1551229123);};};}|];};
+                        {Value = Some 1.5f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.39999998f, 1551136384);
+                                                   O2 = (2.75f, 1551136384);};
+                                     Closing = X2 {O1 = (1.51999998f, 1551229199);
+                                                   O2 = (2.46000004f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.44000006f, 1551145074);
+                                                   O2 = (2.61999989f, 1551145074);};
+                                     Closing = X2 {O1 = (1.51999998f, 1551228987);
+                                                   O2 = (2.46000004f, 1551228987);};};}|];};
+                        {Value = Some 2.0f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.36000001f, 1551136384);
+                                                   O2 = (3.0999999f, 1551136384);};
+                                     Closing = X2 {O1 = (1.46000004f, 1551228836);
+                                                   O2 = (2.5999999f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.44000006f, 1551201723);
+                                                   O2 = (2.61999989f, 1551201723);};
+                                     Closing = X2 {O1 = (1.46000004f, 1551228987);
+                                                   O2 = (2.5999999f, 1551228987);};};}|];};
+                        {Value = Some 2.5f;
+                         BookOdds =
+                          [|{BookID = "417";
+                             Odds = {Opening = X2 {O1 = (1.33000004f, 1551136384);
+                                                   O2 = (3.24000001f, 1551136384);};
+                                     Closing = X2 {O1 = (1.42999995f, 1551229199);
+                                                   O2 = (2.66000009f, 1551229199);};};};
+                            {BookID = "381";
+                             Odds = {Opening = X2 {O1 = (1.42999995f, 1551228971);
+                                                   O2 = (2.66000009f, 1551228971);};
+                                     Closing = X2 {O1 = (1.42999995f, 1551228971);
+                                                   O2 = (2.66000009f, 1551228971);};};}|];}|];}|];})
         Assert.That(actual, Is.EqualTo(expected))
-        *)
     [<Test>]
     member this.ScrapBasketballNBA1819League() =
         let leagueID, pageCount = ("C2416Q6r", 2)
@@ -486,7 +2329,13 @@ type InternetTests() =
     member this.ScrapBasketballMatchWithOT() =
         let matchID = "ChPLtsAp"
         let matchUrl = "basketball/usa/nba/atlanta-hawks-minnesota-timberwolves-" + matchID + "/"
-        let actual = extractMatchOdds basketballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
+        let bookIDs = [|
+            pinnacleID; sbobetID; dafabetID; _188betID;
+            betfairID; asianoddsID; 
+            bet365ID; bwinID;
+            _1xbetID; marafonID; winlineID;
+        |]
+        let actual = extractMatchOdds bookIDs basketballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
         match actual with
         | Some({
                 ID = "ChPLtsAp";
@@ -502,6 +2351,28 @@ type InternetTests() =
                     { Home = 26; Away = 27 };
                     { Home = 32; Away = 23 };
                     { Home = 13; Away = 5 }
+                |];
+          }) -> ()
+        | _ -> failwith "Incorrect data"
+    [<Test>]
+    member this.ScrapSoccerMatchWithPenalties() =
+        let matchID = "KrdKRsTP"
+        let matchUrl = "soccer/russia/premier-league-2016-2017/orenburg-ska-khabarovsk-" + matchID + "/"
+        let bookIDs = [| pinnacleID; betfairID; bet365ID; marafonID |]
+        let actual = extractMatchOdds bookIDs soccerID [out1x2ID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
+        match actual with
+        | Some({
+                ID = "KrdKRsTP";
+                Url = "http://www.oddsportal.com/soccer/russia/premier-league-2016-2017/orenburg-ska-khabarovsk-KrdKRsTP/";
+                TeamHome = "Orenburg";
+                TeamAway = "SKA Khabarovsk";
+                Score = { Home = 0; Away = 1 };
+                ScoreWithoutOT = None;
+                Periods = [|
+                    { Home = 0; Away = 0 };
+                    { Home = 0; Away = 0 };
+                    { Home = 0; Away = 0 };
+                    { Home = 3; Away = 5 }
                 |];
           }) -> ()
         | _ -> failwith "Incorrect data"

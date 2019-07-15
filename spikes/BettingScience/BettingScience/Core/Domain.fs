@@ -28,17 +28,23 @@ type OddsData = {
     [<JsonProperty(PropertyName = "closing")>]
     Closing : OutcomeOdds
 }
-type MatchOdds = {
-    [<JsonProperty(PropertyName = "value")>]
-    Value : float32 option
+type BookmakerOddsData = {
+    [<JsonProperty(PropertyName = "bookID")>]
+    BookID : string
     [<JsonProperty(PropertyName = "odds")>]
     Odds : OddsData
+}
+type ValueOdds = {
+    [<JsonProperty(PropertyName = "value")>]
+    Value : float32 option
+    [<JsonProperty(PropertyName = "bookOdds")>]
+    BookOdds : BookmakerOddsData array
 }
 type MatchOutcomes = {
     [<JsonProperty(PropertyName = "outcomeID")>]
     OutcomeID : string
     [<JsonProperty(PropertyName = "values")>]
-    Values : MatchOdds array
+    Values : ValueOdds array
 }
 type MatchData = {
     [<JsonProperty(PropertyName = "id")>]
