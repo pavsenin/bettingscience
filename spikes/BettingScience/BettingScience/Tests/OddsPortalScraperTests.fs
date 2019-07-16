@@ -127,7 +127,7 @@ type InternetTests() =
             bet365ID; bwinID;
             _1xbetID; marafonID; winlineID;
         |]
-        let actual = extractMatchOdds bookIDs baseballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
+        let actual = extractMatchOdds bookIDs baseballID [outHomeAwayID; outOverUnderID; outHandicapID] (matchID, matchUrl)
         let expected =
             Some({
                  ID = "Of9rIjv8";
@@ -611,7 +611,7 @@ type InternetTests() =
             bet365ID; bwinID;
             _1xbetID; marafonID; winlineID;
         |]
-        let actual = extractMatchOdds bookIDs soccerID [out1x2ID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
+        let actual = extractMatchOdds bookIDs soccerID [out1x2ID; outOverUnderID; outHandicapID] (matchID, matchUrl)
         let expected =
             Some({ID = "6mrwJVoQ";
                  Url =
@@ -1421,7 +1421,7 @@ type InternetTests() =
             bet365ID; bwinID;
             _1xbetID; marafonID; winlineID;
         |]
-        let actual = extractMatchOdds bookIDs basketballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
+        let actual = extractMatchOdds bookIDs basketballID [outHomeAwayID; outOverUnderID; outHandicapID] (matchID, matchUrl)
         let expected =
             Some({
                  ID = "juA7zL51";
@@ -2355,7 +2355,7 @@ type InternetTests() =
             bet365ID; bwinID;
             _1xbetID; marafonID; winlineID;
         |]
-        let actual = extractMatchOdds bookIDs basketballID [outHomeAwayID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
+        let actual = extractMatchOdds bookIDs basketballID [outHomeAwayID; outOverUnderID; outHandicapID] (matchID, matchUrl)
         match actual with
         | Some({
                 ID = "ChPLtsAp";
@@ -2379,7 +2379,7 @@ type InternetTests() =
         let matchID = "KrdKRsTP"
         let matchUrl = "soccer/russia/premier-league-2016-2017/orenburg-ska-khabarovsk-" + matchID + "/"
         let bookIDs = [| pinnacleID; betfairID; bet365ID; marafonID |]
-        let actual = extractMatchOdds bookIDs soccerID [out1x2ID; outOverUnderID; outAsianHandicapID] (matchID, matchUrl)
+        let actual = extractMatchOdds bookIDs soccerID [out1x2ID; outOverUnderID; outHandicapID] (matchID, matchUrl)
         match actual with
         | Some({
                 ID = "KrdKRsTP";

@@ -14,7 +14,7 @@ let soccerID = "1", "2"
 let baseballID = "6", "1"
 let basketballID = "3", "1"
 
-let out1x2ID, outOverUnderID, outHomeAwayID, outAsianHandicapID = "1", "2", "3", "5"
+let out1x2ID, outOverUnderID, outHomeAwayID, outHandicapID = "1", "2", "3", "5"
 
 let pinnacleID, _1xbetID, asianoddsID, _188betID, bet365ID, betfairID, bwinID, marafonID, winlineID, dafabetID, sbobetID =
     "18", "417", "476", "56", "16", "429", "2", "381", "454", "147", "75"
@@ -156,7 +156,7 @@ let parseMatchResponse bookIDs outID id content =
     let json = extractJsonFromResponse id content
     json ||> (fun value ->
         if outID = outOverUnderID then getHandicapOdds bookIDs value
-        else if outID = outAsianHandicapID then getHandicapOdds bookIDs value
+        else if outID = outHandicapID then getHandicapOdds bookIDs value
         else if outID = outHomeAwayID then getHomeAwayOdds bookIDs value
         else if outID = out1x2ID then get1x2Odds bookIDs value
         else None

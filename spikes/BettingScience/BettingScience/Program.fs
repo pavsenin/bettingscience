@@ -7,8 +7,10 @@ open Analytics
 let main argv =
     // test crossed odds
     // test save/load data
-    // test accuracy 1x2, overunder, handicap
-    // accuracy by total / handicap
+    // replace outID \ bookID with types
+    // get rid of fetch tracing in code
+    // test accuracy 1x2
+    // test accuracy 1.0, 1.25
     // calculate accuracy by sports \ leagues \ seasons \ teams \ bookmakers \ outcomes 
     
     //[("C2416Q6r", 28, "NBA1819.json"); ("bwgTBOAd", 28, "NBA1718.json"); ("vBTNUyLS", 29, "NBA1617.json"); ("MmbLsWh8", 29, "NBA1516.json");
@@ -22,10 +24,6 @@ let main argv =
     //    OddsPortalScraper.fetchLeagueDataAndSaveToFile soccerID [out1x2ID; outOverUnderID; outAsianHandicapID] file
     //)
 
-    //let state = {
-    //    OpeningScore = AX2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
-    //    ClosingScore = AX2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
-    //}
     let getInitState out bookID =
         if out = OddsPortalScraper.out1x2ID then
             {

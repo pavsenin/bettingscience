@@ -3,6 +3,7 @@ open System
 open System.Net
 open FSharp.Data
 open HtmlAgilityPack
+open Microsoft.FSharpLu.Json
 
 let defArg defaultValue arg = defaultArg arg defaultValue
 let (|>>) v f = try v |> Option.map f with | _ -> None
