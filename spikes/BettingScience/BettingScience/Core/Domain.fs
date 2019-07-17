@@ -1,6 +1,8 @@
 ﻿module Domain
 open Newtonsoft.Json
 
+type Bookmaker = Pin | BF | B365 | Mar
+type Outcome = HA | O1X2 | OU | AH
 type MatchScore = {
     [<JsonProperty(PropertyName = "home")>]
     Home : int
@@ -29,8 +31,8 @@ type OddsData = {
     Closing : OutcomeOdds
 }
 type BookmakerOddsData = {
-    [<JsonProperty(PropertyName = "bookID")>]
-    BookID : string
+    [<JsonProperty(PropertyName = "book")>]
+    Book : Bookmaker
     [<JsonProperty(PropertyName = "odds")>]
     Odds : OddsData
 }
@@ -41,8 +43,8 @@ type ValueOdds = {
     BookOdds : BookmakerOddsData array
 }
 type MatchOutcomes = {
-    [<JsonProperty(PropertyName = "outcomeID")>]
-    OutcomeID : string
+    [<JsonProperty(PropertyName = "outcome")>]
+    Outcome : Outcome
     [<JsonProperty(PropertyName = "values")>]
     Values : ValueOdds array
 }
@@ -69,6 +71,10 @@ type MatchData = {
 type LeagueData = {
     [<JsonProperty(PropertyName = "id")>]
     ID : string
+    [<JsonProperty(PropertyName = "country")>]
+    Country : string
+    [<JsonProperty(PropertyName = "division")>]
+    Division : string
     [<JsonProperty(PropertyName = "matches")>]
     Matches:MatchData array
 }

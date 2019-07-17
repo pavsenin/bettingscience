@@ -10,7 +10,7 @@ type Accuracy = { Expected : float32; Variance : float32 }
 type AccuracyScoreX2 = { O1 : Accuracy; O2 : Accuracy }
 type AccuracyScoreX3 = { O1 : Accuracy; O0 : Accuracy; O2 : Accuracy }
 type AccuracyScore = AX2 of AccuracyScoreX2 | AX3 of AccuracyScoreX3
-type BookAccuracyScore = { BookID : string; Opening : AccuracyScore; Closing : AccuracyScore }
+type BookAccuracyScore = { Book : Bookmaker; Opening : AccuracyScore; Closing : AccuracyScore }
 
 let private getProbabilities value = function
     | X3 { O1 = (o1, _); O0 = (o0, _); O2 = (o2, _) } ->
@@ -36,31 +36,32 @@ let private getAccuracy out odds real { Expected = e; Variance = v } =
     let prob = getProbabilities out odds
     let diff = prob - real
     { Expected = e + diff; Variance = v + diff * diff }
-let getBook id (books:BookmakerOddsData array) = books |> Array.tryFind (fun b -> b.BookID = id)
+let getBook book (books:BookmakerOddsData array) = books |> Array.tryFind (fun b -> b.Book = book)
 let compute state (score, ex) odd =
     match state with
-    | { BookID = bookID; Opening = AX2 { O1 = oO1; O2 = oO2 }; Closing = AX2 { O1 = cO1; O2 = cO2 } } ->
+    | { Book = b; Opening = AX2 { O1 = oO1; O2 = oO2 }; Closing = AX2 { O1 = cO1; O2 = cO2 } } ->
         let value = odd.Values |> Array.tryFind (fun v -> ex = v.Value)
         match value with
         | Some { Value = value; BookOdds = bookOdds } ->
-            let book = getBook bookID bookOdds
+            let book = getBook b bookOdds
             match book with
             | Some { Odds = { Opening = opening; Closing = closing } } ->
                 let real = 
-                    if odd.OutcomeID = outHomeAwayID then
+                    match odd.Outcome with
+                    | HA ->
                         let result = getMatchResult score
                         if result = O1 then Some (1.f, 0.f) else Some (0.f, 1.f)
-                    else if odd.OutcomeID = outOverUnderID then
+                    | OU ->
                         value |>> (fun handicap ->
                             let total = getMatchTotal score
                             if float32(total) > handicap then 1.f, 0.f else 0.f, 1.f
                         )
-                    else if odd.OutcomeID = outHandicapID then
+                    | AH ->
                         value |>> (fun handicap ->
                             let result = getMatchResultWithHandicap score handicap
                             if result = O1 then 1.f, 0.f else 0.f, 1.f
                         )
-                    else None
+                    | _ -> None
                 match real with
                 | Some (real01, real02) ->
                     let noO1 = getAccuracy O1 opening real01 oO1
@@ -68,14 +69,14 @@ let compute state (score, ex) odd =
                     let ncO1 = getAccuracy O1 closing real01 cO1
                     let ncO2 = getAccuracy O2 closing real02 cO2
 
-                    { BookID = bookID; Opening = AX2 { O1 = noO1; O2 = noO2 }; Closing = AX2 { O1 = ncO1; O2 = ncO2 } }
+                    { Book = b; Opening = AX2 { O1 = noO1; O2 = noO2 }; Closing = AX2 { O1 = ncO1; O2 = ncO2 } }
                 | _ -> state
             | _ -> state
         | _ -> state
-    | { BookID = bookID; Opening = AX3 { O1 = oO1; O0 = oO0; O2 = oO2 }; Closing = AX3 { O1 = cO1; O0 = cO0; O2 = cO2 } } ->
+    | { Book = b; Opening = AX3 { O1 = oO1; O0 = oO0; O2 = oO2 }; Closing = AX3 { O1 = cO1; O0 = cO0; O2 = cO2 } } ->
         match odd.Values with
         | [|{ Value = None; BookOdds = bookOdds }|] ->
-            let book = getBook bookID bookOdds
+            let book = getBook b bookOdds
             match book with
             | Some { Odds = { Opening = opening; Closing = closing } } ->
                 let result = getMatchResult score
@@ -90,18 +91,18 @@ let compute state (score, ex) odd =
                 let ncO0 = getAccuracy O0 closing realO0 cO0
                 let ncO2 = getAccuracy O2 closing real02 cO2
 
-                { BookID = bookID; Opening = AX3 { O1 = noO1; O0 = noO0; O2 = noO2 }; Closing = AX3 { O1 = ncO1; O0 = ncO0; O2 = ncO2 } }
+                { Book = b; Opening = AX3 { O1 = noO1; O0 = noO0; O2 = noO2 }; Closing = AX3 { O1 = ncO1; O0 = ncO0; O2 = ncO2 } }
             | _ -> state
         | _ -> state
     | _ -> state
 
-let analyze (outID, ex) state fileName =
+let analyze (out, ex) state fileName =
     let leagueData = Compact.deserializeFile<LeagueData> fileName
     let resultState =
         leagueData.Matches
         |> Array.fold (fun state matchData ->
             matchData.Odds
-            |> Array.tryFind (fun out -> out.OutcomeID = outID)
+            |> Array.tryFind (fun o -> o.Outcome = out)
             |>> compute state (matchData.Score, ex)
             |> defArg state
         ) state
