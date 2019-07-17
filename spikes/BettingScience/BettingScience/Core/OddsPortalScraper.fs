@@ -298,7 +298,7 @@ let fetchLeagueMatches leagueRelativeUrl pageNum =
     let content = fetchContent url "fb.oddsportal.com" "https://www.oddsportal.com/"
     let json = extractJsonFromResponse leagueRelativeUrlNum content
     json |>> extractLeagueMatches |> defArg []
-let fetchLeagueDataAndSaveToFile (sportID, dataID) outIDs (leagueID, pageCount, country, div, fileName) =
+let fetchLeagueDataAndSaveToFile (sportID, dataID) outIDs (leagueID, pageCount, country, div, season, fileName) =
     let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + sportID + "/" + leagueID + "/X0/1/0/"
     let matches =
         [1..pageCount]
@@ -306,6 +306,6 @@ let fetchLeagueDataAndSaveToFile (sportID, dataID) outIDs (leagueID, pageCount, 
         |> List.concat
     printfn "%d" matches.Length
     let matchesOdds = matches |> List.mapi (fun i m -> printfn "%d" i; extractMatchOdds books (sportID, dataID) outIDs m) |> List.choose id |> List.toArray
-    let leagueData = { ID = leagueID; Country = country; Division = div; Matches = matchesOdds }
+    let leagueData = { ID = leagueID; Country = country; Division = div; Season = season; Matches = matchesOdds }
     Compact.serializeToFile fileName leagueData
 

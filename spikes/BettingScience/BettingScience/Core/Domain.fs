@@ -3,6 +3,7 @@ open Newtonsoft.Json
 
 type Bookmaker = Pin | BF | B365 | Mar
 type Outcome = HA | O1X2 | OU | AH
+type Season = Y12 | Y13 | Y14 | Y15 | Y16 | Y17 | Y18
 type MatchScore = {
     [<JsonProperty(PropertyName = "home")>]
     Home : int
@@ -75,6 +76,8 @@ type LeagueData = {
     Country : string
     [<JsonProperty(PropertyName = "division")>]
     Division : string
+    [<JsonProperty(PropertyName = "season")>]
+    Season : Season
     [<JsonProperty(PropertyName = "matches")>]
     Matches:MatchData array
 }

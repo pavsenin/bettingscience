@@ -17,7 +17,7 @@ let private getProbabilities value = function
         let o1Prob, o0Prob, o2Prob = 1.f / o1, 1.f / o0, 1.f / o2
         let sumProb = o1Prob + o0Prob + o2Prob
         if value = O1 then o1Prob / sumProb
-        else if value = O0 then o2Prob / sumProb
+        else if value = O2 then o2Prob / sumProb
         else o0Prob / sumProb
     | X2 { O1 = (o1, _); O2 = (o2, _) } ->
         let o1Prob, o2Prob = 1.f / o1, 1.f / o2
@@ -34,7 +34,7 @@ let private getMatchTotal ({ Home = home; Away = away }:MatchScore) =
     home + away
 let private getAccuracy out odds real { Expected = e; Variance = v } =
     let prob = getProbabilities out odds
-    let diff = prob - real
+    let diff = real - prob
     { Expected = e + diff; Variance = v + diff * diff }
 let getBook book (books:BookmakerOddsData array) = books |> Array.tryFind (fun b -> b.Book = book)
 let compute state (score, ex) odd =
