@@ -8,8 +8,7 @@ type InternetTests() =
     [<Test>]
     member this.ScrapBaseballMLB18League() =
         let leagueID, pageCount = ("r3414Mwe", 2)
-        let (sportID, _) = baseballID
-        let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + sportID + "/" + leagueID + "/X0/1/0/"
+        let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + baseballID + "/" + leagueID + "/X0/1/0/"
         let actual =
             [1..pageCount]
             |> List.map (fun pageNum -> fetchLeagueMatches leagueRelativeUrl pageNum)
@@ -121,7 +120,7 @@ type InternetTests() =
     member this.ScrapBaseballMLB18Match() =
         let matchID = "Of9rIjv8"
         let matchUrl = "baseball/usa/mlb-2018/cincinnati-reds-pittsburgh-pirates-" + matchID + "/"
-        let actual = extractMatchOdds [| Pin; BF; B365; Mar |] baseballID [| HA; OU; AH |] (matchID, matchUrl)
+        let actual = extractMatchOdds [| Pin; BF; B365; Mar |] (baseballID, baseballDataID) [| HA; OU; AH |] (matchID, matchUrl)
         let expected =
             Some({ID = "Of9rIjv8";
                  Url =
@@ -315,8 +314,7 @@ type InternetTests() =
     [<Test>]
     member this.ScrapSoccerRPL1819League() =
         let leagueID, pageCount = ("jytwvQhq", 2)
-        let (sportID, _) = soccerID
-        let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + sportID + "/" + leagueID + "/X0/1/0/"
+        let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + soccerID + "/" + leagueID + "/X0/1/0/"
         let actual =
             [1..pageCount]
             |> List.map (fun pageNum -> fetchLeagueMatches leagueRelativeUrl pageNum)
@@ -428,7 +426,7 @@ type InternetTests() =
     member this.ScrapSoccerRPL1819Match() =
         let matchID = "6mrwJVoQ"
         let matchUrl = "soccer/russia/premier-league-2018-2019/dynamo-moscow-arsenal-tula-" + matchID + "/"
-        let actual = extractMatchOdds [| Pin; BF; B365; Mar |] soccerID [| O1X2; OU; AH |] (matchID, matchUrl)
+        let actual = extractMatchOdds [| Pin; BF; B365; Mar |] (soccerID, soccerDataID) [| O1X2; OU; AH |] (matchID, matchUrl)
         let expected =
             Some({ID = "6mrwJVoQ";
                  Url =
@@ -842,10 +840,60 @@ type InternetTests() =
                                                              O2 = (11.5f, 1558868344);};};}|];}|];}|];})
         Assert.That(actual, Is.EqualTo(expected))
     [<Test>]
+    member this.ScrapSoccerMatchWithPenalties() =
+        let matchID = "KrdKRsTP"
+        let matchUrl = "soccer/russia/premier-league-2016-2017/orenburg-ska-khabarovsk-" + matchID + "/"
+        let actual = extractMatchOdds [| Pin; BF; B365; Mar |] (soccerID, soccerDataID) [| O1X2; OU; AH |] (matchID, matchUrl)
+        match actual with
+        | Some({
+                ID = "KrdKRsTP";
+                Url = "http://www.oddsportal.com/soccer/russia/premier-league-2016-2017/orenburg-ska-khabarovsk-KrdKRsTP/";
+                TeamHome = "Orenburg";
+                TeamAway = "SKA Khabarovsk";
+                Score = { Home = 0; Away = 1 };
+                ScoreWithoutOT = None;
+                Periods = [|
+                    { Home = 0; Away = 0 };
+                    { Home = 0; Away = 0 };
+                    { Home = 0; Away = 0 };
+                    { Home = 3; Away = 5 }
+                |];
+          }) -> ()
+        | _ -> failwith "Incorrect data"
+    [<Test>]
+    member this.ScrapSoccerMatchFromBet365() =
+        let matchID = "OIyXBXea"
+        let matchUrl = "soccer/russia/premier-league-2014-2015/arsenal-tula-akhmat-grozny-" + matchID + "/"
+        let actual = extractMatchOdds [| B365 |] (soccerID, soccerDataID) [| O1X2 |] (matchID, matchUrl)
+        match actual with
+        | Some({
+                ID = "OIyXBXea";
+                Url = "http://www.oddsportal.com/soccer/russia/premier-league-2014-2015/arsenal-tula-akhmat-grozny-OIyXBXea/";
+                Score = { Home = 1; Away = 1 };
+                ScoreWithoutOT = None;
+                Periods = [|
+                    { Home = 1; Away = 1 };
+                    { Home = 0; Away = 0 }
+                |];
+                Odds = [|{
+                    Outcome = O1X2;
+                    Values = [|{
+                        Value = None;
+                        BookOdds = [|{
+                            Book = B365;
+                            Odds = { Opening = X3 { O1 = (2.88f, 1431443386); O0 = (3.2f, 1431443386); O2 = (2.5f, 1431443386) };
+                                     Closing = X3 { O1 = (2.38f, 1431763683); O0 = (3.2f, 1431443386); O2 = (3.f, 1431763683) }
+                            }
+                        }|]
+                    }|]
+                }|]
+            }) -> ()
+        | _ -> failwith "Incorrect data"
+    [<Test>]
     member this.ScrapBasketballNBA1819Match() =
         let matchID = "juA7zL51"
         let matchUrl = "basketball/usa/nba/toronto-raptors-boston-celtics-" + matchID + "/"
-        let actual = extractMatchOdds [| Pin; BF; B365; Mar |] basketballID [| HA; OU; AH |] (matchID, matchUrl)
+        let actual = extractMatchOdds [| Pin; BF; B365; Mar |] (basketballID, baseballDataID) [| HA; OU; AH |] (matchID, matchUrl)
         let expected =
             Some({ID = "juA7zL51";
                  Url =
@@ -1223,8 +1271,7 @@ type InternetTests() =
     [<Test>]
     member this.ScrapBasketballNBA1819League() =
         let leagueID, pageCount = ("C2416Q6r", 2)
-        let (sportID, _) = basketballID
-        let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + sportID + "/" + leagueID + "/X0/1/0/"
+        let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + basketballID + "/" + leagueID + "/X0/1/0/"
         let actual =
             [1..pageCount]
             |> List.map (fun pageNum -> fetchLeagueMatches leagueRelativeUrl pageNum)
@@ -1336,7 +1383,7 @@ type InternetTests() =
     member this.ScrapBasketballMatchWithOT() =
         let matchID = "ChPLtsAp"
         let matchUrl = "basketball/usa/nba/atlanta-hawks-minnesota-timberwolves-" + matchID + "/"
-        let actual = extractMatchOdds [| Pin |] basketballID [| HA; OU; AH |] (matchID, matchUrl)
+        let actual = extractMatchOdds [| Pin |] (basketballID, basketballDataID) [| HA; OU; AH |] (matchID, matchUrl)
         match actual with
         | Some({
                 ID = "ChPLtsAp";
@@ -1356,54 +1403,393 @@ type InternetTests() =
           }) -> ()
         | _ -> failwith "Incorrect data"
     [<Test>]
-    member this.ScrapSoccerMatchWithPenalties() =
-        let matchID = "KrdKRsTP"
-        let matchUrl = "soccer/russia/premier-league-2016-2017/orenburg-ska-khabarovsk-" + matchID + "/"
-        let actual = extractMatchOdds [| Pin; BF; B365; Mar |] soccerID [| O1X2; OU; AH |] (matchID, matchUrl)
-        match actual with
-        | Some({
-                ID = "KrdKRsTP";
-                Url = "http://www.oddsportal.com/soccer/russia/premier-league-2016-2017/orenburg-ska-khabarovsk-KrdKRsTP/";
-                TeamHome = "Orenburg";
-                TeamAway = "SKA Khabarovsk";
-                Score = { Home = 0; Away = 1 };
-                ScoreWithoutOT = None;
-                Periods = [|
-                    { Home = 0; Away = 0 };
-                    { Home = 0; Away = 0 };
-                    { Home = 0; Away = 0 };
-                    { Home = 3; Away = 5 }
-                |];
-          }) -> ()
-        | _ -> failwith "Incorrect data"
+    member this.ScrapTennisAtpWimbledon19Match() =
+        let matchID = "fyXBxdlb"
+        let matchUrl = "tennis/united-kingdom/atp-wimbledon/djokovic-novak-federer-roger-" + matchID + "/"
+        let actual = extractMatchOdds [| Pin; BF; B365; Mar |] (tennisID, tennisDataID) [| HA; OU; AH |] (matchID, matchUrl)
+        let expected =
+            Some({ID = "fyXBxdlb";
+                 Url =
+                  "http://www.oddsportal.com/tennis/united-kingdom/atp-wimbledon/djokovic-novak-federer-roger-fyXBxdlb/";
+                 TeamHome = "Djokovic N.";
+                 TeamAway = "Federer R.";
+                 Time = 1563109800;
+                 Score = {Home = 3;
+                          Away = 2;};
+                 ScoreWithoutOT = None;
+                 Periods = [|{Home = 7;
+                              Away = 6;}; {Home = 1;
+                                           Away = 6;}; {Home = 7;
+                                                        Away = 6;}; {Home = 4;
+                                                                     Away = 6;}; {Home = 13;
+                                                                                  Away = 12;}|];
+                 Odds =
+                  [|{Outcome = HA;
+                     Values =
+                      [|{Value = None;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.55999994f, 1562957689);
+                                                   O2 = (2.5999999f, 1562957689);};
+                                     Closing = X2 {O1 = (1.54999995f, 1563109775);
+                                                   O2 = (2.66000009f, 1563109775);};};};
+                            {Book = BF;
+                             Odds = {Opening = X2 {O1 = (1.48000002f, 1562959145);
+                                                   O2 = (2.70000005f, 1562959145);};
+                                     Closing = X2 {O1 = (1.52999997f, 1563071579);
+                                                   O2 = (2.63000011f, 1563109112);};};};
+                            {Book = B365;
+                             Odds = {Opening = X2 {O1 = (1.47000003f, 1562957276);
+                                                   O2 = (2.75f, 1562957276);};
+                                     Closing = X2 {O1 = (1.54999995f, 1563055499);
+                                                   O2 = (2.5999999f, 1563055499);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.48000002f, 1562957742);
+                                                   O2 = (2.9000001f, 1562957742);};
+                                     Closing = X2 {O1 = (1.57000005f, 1563105435);
+                                                   O2 = (2.6099999f, 1563105435);};};}|];}|];};
+                    {Outcome = OU;
+                     Values =
+                      [|{Value = Some 38.5f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.71000004f, 1563053282);
+                                                   O2 = (2.21000004f, 1563053282);};
+                                     Closing = X2 {O1 = (1.74000001f, 1563109597);
+                                                   O2 = (2.20000005f, 1563109597);};};}|];};
+                        {Value = Some 39.0f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.70000005f, 1562974921);
+                                                   O2 = (2.21000004f, 1562974921);};
+                                     Closing = X2 {O1 = (1.77999997f, 1563109597);
+                                                   O2 = (2.1400001f, 1563109597);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.72000003f, 1562967201);
+                                                   O2 = (2.11999989f, 1562967201);};
+                                     Closing = X2 {O1 = (1.72000003f, 1563086513);
+                                                   O2 = (2.11999989f, 1563086513);};};}|];};
+                        {Value = Some 39.5f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.76999998f, 1562974921);
+                                                   O2 = (2.11999989f, 1562974921);};
+                                     Closing = X2 {O1 = (1.85000002f, 1563109597);
+                                                   O2 = (2.04999995f, 1563109597);};};};
+                            {Book = B365;
+                             Odds = {Opening = X2 {O1 = (1.83000004f, 1562967095);
+                                                   O2 = (1.83000004f, 1562967095);};
+                                     Closing = X2 {O1 = (1.83000004f, 1562967095);
+                                                   O2 = (1.83000004f, 1562967095);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.76999998f, 1562967201);
+                                                   O2 = (2.06999993f, 1562967201);};
+                                     Closing = X2 {O1 = (1.77999997f, 1563086513);
+                                                   O2 = (2.05999994f, 1563086513);};};}|];};
+                        {Value = Some 40.0f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.80999994f, 1562958346);
+                                                   O2 = (2.06999993f, 1562958346);};
+                                     Closing = X2 {O1 = (1.90999997f, 1563109597);
+                                                   O2 = (1.99000001f, 1563109597);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1562957742);
+                                                   O2 = (1.95000005f, 1562957742);};
+                                     Closing = X2 {O1 = (1.83000004f, 1563086513);
+                                                   O2 = (2.01999998f, 1563086513);};};}|];};
+                        {Value = Some 40.5f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.87f, 1562958346);
+                                                   O2 = (2.00999999f, 1562958346);};
+                                     Closing = X2 {O1 = (1.97000003f, 1563109597);
+                                                   O2 = (1.92999995f, 1563109597);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.75999999f, 1562957828);
+                                                   O2 = (2.08999991f, 1562957828);};
+                                     Closing = X2 {O1 = (1.88999999f, 1563087179);
+                                                   O2 = (1.97000003f, 1563087179);};};}|];};
+                        {Value = Some 41.0f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.94000006f, 1562958346);
+                                                   O2 = (1.94000006f, 1562958346);};
+                                     Closing = X2 {O1 = (2.04999995f, 1563109597);
+                                                   O2 = (1.85000002f, 1563109597);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.80999994f, 1562957828);
+                                                   O2 = (2.04999995f, 1562957828);};
+                                     Closing = X2 {O1 = (1.96000004f, 1563087179);
+                                                   O2 = (1.94000006f, 1563087179);};};}|];};
+                        {Value = Some 41.5f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.99000001f, 1562958346);
+                                                   O2 = (1.88999999f, 1562958346);};
+                                     Closing = X2 {O1 = (2.11999989f, 1563109597);
+                                                   O2 = (1.78999996f, 1563109597);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.87f, 1562957828);
+                                                   O2 = (2.0f, 1562957828);};
+                                     Closing = X2 {O1 = (2.00999999f, 1563087179);
+                                                   O2 = (1.86000001f, 1563087179);};};}|];};
+                        {Value = Some 42.0f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (2.07999992f, 1562958346);
+                                                   O2 = (1.80999994f, 1562958346);};
+                                     Closing = X2 {O1 = (2.21000004f, 1563109597);
+                                                   O2 = (1.73000002f, 1563109597);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.94000006f, 1562957828);
+                                                   O2 = (1.96000004f, 1562957828);};
+                                     Closing = X2 {O1 = (2.06999993f, 1563087179);
+                                                   O2 = (1.78999996f, 1563087179);};};}|];};
+                        {Value = Some 42.5f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (2.16000009f, 1562974921);
+                                                   O2 = (1.74000001f, 1562974921);};
+                                     Closing = X2 {O1 = (2.28999996f, 1563109597);
+                                                   O2 = (1.67999995f, 1563109597);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.96000004f, 1562957828);
+                                                   O2 = (1.89999998f, 1562957828);};
+                                     Closing = X2 {O1 = (2.11999989f, 1563087179);
+                                                   O2 = (1.74000001f, 1563087179);};};}|];};
+                        {Value = Some 43.0f;
+                         BookOdds =
+                          [|{Book = Mar;
+                             Odds = {Opening = X2 {O1 = (2.01999998f, 1562957828);
+                                                   O2 = (1.83000004f, 1562957828);};
+                                     Closing = X2 {O1 = (2.19000006f, 1563087179);
+                                                   O2 = (1.67999995f, 1563087179);};};}|];}|];};
+                    {Outcome = AH;
+                     Values =
+                      [|{Value = Some -5.5f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (2.72000003f, 1563094089);
+                                                   O2 = (1.48000002f, 1563094089);};
+                                     Closing = X2 {O1 = (2.48000002f, 1563109775);
+                                                   O2 = (1.57000005f, 1563109597);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (2.88000011f, 1563076410);
+                                                   O2 = (1.41999996f, 1563076410);};
+                                     Closing = X2 {O1 = (2.45000005f, 1563104351);
+                                                   O2 = (1.54999995f, 1563104351);};};}|];};
+                        {Value = Some -5.0f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (3.13000011f, 1562974921);
+                                                   O2 = (1.35000002f, 1562974921);};
+                                     Closing = X2 {O1 = (2.29999995f, 1563109714);
+                                                   O2 = (1.66999996f, 1563109714);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (3.1500001f, 1562957828);
+                                                   O2 = (1.36000001f, 1562957828);};
+                                     Closing = X2 {O1 = (2.25f, 1563104351);
+                                                   O2 = (1.65999997f, 1563104351);};};}|];};
+                        {Value = Some -4.5f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (2.63000011f, 1562974921);
+                                                   O2 = (1.49000001f, 1562974921);};
+                                     Closing = X2 {O1 = (2.19000006f, 1563109714);
+                                                   O2 = (1.74000001f, 1563109714);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (2.56999993f, 1562957828);
+                                                   O2 = (1.51999998f, 1562957828);};
+                                     Closing = X2 {O1 = (2.0999999f, 1563104351);
+                                                   O2 = (1.76999998f, 1563104351);};};}|];};
+                        {Value = Some -4.0f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (2.27999997f, 1562958404);
+                                                   O2 = (1.65999997f, 1562958404);};
+                                     Closing = X2 {O1 = (2.00999999f, 1563109775);
+                                                   O2 = (1.88999999f, 1563109775);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (2.3599999f, 1562957828);
+                                                   O2 = (1.62f, 1562957828);};
+                                     Closing = X2 {O1 = (2.01999998f, 1563104351);
+                                                   O2 = (1.85000002f, 1563104351);};};}|];};
+                        {Value = Some -3.5f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (2.04999995f, 1562958404);
+                                                   O2 = (1.83000004f, 1562958404);};
+                                     Closing = X2 {O1 = (1.87f, 1563109775);
+                                                   O2 = (2.02999997f, 1563109775);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.91999996f, 1562957742);
+                                                   O2 = (1.98000002f, 1562957742);};
+                                     Closing = X2 {O1 = (1.90999997f, 1563104351);
+                                                   O2 = (1.99000001f, 1563104351);};};}|];};
+                        {Value = Some -3.0f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1562958404);
+                                                   O2 = (1.92999995f, 1562958404);};
+                                     Closing = X2 {O1 = (1.75999999f, 1563109658);
+                                                   O2 = (2.16000009f, 1563109775);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.95000005f, 1562957828);
+                                                   O2 = (1.95000005f, 1562957828);};
+                                     Closing = X2 {O1 = (1.75f, 1563104351);
+                                                   O2 = (2.1500001f, 1563104351);};};}|];};
+                        {Value = Some -2.5f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.82000005f, 1562958404);
+                                                   O2 = (2.05999994f, 1562958404);};
+                                     Closing = X2 {O1 = (1.69000006f, 1563109658);
+                                                   O2 = (2.25999999f, 1563109775);};};};
+                            {Book = B365;
+                             Odds = {Opening = X2 {O1 = (1.79999995f, 1562967095);
+                                                   O2 = (1.89999998f, 1562967095);};
+                                     Closing = X2 {O1 = (1.79999995f, 1562967095);
+                                                   O2 = (1.89999998f, 1562967095);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.79999995f, 1562957828);
+                                                   O2 = (2.07999992f, 1562957828);};
+                                     Closing = X2 {O1 = (1.70000005f, 1563104351);
+                                                   O2 = (2.21000004f, 1563104351);};};}|];};
+                        {Value = Some -2.0f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.72000003f, 1562958404);
+                                                   O2 = (2.18000007f, 1562958404);};
+                                     Closing = X2 {O1 = (1.63999999f, 1563109775);
+                                                   O2 = (2.3599999f, 1563109658);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.69000006f, 1562957828);
+                                                   O2 = (2.22000003f, 1562957828);};
+                                     Closing = X2 {O1 = (1.63f, 1563104351);
+                                                   O2 = (2.30999994f, 1563104351);};};}|];};
+                        {Value = Some -1.5f;
+                         BookOdds =
+                          [|{Book = Pin;
+                             Odds = {Opening = X2 {O1 = (1.70000005f, 1562974921);
+                                                   O2 = (2.21000004f, 1562974921);};
+                                     Closing = X2 {O1 = (1.60000002f, 1563109597);
+                                                   O2 = (2.44000006f, 1563109775);};};};
+                            {Book = Mar;
+                             Odds = {Opening = X2 {O1 = (1.62f, 1562957828);
+                                                   O2 = (2.32999992f, 1562957828);};
+                                     Closing = X2 {O1 = (1.59000003f, 1563104351);
+                                                   O2 = (2.3599999f, 1563104351);};};}|];}|];}|];})
+        Assert.That(actual, Is.EqualTo(expected))
     [<Test>]
-    member this.ScrapSoccerMatchFromBet365() =
-        let matchID = "OIyXBXea"
-        let matchUrl = "soccer/russia/premier-league-2014-2015/arsenal-tula-akhmat-grozny-" + matchID + "/"
-        let actual = extractMatchOdds [| B365 |] soccerID [| O1X2 |] (matchID, matchUrl)
-        match actual with
-        | Some({
-                ID = "OIyXBXea";
-                Url = "http://www.oddsportal.com/soccer/russia/premier-league-2014-2015/arsenal-tula-akhmat-grozny-OIyXBXea/";
-                Score = { Home = 1; Away = 1 };
-                ScoreWithoutOT = None;
-                Periods = [|
-                    { Home = 1; Away = 1 };
-                    { Home = 0; Away = 0 }
-                |];
-                Odds = [|{
-                    Outcome = O1X2;
-                    Values = [|{
-                        Value = None;
-                        BookOdds = [|{
-                            Book = B365;
-                            Odds = { Opening = X3 { O1 = (2.88f, 1431443386); O0 = (3.2f, 1431443386); O2 = (2.5f, 1431443386) };
-                                     Closing = X3 { O1 = (2.38f, 1431763683); O0 = (3.2f, 1431443386); O2 = (3.f, 1431763683) }
-                            }
-                        }|]
-                    }|]
-                }|]
-            }) -> ()
-        | _ -> failwith "Incorrect data"
+    member this.ScrapTennisAtpWimbeldon19League() =
+        let leagueID, pageCount = ("Ieiv94gB", 2)
+        let leagueRelativeUrl = "/ajax-sport-country-tournament-archive/" + tennisID + "/" + leagueID + "/X0/1/0/"
+        let actual =
+            [1..pageCount]
+            |> List.map (fun pageNum -> fetchLeagueMatches leagueRelativeUrl pageNum)
+            |> List.concat
+        let expected =
+            [("fyXBxdlb", "/tennis/united-kingdom/atp-wimbledon/djokovic-novak-federer-roger-fyXBxdlb/");
+            ("lhqi1P31", "/tennis/united-kingdom/atp-wimbledon/nadal-rafael-federer-roger-lhqi1P31/");
+            ("WQR97Wkf", "/tennis/united-kingdom/atp-wimbledon/djokovic-novak-bautista-agut-roberto-WQR97Wkf/");
+            ("MoZL0bZO", "/tennis/united-kingdom/atp-wimbledon/querrey-sam-nadal-rafael-MoZL0bZO/");
+            ("8nPvK4uo", "/tennis/united-kingdom/atp-wimbledon/nishikori-kei-federer-roger-8nPvK4uo/");
+            ("63QkVFVe", "/tennis/united-kingdom/atp-wimbledon/djokovic-novak-goffin-david-63QkVFVe/");
+            ("tjQrQcOu", "/tennis/united-kingdom/atp-wimbledon/pella-guido-bautista-agut-roberto-tjQrQcOu/");
+            ("txeUhhnC", "/tennis/united-kingdom/atp-wimbledon/berrettini-matteo-federer-roger-txeUhhnC/");
+            ("tOFevgXI", "/tennis/united-kingdom/atp-wimbledon/nishikori-kei-kukushkin-mikhail-tOFevgXI/");
+            ("rwBl5NEa", "/tennis/united-kingdom/atp-wimbledon/pella-guido-raonic-milos-rwBl5NEa/");
+            ("Eyj9kfxR", "/tennis/united-kingdom/atp-wimbledon/djokovic-novak-humbert-ugo-Eyj9kfxR/");
+            ("ObRv89ZP", "/tennis/united-kingdom/atp-wimbledon/querrey-sam-sandgren-tennys-ObRv89ZP/");
+            ("23JK1TjA", "/tennis/united-kingdom/atp-wimbledon/bautista-agut-roberto-paire-benoit-23JK1TjA/");
+            ("OjBEcxCc", "/tennis/united-kingdom/atp-wimbledon/goffin-david-verdasco-fernando-OjBEcxCc/");
+            ("6iYxpTwm", "/tennis/united-kingdom/atp-wimbledon/sousa-joao-nadal-rafael-6iYxpTwm/");
+            ("v7B9XBIB", "/tennis/united-kingdom/atp-wimbledon/sousa-joao-evans-daniel-v7B9XBIB/");
+            ("4lFhdE7P", "/tennis/united-kingdom/atp-wimbledon/pouille-lucas-federer-roger-4lFhdE7P/");
+            ("Sj8XHCqh", "/tennis/united-kingdom/atp-wimbledon/tsonga-jo-wilfried-nadal-rafael-Sj8XHCqh/");
+            ("AFcxHWbb", "/tennis/united-kingdom/atp-wimbledon/berrettini-matteo-schwartzman-diego-sebastian-AFcxHWbb/");
+            ("vsSIblHA", "/tennis/united-kingdom/atp-wimbledon/struff-jan-lennard-kukushkin-mikhail-vsSIblHA/");
+            ("OI1tGjE4", "/tennis/united-kingdom/atp-wimbledon/sandgren-tennys-fognini-fabio-OI1tGjE4/");
+            ("zH3QOTfE", "/tennis/united-kingdom/atp-wimbledon/nishikori-kei-johnson-steve-zH3QOTfE/");
+            ("h04h3B7m", "/tennis/united-kingdom/atp-wimbledon/querrey-sam-millman-john-h04h3B7m/");
+            ("U7AnZvUP", "/tennis/united-kingdom/atp-wimbledon/auger-aliassime-felix-humbert-ugo-U7AnZvUP/");
+            ("MPo53Mwr", "/tennis/united-kingdom/atp-wimbledon/verdasco-fernando-fabbiano-thomas-MPo53Mwr/");
+            ("z1HAfnd3", "/tennis/united-kingdom/atp-wimbledon/djokovic-novak-hurkacz-hubert-z1HAfnd3/");
+            ("Snv6JJBk", "/tennis/united-kingdom/atp-wimbledon/medvedev-daniil-goffin-david-Snv6JJBk/");
+            ("zR01T9c4", "/tennis/united-kingdom/atp-wimbledon/anderson-kevin-pella-guido-zR01T9c4/");
+            ("MB6WlNOl", "/tennis/united-kingdom/atp-wimbledon/khachanov-karen-bautista-agut-roberto-MB6WlNOl/");
+            ("j72WVm1C", "/tennis/united-kingdom/atp-wimbledon/opelka-reilly-raonic-milos-j72WVm1C/");
+            ("vgKgEYro", "/tennis/united-kingdom/atp-wimbledon/paire-benoit-vesely-jiri-vgKgEYro/");
+            ("WYRkGkXp", "/tennis/united-kingdom/atp-wimbledon/koepfer-dominik-schwartzman-diego-sebastian-WYRkGkXp/");
+            ("EZMAABst", "/tennis/united-kingdom/atp-wimbledon/berrettini-matteo-baghdatis-marcos-EZMAABst/");
+            ("Q96ST81p", "/tennis/united-kingdom/atp-wimbledon/kyrgios-nick-nadal-rafael-Q96ST81p/");
+            ("EV2QFIg1", "/tennis/united-kingdom/atp-wimbledon/fucsovics-marton-fognini-fabio-EV2QFIg1/");
+            ("EeE9JRs8", "/tennis/united-kingdom/atp-wimbledon/simon-gilles-sandgren-tennys-EeE9JRs8/");
+            ("hplrGRmp", "/tennis/united-kingdom/atp-wimbledon/pouille-lucas-barrere-gregoire-hplrGRmp/");
+            ("bqGLGPRQ", "/tennis/united-kingdom/atp-wimbledon/clarke-jay-federer-roger-bqGLGPRQ/");
+            ("lUClyi9A", "/tennis/united-kingdom/atp-wimbledon/berankis-ricardas-tsonga-jo-wilfried-lUClyi9A/");
+            ("fRuDwMo8", "/tennis/united-kingdom/atp-wimbledon/cilic-marin-sousa-joao-fRuDwMo8/");
+            ("8CCBLmQM", "/tennis/united-kingdom/atp-wimbledon/kukushkin-mikhail-isner-john-8CCBLmQM/");
+            ("A1GJ8kCh", "/tennis/united-kingdom/atp-wimbledon/nishikori-kei-norrie-cameron-A1GJ8kCh/");
+            ("WvLd97pD", "/tennis/united-kingdom/atp-wimbledon/evans-daniel-basilashvili-nikoloz-WvLd97pD/");
+            ("n9l97LlD", "/tennis/united-kingdom/atp-wimbledon/struff-jan-lennard-fritz-taylor-harry-n9l97LlD/");
+            ("d2jYAMQ1", "/tennis/united-kingdom/atp-wimbledon/johnson-steve-de-minaur-alex-d2jYAMQ1/");
+            ("KflNGbve", "/tennis/united-kingdom/atp-wimbledon/millman-john-djere-laslo-KflNGbve/");
+            ("Aa5tKwHL", "/tennis/united-kingdom/atp-wimbledon/querrey-sam-rublev-andrey-Aa5tKwHL/");
+            ("2J7Sp1Mk", "/tennis/united-kingdom/atp-wimbledon/djokovic-novak-kudla-denis-2J7Sp1Mk/");
+            ("jq4Oos7q", "/tennis/united-kingdom/atp-wimbledon/anderson-kevin-tipsarevic-janko-jq4Oos7q/");
+            ("0fJ6FbyA", "/tennis/united-kingdom/atp-wimbledon/auger-aliassime-felix-moutet-corentin-0fJ6FbyA/");
+            ("E7rj7zqj", "/tennis/united-kingdom/atp-wimbledon/granollers-pujol-marcel-humbert-ugo-E7rj7zqj/");
+            ("AZDpGG9U", "/tennis/united-kingdom/atp-wimbledon/seppi-andreas-pella-guido-AZDpGG9U/");
+            ("GOSqG7wK", "/tennis/united-kingdom/atp-wimbledon/khachanov-karen-lopez-feliciano-GOSqG7wK/");
+            ("hObkCFqF", "/tennis/united-kingdom/atp-wimbledon/darcis-steve-bautista-agut-roberto-hObkCFqF/");
+            ("niF2GvM3", "/tennis/united-kingdom/atp-wimbledon/edmund-kyle-verdasco-fernando-niF2GvM3/");
+            ("Uws7XHv5", "/tennis/united-kingdom/atp-wimbledon/haase-robin-raonic-milos-Uws7XHv5/");
+            ("rJ8BEIjG", "/tennis/united-kingdom/atp-wimbledon/chardy-jeremy-goffin-david-rJ8BEIjG/");
+            ("8UuBWyfB", "/tennis/united-kingdom/atp-wimbledon/mayer-leonardo-hurkacz-hubert-8UuBWyfB/");
+            ("0bgfzKfn", "/tennis/united-kingdom/atp-wimbledon/karlovic-ivo-fabbiano-thomas-0bgfzKfn/");
+            ("MDs3YcPb", "/tennis/united-kingdom/atp-wimbledon/medvedev-daniil-popyrin-alexei-MDs3YcPb/");
+            ("nekjy0ut", "/tennis/united-kingdom/atp-wimbledon/cuevas-pablo-vesely-jiri-nekjy0ut/");
+            ("YJPnD5wp", "/tennis/united-kingdom/atp-wimbledon/wawrinka-stan-opelka-reilly-YJPnD5wp/");
+            ("zFxDIOmJ", "/tennis/united-kingdom/atp-wimbledon/paire-benoit-kecmanovic-miomir-zFxDIOmJ/");
+            ("4SV1LoVc", "/tennis/united-kingdom/atp-wimbledon/pouille-lucas-gasquet-richard-4SV1LoVc/");
+            ("APCv4p0N", "/tennis/united-kingdom/atp-wimbledon/ruud-casper-isner-john-APCv4p0N/");
+            ("4jIqDg2c", "/tennis/united-kingdom/atp-wimbledon/sousa-joao-jubb-paul-4jIqDg2c/");
+            ("QaJuEZni", "/tennis/united-kingdom/atp-wimbledon/cilic-marin-mannarino-adrian-QaJuEZni/");
+            ("bgRgjWfp", "/tennis/united-kingdom/atp-wimbledon/fucsovics-marton-novak-dennis-bgRgjWfp/");
+            ("6ahoYINN", "/tennis/united-kingdom/atp-wimbledon/andreozzi-guido-djere-laslo-6ahoYINN/");
+            ("IVZ5K5p4", "/tennis/united-kingdom/atp-wimbledon/bublik-alexander-barrere-gregoire-IVZ5K5p4/");
+            ("bk9z5QpH", "/tennis/united-kingdom/atp-wimbledon/andujar-alba-pablo-kukushkin-mikhail-bk9z5QpH/");
+            ("xpQckjAj", "/tennis/united-kingdom/atp-wimbledon/tiafoe-frances-fognini-fabio-xpQckjAj/");
+            ("hdlsZb8H", "/tennis/united-kingdom/atp-wimbledon/dellien-hugo-millman-john-hdlsZb8H/");
+            ("GjDP3kPq", "/tennis/united-kingdom/atp-wimbledon/sugita-yuichi-nadal-rafael-GjDP3kPq/");
+            ("fuBdAinG", "/tennis/united-kingdom/atp-wimbledon/shapovalov-denis-berankis-ricardas-fuBdAinG/");
+            ("M3tcMRFi", "/tennis/united-kingdom/atp-wimbledon/ebden-matthew-schwartzman-diego-sebastian-M3tcMRFi/");
+            ("4S9W56VA", "/tennis/united-kingdom/atp-wimbledon/fritz-taylor-harry-berdych-tomas-4S9W56VA/");
+            ("fclBbONp", "/tennis/united-kingdom/atp-wimbledon/struff-jan-lennard-albot-radu-fclBbONp/");
+            ("YV909B1M", "/tennis/united-kingdom/atp-wimbledon/tomic-bernard-tsonga-jo-wilfried-YV909B1M/");
+            ("IeDP7bQH", "/tennis/united-kingdom/atp-wimbledon/uchiyama-yasutaka-sandgren-tennys-IeDP7bQH/");
+            ("jqYDIqFG", "/tennis/united-kingdom/atp-wimbledon/harris-lloyd-george-federer-roger-jqYDIqFG/");
+            ("ChZ9JPaA", "/tennis/united-kingdom/atp-wimbledon/clarke-jay-rubin-noah-ChZ9JPaA/");
+            ("rDsgN70o", "/tennis/united-kingdom/atp-wimbledon/koepfer-dominik-krajinovic-filip-rDsgN70o/");
+            ("bZlwzugB", "/tennis/united-kingdom/atp-wimbledon/garin-christian-rublev-andrey-bZlwzugB/");
+            ("OGGX1Tgd", "/tennis/united-kingdom/atp-wimbledon/istomin-denis-norrie-cameron-OGGX1Tgd/");
+            ("KAfM8vBB", "/tennis/united-kingdom/atp-wimbledon/simon-gilles-caruso-salvatore-KAfM8vBB/");
+            ("KrjZzLw5", "/tennis/united-kingdom/atp-wimbledon/thiem-dominic-querrey-sam-KrjZzLw5/");
+            ("QyBS6nG4", "/tennis/united-kingdom/atp-wimbledon/berrettini-matteo-bedene-aljaz-QyBS6nG4/");
+            ("hl2q34FT", "/tennis/united-kingdom/atp-wimbledon/schnur-brayden-baghdatis-marcos-hl2q34FT/");
+            ("EsRc8VGS", "/tennis/united-kingdom/atp-wimbledon/kyrgios-nick-thompson-jordan-EsRc8VGS/");
+            ("4CgKPWo3", "/tennis/united-kingdom/atp-wimbledon/cecchinato-marco-de-minaur-alex-4CgKPWo3/");
+            ("nF7lCDH3", "/tennis/united-kingdom/atp-wimbledon/delbonis-federico-evans-daniel-nF7lCDH3/");
+            ("QLfGQCWd", "/tennis/united-kingdom/atp-wimbledon/johnson-steve-ramos-vinolas-albert-QLfGQCWd/");
+            ("ADCT29vj", "/tennis/united-kingdom/atp-wimbledon/nishikori-kei-monteiro-thiago-ADCT29vj/");
+            ("0IBhBXW9", "/tennis/united-kingdom/atp-wimbledon/ward-james-basilashvili-nikoloz-0IBhBXW9/");
+            ("6JzUwNgn", "/tennis/united-kingdom/atp-wimbledon/carballes-baena-roberto-kecmanovic-miomir-6JzUwNgn/");
+            ("C4gkX2Jm", "/tennis/united-kingdom/atp-wimbledon/klahn-bradley-goffin-david-C4gkX2Jm/");
+            ("hIgFPHGo", "/tennis/united-kingdom/atp-wimbledon/edmund-kyle-munar-jaume-hIgFPHGo/");
+            ("ChVRSmS1", "/tennis/united-kingdom/atp-wimbledon/sonego-lorenzo-granollers-pujol-marcel-ChVRSmS1/");
+            ("Y1WNTTCe", "/tennis/united-kingdom/atp-wimbledon/dimitrov-grigor-moutet-corentin-Y1WNTTCe/")]
+        Assert.That(actual, Is.EqualTo(expected))
 
 

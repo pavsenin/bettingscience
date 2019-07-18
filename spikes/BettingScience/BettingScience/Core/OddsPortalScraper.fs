@@ -10,9 +10,17 @@ open System.Net
 
 let oddsportalHost = "www.oddsportal.com"
 
-let soccerID = "1", "2"
-let baseballID = "6", "1"
-let basketballID = "3", "1"
+let soccerID, soccerDataID = "1", "2"
+let tennisID, tennisDataID = "2", "2"
+let baseballID, baseballDataID = "6", "1"
+let basketballID, basketballDataID = "3", "1"
+
+let getSportFromID id =
+    if id = soccerID then Some Soccer
+    else if id = tennisID then Some Tennis
+    else if id = basketballID then Some Basketball
+    else if id = baseballID then Some Baseball
+    else None
 
 let out1x2ID, outOverUnderID, outHomeAwayID, outHandicapID = "1", "2", "3", "5"
 let getOutID = function | HA -> outHomeAwayID | O1X2 -> out1x2ID | OU -> outOverUnderID | AH -> outHandicapID
@@ -122,26 +130,30 @@ let get1x2Odds books value =
                 Some { Book = book; Odds = { Opening = X3 { O1 = s1; O0 = s0; O2 = s2 }; Closing = X3 { O1 = c1; O0 = c0; O2 = c2 } } }
             | _ -> None
     getBookmakersOdds books getOdds
-let getHandicapOdds books value =
+let getHandicapOdds books value sport =
     let oddsData = value?d?oddsdata?back
     match oddsData with
     | JsonValue.Record data ->
         let values =
             data |> Array.choose (fun (_, innerValue) ->
-                let handicap = asFloat innerValue?handicapValue
-                let bookOdds =
-                    books |> Array.choose (fun book ->
-                        let starting = getOdds2 book (innerValue?opening_odds, innerValue?opening_change_time)
-                        let closing = getOdds2 book (innerValue?odds, innerValue?change_time)
-                        let active = getActive book innerValue?act
-                        if not active then None
-                        else
-                            match starting, closing with
-                            | Some (s1, s2), Some (c1, c2) ->
-                                Some { Book = book; Odds = { Opening = X2 { O1 = s1; O2 = s2 }; Closing = X2 { O1 = c1; O2 = c2 } } }
-                            | _ -> None
-                    )
-                match bookOdds with | [||] -> None | _ -> Some { Value = Some handicap; BookOdds = bookOdds }
+                let handicapType = asInt innerValue?handicapType
+                match sport, handicapType with
+                | Tennis, 1 -> None
+                | _ ->
+                    let handicap = asFloat innerValue?handicapValue
+                    let bookOdds =
+                        books |> Array.choose (fun book ->
+                            let starting = getOdds2 book (innerValue?opening_odds, innerValue?opening_change_time)
+                            let closing = getOdds2 book (innerValue?odds, innerValue?change_time)
+                            let active = getActive book innerValue?act
+                            if not active then None
+                            else
+                                match starting, closing with
+                                | Some (s1, s2), Some (c1, c2) ->
+                                    Some { Book = book; Odds = { Opening = X2 { O1 = s1; O2 = s2 }; Closing = X2 { O1 = c1; O2 = c2 } } }
+                                | _ -> None
+                        )
+                    match bookOdds with | [||] -> None | _ -> Some { Value = Some handicap; BookOdds = bookOdds }
             )
             |> Array.sortBy (fun value -> match value with | { Value = Some handicap } -> handicap | _ -> Single.MinValue)
         values
@@ -157,15 +169,15 @@ let extractJsonFromResponse filePath (response:string) =
         Some json
     else
         None
-let parseMatchResponse books out id content =
+let parseMatchResponse books sport out id content =
     let json = extractJsonFromResponse id content
     json ||> (fun value ->
         match out with
-        | OU | AH -> getHandicapOdds books value
+        | OU | AH -> getHandicapOdds books value sport
         | HA -> getHomeAwayOdds books value
         | O1X2 -> get1x2Odds books value
     )
-let parseMainMatchPage url =
+let parseMainMatchPage url sportID =
     let extractXHashKey (text:string) =
         let endText = "\",\""
         let idStart = text.IndexOf "\"id\":\""
@@ -184,6 +196,7 @@ let parseMainMatchPage url =
     let html = fetchContent url oddsportalHost url
     let document = HtmlDocument()
     document.LoadHtml(html)
+    let sport = getSportFromID sportID
     let xhash = document.DocumentNode.SelectNodes("/html/body/script") |> List.ofSeq |> Seq.tryPick (fun script -> extractXHashKey script.InnerText)
     let score =
         let getScore (text:string) =
@@ -224,7 +237,14 @@ let parseMainMatchPage url =
                 | array ->
                     array |> Array.map (fun p ->
                         match p.Split(':') with
-                        | [|x1; x2|] -> toInt x1, toInt x2
+                        | [|x1; x2|] ->
+                            match sport with
+                            | Some Tennis ->
+                                let correctInt x =
+                                    let s = toInt x
+                                    if s > 60 then s / 10 else s
+                                correctInt x1, correctInt x2
+                            | _ -> toInt x1, toInt x2
                         | _ -> -1, -1)
                     |> Some
             else None
@@ -252,8 +272,8 @@ let parseMainMatchPage url =
             | _ -> None
         else
             None
-    match xhash, teams, score, periods, time with
-    | Some x1, Some x2, Some x3, Some x4, Some x5 -> Some (x1, x2, x3, x4, x5)
+    match xhash, teams, score, periods, time, sport with
+    | Some x1, Some x2, Some x3, Some x4, Some x5, Some x6 -> Some (x1, x2, x3, x4, x5, x6)
     | _ -> None
 let extractMatches (document:HtmlDocument) =
     let getMatchUrl node =
@@ -270,21 +290,21 @@ let extractMatches (document:HtmlDocument) =
         | _ -> None
     document.DocumentNode.SelectNodes("/table/tbody/tr") |> List.ofSeq |> List.choose getMatchData
 let extractMatchOdds books (sportID, dataID) outs (matchID, matchRelativeUrl) =
-    let getOddsData hash out =
+    let getOddsData hash sport out =
         let outID = getOutID out
         let matchData = "/feed/match/1-" + sportID + "-" + matchID + "-" + outID + "-" + dataID + "-" + hash + ".dat"
         let matchDataUrl = "https://fb.oddsportal.com" + matchData + "?_=" + fromUnixTimestamp()
         let matchContent = fetchContent matchDataUrl "fb.oddsportal.com" oddsportalHost
-        let odds = parseMatchResponse books out matchData matchContent
+        let odds = parseMatchResponse books sport out matchData matchContent
         odds |>> (fun values -> { Outcome = out; Values = values })
-    let getMatchData matchUrl (hash, (teamHome, teamAway), ((score1, score2), scoreWithoutOT), periodsData, time) =
-        let odds = outs |> Array.choose (getOddsData hash)
+    let getMatchData matchUrl (hash, (teamHome, teamAway), ((score1, score2), scoreWithoutOT), periodsData, time, sport) =
+        let odds = outs |> Array.choose (getOddsData hash sport)
         let periods = periodsData |> Array.map (fun (ph, pa) -> { Home = ph; Away = pa })
         let scoreOT = scoreWithoutOT |>> (fun (s1, s2) -> { Home = s1; Away = s2 })
         { ID = matchID; Url = matchUrl; TeamHome = teamHome; TeamAway = teamAway; Time = time;
         Score = { Home = score1; Away = score2 }; ScoreWithoutOT = scoreOT; Periods = periods; Odds = odds }
     let matchUrl = "http://www.oddsportal.com/" + matchRelativeUrl
-    let mainData = parseMainMatchPage matchUrl
+    let mainData = parseMainMatchPage matchUrl sportID
     mainData |>> getMatchData matchUrl
 
 let extractLeagueMatches (json:JsonValue) =

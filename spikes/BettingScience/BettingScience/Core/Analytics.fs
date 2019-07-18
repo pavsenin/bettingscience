@@ -96,14 +96,19 @@ let compute state (score, ex) odd =
         | _ -> state
     | _ -> state
 
-let analyze (out, ex) state fileName =
+let analyze (sport, out, ex) state fileName =
     let leagueData = Compact.deserializeFile<LeagueData> fileName
     let resultState =
         leagueData.Matches
         |> Array.fold (fun state matchData ->
+            let score =
+                match sport with
+                | Tennis ->
+                    matchData.Periods |> Array.fold (fun { Home = h; Away = a } p -> { Home = h + p.Home; Away = a + p.Away } ) { Home = 0; Away = 0 }
+                | _ -> matchData.Score
             matchData.Odds
             |> Array.tryFind (fun o -> o.Outcome = out)
-            |>> compute state (matchData.Score, ex)
+            |>> compute state (score, ex)
             |> defArg state
         ) state
     resultState
