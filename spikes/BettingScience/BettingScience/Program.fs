@@ -5,10 +5,9 @@ open Analytics
 
 [<EntryPoint>]
 let main argv =
-    // test crossed odds
     // test save/load data
     // get rid of fetch tracing in code
-    // test accuracy 1.0, 1.25
+    // simple models: random, (home, away) / total 
     // calculate accuracy by sports \ leagues \ seasons \ teams \ bookmakers \ outcomes 
     
     //[("bwgTBOAd", 28, "USA", "NBA", Y17, "NBA1718.json")]
@@ -27,13 +26,13 @@ let main argv =
         match out with
         | O1X2 ->
             {
-                Book = book;
+                Book = book; Count = 0;
                 Opening = AX3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
                 Closing = AX3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
             }
         | _ ->
             {
-                Book = book;
+                Book = book; Count = 0;
                 Opening = AX2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
                 Closing = AX2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
             }
@@ -48,13 +47,13 @@ let main argv =
     //        printfn "%s %A %A" file out result
     //    )
     //)
-    ["ATPWIM19.json"]
-    |> List.iter (fun file ->
-        [OU]
-        |> List.iter (fun out ->
-            let state = getInitState out Pin
-            let result = analyze (Tennis, out, Some 36.5f) state file
-            printfn "%s %A %A" file out result
-        )
-    )
+    //["ATPWIM19.json"]
+    //|> List.iter (fun file ->
+    //    [OU]
+    //    |> List.iter (fun out ->
+    //        let state = getInitState out Pin
+    //        let result = analyze (Tennis, out, Some 36.5f) state file
+    //        printfn "%s %A %A" file out result
+    //    )
+    //)
     0

@@ -1791,5 +1791,19 @@ type InternetTests() =
             ("ChVRSmS1", "/tennis/united-kingdom/atp-wimbledon/sonego-lorenzo-granollers-pujol-marcel-ChVRSmS1/");
             ("Y1WNTTCe", "/tennis/united-kingdom/atp-wimbledon/dimitrov-grigor-moutet-corentin-Y1WNTTCe/")]
         Assert.That(actual, Is.EqualTo(expected))
+    [<Test>]
+    member this.ScrapTennisAtpWimbledonCrossedOutOdds() =
+        let matchID = "fyXBxdlb"
+        let matchUrl = "tennis/united-kingdom/atp-wimbledon/djokovic-novak-federer-roger-" + matchID + "/"
+        let actual = extractMatchOdds [| Pin; BF; B365; Mar |] (tennisID, tennisDataID) [| HA; OU; AH |] (matchID, matchUrl)
+        match actual with
+        | Some({ ID = "fyXBxdlb"; Odds = odds }) ->
+            let odd = odds |> Array.find (fun odd -> odd.Outcome = OU)
+            let value = odd.Values |> Array.find(fun value -> value.Value = Some 43.0f)
+            let pinExist = value.BookOdds |> Array.exists (fun book -> book.Book = Pin)
+            let marExist = value.BookOdds |> Array.exists (fun book -> book.Book = Mar)
+            Assert.That(pinExist, Is.False)
+            Assert.That(marExist, Is.True)
+        | _ -> failwith "Incorrect data"
 
 
