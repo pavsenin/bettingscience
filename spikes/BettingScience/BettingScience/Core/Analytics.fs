@@ -11,6 +11,14 @@ type AccuracyScoreX2 = { O1 : Accuracy; O2 : Accuracy }
 type AccuracyScoreX3 = { O1 : Accuracy; O0 : Accuracy; O2 : Accuracy }
 type AccuracyScore = AX2 of AccuracyScoreX2 | AX3 of AccuracyScoreX3
 type BookAccuracyScore = { Book : Bookmaker; Count : int; Opening : AccuracyScore; Closing : AccuracyScore }
+type Accuracy with
+    member this.ToFullString() = sprintf "(%.2f,%.2f)" this.Expected this.Variance
+type AccuracyScoreX2 with
+    member this.ToFullString() = sprintf "O1%s; O2%s" (this.O1.ToFullString()) (this.O2.ToFullString())
+type AccuracyScoreX3 with
+    member this.ToFullString() = sprintf "O1%s; O0%s; O2%s" (this.O1.ToFullString()) (this.O0.ToFullString()) (this.O2.ToFullString())
+type AccuracyScore with
+    member this.ToFullString() = match this with | AX2 score -> score.ToFullString() | AX3 score -> score.ToFullString()
 
 let private getProbabilities value = function
     | X3 { O1 = (o1, _); O0 = (o0, _); O2 = (o2, _) } ->
@@ -103,19 +111,16 @@ let compute state (score, ex) odd =
         | _ -> state
     | _ -> state
 
-let analyze (sport, out, ex) state fileName =
-    let leagueData = Compact.deserializeFile<LeagueData> fileName
-    let resultState =
-        leagueData.Matches
-        |> Array.fold (fun state matchData ->
-            let score =
-                match sport with
-                | Tennis ->
-                    matchData.Periods |> Array.fold (fun { Home = h; Away = a } p -> { Home = h + p.Home; Away = a + p.Away } ) { Home = 0; Away = 0 }
-                | _ -> matchData.Score
-            matchData.Odds
-            |> Array.tryFind (fun o -> o.Outcome = out)
-            |>> compute state (score, ex)
-            |> defArg state
-        ) state
-    resultState
+let analyze (sport, out, ex) state matches =
+    matches
+    |> Array.fold (fun state matchData ->
+        let score =
+            match sport with
+            | Tennis ->
+                matchData.Periods |> Array.fold (fun { Home = h; Away = a } p -> { Home = h + p.Home; Away = a + p.Away } ) { Home = 0; Away = 0 }
+            | _ -> matchData.Score
+        matchData.Odds
+        |> Array.tryFind (fun o -> o.Outcome = out)
+        |>> compute state (score, ex)
+        |> defArg state
+    ) state
