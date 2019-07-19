@@ -19,6 +19,13 @@ type AccuracyScoreX3 with
     member this.ToFullString() = sprintf "O1%s; O0%s; O2%s" (this.O1.ToFullString()) (this.O0.ToFullString()) (this.O2.ToFullString())
 type AccuracyScore with
     member this.ToFullString() = match this with | AX2 score -> score.ToFullString() | AX3 score -> score.ToFullString()
+    member this.Normalize count =
+        let cnt = float32(count)
+        match this with
+        | AX2 { O1 = { Expected = o1e; Variance = o1v }; O2 = { Expected = o2e; Variance = o2v } } ->
+            AX2 { O1 = { Expected = o1e / cnt; Variance = o1v / cnt }; O2 = { Expected = o2e / cnt; Variance = o2v / cnt } }
+        | AX3 { O1 = { Expected = o1e; Variance = o1v }; O0 = { Expected = o0e; Variance = o0v }; O2 = { Expected = o2e; Variance = o2v } } ->
+            AX3 { O1 = { Expected = o1e / cnt; Variance = o1v / cnt }; O0 = { Expected = o0e / cnt; Variance = o0v / cnt }; O2 = { Expected = o2e / cnt; Variance = o2v / cnt } }
 
 let private getProbabilities value = function
     | X3 { O1 = (o1, _); O0 = (o0, _); O2 = (o2, _) } ->

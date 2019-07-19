@@ -3,7 +3,6 @@ open System
 open System.Net
 open FSharp.Data
 open HtmlAgilityPack
-open Microsoft.FSharpLu.Json
 
 let defArg defaultValue arg = defaultArg arg defaultValue
 let (|>>) v f = try v |> Option.map f with | _ -> None
@@ -20,8 +19,17 @@ let fromUnixTimestamp() =
     let ms = time.TotalMilliseconds |> int64
     ms.ToString()
 
+type LongWebClient() =
+    inherit WebClient()
+    override this.GetWebRequest uri =
+        let timeout = 600 * 60 * 1000
+        let webRequest = base.GetWebRequest uri
+        webRequest.Timeout <- timeout
+        match webRequest with | :? HttpWebRequest as httpRequest -> httpRequest.ReadWriteTimeout <- timeout | _ -> () |> ignore
+        webRequest
+
 let fetchContent (url:string) host referer =
-    let client = new WebClient()
+    let client = new LongWebClient()
     client.Headers.Add("Host", host)
     client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36")
     client.Headers.Add("Referer", referer)
