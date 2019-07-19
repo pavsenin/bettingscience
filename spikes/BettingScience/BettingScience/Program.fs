@@ -102,19 +102,20 @@ let main argv =
     
     let soccerOUHandicaps = generateHandicaps 1 4 OU
     let soccerAHHandicaps = generateHandicaps -3 3 AH
-    let files = Directory.GetFiles("../../../data/soccer/", "*.json", SearchOption.AllDirectories)
+    let files = Directory.GetFiles("../../../data/soccer/apl/", "*.json", SearchOption.AllDirectories)
     files
     |> Array.iter (fun file ->
         [|(O1X2, None)|]
-        //soccerOUHandicaps
+        //soccerAHHandicaps
         |> Array.iter (fun (out, handicap) ->
-            [|B365; BF; Pin; Mar|]
+            [|Pin|]
             |> Array.iter (fun book ->
                 let state = getInitState out book
                 let { Country = country; Division = division; Season = season; Matches = matches;} =
                     Compact.deserializeFile<LeagueData> file
+                let filteredMatches = matches |> Array.filter (fun m -> m.TeamAway = "Manchester Utd" || m.TeamHome = "Manchester Utd")
                 let { Book = book; Count = count; Opening = opening; Closing = closing } =
-                    analyze (Soccer, out, handicap) state matches
+                    analyze (Soccer, out, handicap) state filteredMatches
                 let outText = sprintf "%A%s" out (handicap |>> (fun h -> sprintf "(%.1f)" h) |> defArg "")
                 printfn "|%-8s|%-18s|%s|%-8s|%-3d|%-10s|%-49s|%-49s|" country division (season.ToFullString()) (book.ToFullString()) count
                     outText (opening.Normalize(count).ToFullString()) (closing.Normalize(count).ToFullString())
