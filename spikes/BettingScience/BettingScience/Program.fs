@@ -9,12 +9,13 @@ open System.IO
 
 [<EntryPoint>]
 let main argv =
-    Console.SetWindowSize(170, 60)
+    Console.SetWindowSize(160, 60)
     // test save/load data
     // tennis to 2/3 sets in wimbledon?
     // get rid of long floats?
     // get rid of fetch tracing in code
-    // simple models: random, (home, away) / total 
+    // simple models: random, (home, away) / total, ideal
+    // можно ли быть в плюсе за счет variance, если expected 0 
     // calculate accuracy by sports \ leagues \ seasons \ teams \ bookmakers \ outcomes 
     
     //[("MmbLsWh8", 29, "USA", "NBA", Y15, "NBA1516.json"); ("rcgzdfbO", 29, "USA", "NBA", Y14, "NBA1415.json"); ("f7RlGfit", 29, "USA", "NBA", Y13, "NBA1314.json"); ("0l4l9qpR", 29, "USA", "NBA", Y12, "NBA1213.json")]
@@ -93,19 +94,21 @@ let main argv =
                 Opening = AX2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
                 Closing = AX2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
             }
-    let generateHandicaps min max out = [min * 2..max * 2] |> List.map (fun h -> (out, Some (float32(h) / 2.f)))
-    let tennisOUMin, tennisOUMax = 20, 50
-    let tennisAHMin, tennisAHMax = -12, 12
-    let tennisOUHandicaps = generateHandicaps tennisOUMin tennisOUMax OU
-    let tennisAHHandicaps = generateHandicaps tennisAHMin tennisAHMax AH
-
-
+    let generateHandicaps min max out = [|min * 2..max * 2|] |> Array.map (fun h -> (out, Some (float32(h) / 2.f)))
+    //let tennisOUMin, tennisOUMax = 20, 50
+    //let tennisAHMin, tennisAHMax = -12, 12
+    //let tennisOUHandicaps = generateHandicaps 20 50 OU
+    //let tennisAHHandicaps = generateHandicaps -12 12 AH
+    
+    let soccerOUHandicaps = generateHandicaps 1 4 OU
+    let soccerAHHandicaps = generateHandicaps -3 3 AH
     let files = Directory.GetFiles("../../../data/soccer/", "*.json", SearchOption.AllDirectories)
     files
     |> Array.iter (fun file ->
         [|(O1X2, None)|]
+        //soccerOUHandicaps
         |> Array.iter (fun (out, handicap) ->
-            [|Pin|]
+            [|B365; BF; Pin; Mar|]
             |> Array.iter (fun book ->
                 let state = getInitState out book
                 let { Country = country; Division = division; Season = season; Matches = matches;} =
@@ -113,7 +116,7 @@ let main argv =
                 let { Book = book; Count = count; Opening = opening; Closing = closing } =
                     analyze (Soccer, out, handicap) state matches
                 let outText = sprintf "%A%s" out (handicap |>> (fun h -> sprintf "(%.1f)" h) |> defArg "")
-                printfn "|%-8s|%-18s|%s|%-8s|%-3d|%-10s|%-50s|%-50s|" country division (season.ToFullString()) (book.ToFullString()) count
+                printfn "|%-8s|%-18s|%s|%-8s|%-3d|%-10s|%-49s|%-49s|" country division (season.ToFullString()) (book.ToFullString()) count
                     outText (opening.Normalize(count).ToFullString()) (closing.Normalize(count).ToFullString())
             )
         )
