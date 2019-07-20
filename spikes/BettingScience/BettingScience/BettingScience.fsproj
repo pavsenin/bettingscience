@@ -55,6 +55,7 @@
     <Compile Include="Core\Analytics.fs" />
     <Compile Include="Tests\OddsPortalScraperTests.fs" />
     <Compile Include="Tests\AnalyticsTests.fs" />
+    <Compile Include="Tests\MachineLearningTests.fs" />
     <Compile Include="Program.fs" />
     <Content Include="packages.config" />
     <Content Include="Notes.txt" />

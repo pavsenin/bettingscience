@@ -9,8 +9,8 @@ type AccuracyTests() =
     let getAccuracy2 out value data =
         let state = {
             Book = Pin; Count = 0;
-            Opening = AX2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
-            Closing = AX2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
+            Opening = X2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
+            Closing = X2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
         }
         data
         |> List.fold (fun state (op, cl, (h, a)) ->
@@ -24,8 +24,8 @@ type AccuracyTests() =
     let getAccuracy3 out value data =
         let state = {
             Book = Pin; Count = 0;
-            Opening = AX3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
-            Closing = AX3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
+            Opening = X3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
+            Closing = X3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
         }
         data
         |> List.fold (fun state ((oO1, oO0, oO2), (cO1, cO0, cO2), (h, a)) ->
@@ -40,8 +40,8 @@ type AccuracyTests() =
     member this.ComputeAccuracyDifferentVariance() =
         let expected = {
             Book = Pin; Count = 8;
-            Opening = AX2 {O1 = {Expected = 0.0f; Variance = 1.07999992f }; O2 = {Expected = 0.0f; Variance = 1.07999992f } };
-            Closing = AX2 {O1 = {Expected = 0.0f; Variance = 2.0f }; O2 = {Expected = 0.0f; Variance = 2.0f } }
+            Opening = X2 {O1 = {Expected = 0.0f; Variance = 1.07999992f }; O2 = {Expected = 0.0f; Variance = 1.07999992f } };
+            Closing = X2 {O1 = {Expected = 0.0f; Variance = 2.0f }; O2 = {Expected = 0.0f; Variance = 2.0f } }
         }
         let actual = 
             [(0.2f, 0.5f, (0, 1)); (0.3f, 0.5f, (0, 1)); (0.4f, 0.5f, (0, 1)); (0.5f, 0.5f, (0, 1));
@@ -52,8 +52,8 @@ type AccuracyTests() =
     member this.ComputeAccuracyDifferentExpected() =
         let expected = {
             Book = Pin; Count = 8;
-            Opening = AX2 {O1 = {Expected = 1.1920929e-07f; Variance = 3.48000026f }; O2 = {Expected = -1.1920929e-07f; Variance = 3.48000026f } };
-            Closing = AX2 {O1 = {Expected = -0.800000072f; Variance = 2.07999992f }; O2 = {Expected = 0.800000072f; Variance = 2.07999992f } }
+            Opening = X2 {O1 = {Expected = 1.1920929e-07f; Variance = 3.48000026f }; O2 = {Expected = -1.1920929e-07f; Variance = 3.48000026f } };
+            Closing = X2 {O1 = {Expected = -0.800000072f; Variance = 2.07999992f }; O2 = {Expected = 0.800000072f; Variance = 2.07999992f } }
         }
         let actual = 
             [(0.8f, 0.6f, (0, 1)); (0.7f, 0.6f, (0, 1)); (0.6f, 0.6f, (0, 1)); (0.5f, 0.6f, (0, 1));
@@ -67,8 +67,8 @@ type AccuracyTests() =
     member this.ComputeAccuracy1X2(count, oO1e, oO1v, oO0e, oO0v, oO2e, oO2v, cO1e, cO1v, cO0e, cO0v, cO2e, cO2v, h, a) =
         let expected = {
             Book = Pin; Count = count;
-            Opening = AX3 { O1 = { Expected = oO1e; Variance = oO1v }; O0 = { Expected = oO0e; Variance = oO0v }; O2 = { Expected = oO2e; Variance = oO2v } };
-            Closing = AX3 { O1 = { Expected = cO1e; Variance = cO1v }; O0 = { Expected = cO0e; Variance = cO0v }; O2 = { Expected = cO2e; Variance = cO2v } } 
+            Opening = X3 { O1 = { Expected = oO1e; Variance = oO1v }; O0 = { Expected = oO0e; Variance = oO0v }; O2 = { Expected = oO2e; Variance = oO2v } };
+            Closing = X3 { O1 = { Expected = cO1e; Variance = cO1v }; O0 = { Expected = cO0e; Variance = cO0v }; O2 = { Expected = cO2e; Variance = cO2v } } 
         }
         let actual = 
             [((0.7f, 0.2f, 0.1f), (0.3f, 0.4f, 0.3f), (h, a)); ((0.6f, 0.3f, 0.1f), (0.3f, 0.4f, 0.3f), (h, a));
@@ -83,8 +83,8 @@ type AccuracyTests() =
     member this.ComputeAccuracyOverUnder(handicap, count, openingExp, openingVar, closingExp, closingVar) =
         let expected = {
             Book = Pin; Count = count;
-            Opening = AX2 {O1 = {Expected = openingExp; Variance = openingVar }; O2 = {Expected = -openingExp; Variance = openingVar } };
-            Closing = AX2 {O1 = {Expected = closingExp; Variance = closingVar }; O2 = {Expected = -closingExp; Variance = closingVar } }
+            Opening = X2 {O1 = {Expected = openingExp; Variance = openingVar }; O2 = {Expected = -openingExp; Variance = openingVar } };
+            Closing = X2 {O1 = {Expected = closingExp; Variance = closingVar }; O2 = {Expected = -closingExp; Variance = closingVar } }
         }
         let actual = 
             [(0.8f, 0.6f, (2, 0)); (0.7f, 0.6f, (2, 0)); (0.6f, 0.6f, (2, 0)); (0.5f, 0.6f, (2, 0));
@@ -99,8 +99,8 @@ type AccuracyTests() =
     member this.ComputeAccuracyOverUnderWithReturn(handicap, count, openingExp, openingVar, closingExp, closingVar) =
         let expected = {
             Book = Pin; Count = count;
-            Opening = AX2 {O1 = {Expected = openingExp; Variance = openingVar }; O2 = {Expected = -openingExp; Variance = openingVar } };
-            Closing = AX2 {O1 = {Expected = closingExp; Variance = closingVar }; O2 = {Expected = -closingExp; Variance = closingVar } }
+            Opening = X2 {O1 = {Expected = openingExp; Variance = openingVar }; O2 = {Expected = -openingExp; Variance = openingVar } };
+            Closing = X2 {O1 = {Expected = closingExp; Variance = closingVar }; O2 = {Expected = -closingExp; Variance = closingVar } }
         }
         let actual = [(0.8f, 0.6f, (2, 0)); (0.2f, 0.6f, (3, 0))] |> getAccuracy2 OU (Some handicap)
         Assert.That(expected, Is.EqualTo(actual))
@@ -112,8 +112,8 @@ type AccuracyTests() =
     member this.ComputeAccuracyHandicap(handicap, count, openingExp, openingVar, closingExp, closingVar) =
         let expected = {
             Book = Pin; Count = count;
-            Opening = AX2 {O1 = {Expected = openingExp; Variance = openingVar }; O2 = {Expected = -openingExp; Variance = openingVar } };
-            Closing = AX2 {O1 = {Expected = closingExp; Variance = closingVar }; O2 = {Expected = -closingExp; Variance = closingVar } }
+            Opening = X2 {O1 = {Expected = openingExp; Variance = openingVar }; O2 = {Expected = -openingExp; Variance = openingVar } };
+            Closing = X2 {O1 = {Expected = closingExp; Variance = closingVar }; O2 = {Expected = -closingExp; Variance = closingVar } }
         }
         let actual = 
             [(0.8f, 0.6f, (1, 0)); (0.7f, 0.6f, (1, 0)); (0.6f, 0.6f, (1, 0)); (0.5f, 0.6f, (1, 0));
@@ -128,8 +128,8 @@ type AccuracyTests() =
     member this.ComputeAccuracyHandicapWithReturn(handicap, count, openingExp, openingVar, closingExp, closingVar) =
         let expected = {
             Book = Pin; Count = count;
-            Opening = AX2 {O1 = {Expected = openingExp; Variance = openingVar }; O2 = {Expected = -openingExp; Variance = openingVar } };
-            Closing = AX2 {O1 = {Expected = closingExp; Variance = closingVar }; O2 = {Expected = -closingExp; Variance = closingVar } }
+            Opening = X2 {O1 = {Expected = openingExp; Variance = openingVar }; O2 = {Expected = -openingExp; Variance = openingVar } };
+            Closing = X2 {O1 = {Expected = closingExp; Variance = closingVar }; O2 = {Expected = -closingExp; Variance = closingVar } }
         }
         let actual = [(0.8f, 0.6f, (1, 0)); (0.2f, 0.6f, (2, 0))] |> getAccuracy2 AH (Some handicap)
         Assert.That(expected, Is.EqualTo(actual))
@@ -141,8 +141,8 @@ type AccuracyTests() =
     member this.CannotComputeAccuracySomeHandicaps(handicap) =
         let expected = {
             Book = Pin; Count = 0;
-            Opening = AX2 {O1 = {Expected = 0.f; Variance = 0.f }; O2 = {Expected = 0.f; Variance = 0.f } };
-            Closing = AX2 {O1 = {Expected = 0.f; Variance = 0.f }; O2 = {Expected = 0.f; Variance = 0.f } }
+            Opening = X2 {O1 = {Expected = 0.f; Variance = 0.f }; O2 = {Expected = 0.f; Variance = 0.f } };
+            Closing = X2 {O1 = {Expected = 0.f; Variance = 0.f }; O2 = {Expected = 0.f; Variance = 0.f } }
         }
         [| AH; OU |]
         |> Array.iter (fun out ->
