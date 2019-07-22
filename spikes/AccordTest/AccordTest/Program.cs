@@ -8,7 +8,7 @@ namespace AccordTest {
     class Program {
         static void Main(string[] args) {
             var network = new DeepBeliefNetwork(new BernoulliFunction(), 1024, 50, 10);
-            var teacher = new BackPropagationLearning(Main.Network) {
+            var teacher = new BackPropagationLearning(network) {
                 LearningRate = 0.1,
                 Momentum = 0.9
             };

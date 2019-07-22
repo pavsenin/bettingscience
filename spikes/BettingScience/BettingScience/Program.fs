@@ -2,7 +2,6 @@
 open Microsoft.FSharpLu.Json
 open Domain
 open Analytics
-open FSharp.Data.Runtime.WorldBank
 open System
 open Utils
 open System.IO
@@ -10,6 +9,7 @@ open System.IO
 [<EntryPoint>]
 let main argv =
     Console.SetWindowSize(160, 60)
+    // избавиться от необходимости везде писать типы
     // test save/load data
     // tennis to 2/3 sets in wimbledon?
     // get rid of long floats?
@@ -27,29 +27,14 @@ let main argv =
     //    OddsPortalScraper.fetchLeagueDataAndSaveToFile (tennisID, tennisDataID) [| HA; OU; AH |] file
     //)
 
-    //("GKpNhNie", 11, "England", "Championship", Y18, "ENGCham1819.json");
-    //("Crp25tJq", 11, "England", "Championship", Y17, "ENGCham1718.json");
-    //("4rGIVFO5", 11, "England", "Championship", Y16, "ENGCham1617.json");
-    //("2qovK39D", 11, "England", "Championship", Y15, "ENGCham1516.json");
-    //("CYE9yYa7", 11, "England", "Championship", Y14, "ENGCham1415.json");
-    //("QwlQakAC", 11, "England", "Championship", Y13, "ENGCham1314.json");
-    //("QgPQWITg", 11, "England", "Championship", Y12, "ENGCham1213.json");
-
-    //("zZrqwoEl", 11, "England", "League One", Y18, "ENGL11819.json");
-    //("jgR4MfcI", 11, "England", "League One", Y17, "ENGL11718.json");
-    //("xzXfCRNp", 11, "England", "League One", Y16, "ENGL11617.json");
-    //("YBcjpmnE", 11, "England", "League One", Y15, "ENGL11516.json");
-    //("Q5lCayhE", 11, "England", "League One", Y14, "ENGL11415.json");
-    //("nqNeEi8r", 11, "England", "League One", Y13, "ENGL11314.json");
-    //("KGOUVxq0", 11, "England", "League One", Y12, "ENGL11213.json");
-
-    [("W4IGRV1A", 8, "Russia", "FNL", Y18, "FNL1819.json");
-    ("jNEmsIct", 8, "Russia", "FNL", Y17, "FNL1718.json");
-    ("2J5NzQPQ", 8, "Russia", "FNL", Y16, "FNL1617.json");
-    ("Y5UxEHVD", 8, "Russia", "FNL", Y15, "FNL1516.json");
-    ("xEJxRx9o", 7, "Russia", "FNL", Y14, "FNL1415.json");
-    ("tf8TEz96", 7, "Russia", "FNL", Y13, "FNL1314.json");
-    ("Mq3Ksu27", 6, "Russia", "FNL", Y12, "FNL1213.json")]
+    [("Crp25tJq", 11, "England", "Championship", Y17, "ENGCham1718.json");
+    ("4rGIVFO5", 11, "England", "Championship", Y16, "ENGCham1617.json");
+    ("2qovK39D", 11, "England", "Championship", Y15, "ENGCham1516.json");
+    ("CYE9yYa7", 11, "England", "Championship", Y14, "ENGCham1415.json");
+    ("QwlQakAC", 11, "England", "Championship", Y13, "ENGCham1314.json");
+    ("QgPQWITg", 11, "England", "Championship", Y12, "ENGCham1213.json")]
+    @
+    [("jgR4MfcI", 11, "England", "League One", Y17, "ENGL11718.json")]
     |> List.iter (fun file ->
         OddsPortalScraper.fetchLeagueDataAndSaveToFile (soccerID, soccerDataID) [| O1X2; OU; AH |] file
     )

@@ -3,6 +3,7 @@ open NUnit.Framework
 open Analytics
 open Domain
 open OddsPortalScraper
+open Utils
 
 [<TestFixture>]
 type AccuracyTests() =
@@ -17,9 +18,8 @@ type AccuracyTests() =
             let score = { Home = h; Away = a }
             let opening = { O1 = (1.f / op, 0); O2 = (1.f / (1.f - op), 0) }
             let closing = { O1 = (1.f / cl, 0); O2 = (1.f / (1.f - cl), 0) }
-            let odds = { Outcome = out; Values = [|{ Value = value; BookOdds = [| { Book = Pin; Odds = { Opening = X2 opening; Closing = X2 closing } } |] }|] }
-            let newState = Analytics.compute state (score, value) odds
-            newState
+            let book = { Book = Pin; Odds = { Opening = X2 opening; Closing = X2 closing } }
+            Analytics.compute state score out value book
         ) state
     let getAccuracy3 out value data =
         let state = {
@@ -32,9 +32,8 @@ type AccuracyTests() =
             let score = { Home = h; Away = a }
             let opening = { O1 = (1.f / oO1, 0); O0 = (1.f / oO0, 0); O2 = (1.f / oO2, 0) }
             let closing = { O1 = (1.f / cO1, 0); O0 = (1.f / cO0, 0); O2 = (1.f / cO2, 0) }
-            let odds = { Outcome = out; Values = [|{ Value = value; BookOdds = [| { Book = Pin; Odds = { Opening = X3 opening; Closing = X3 closing } } |] }|] }
-            let newState = Analytics.compute state (score, value) odds
-            newState
+            let book = { Book = Pin; Odds = { Opening = X3 opening; Closing = X3 closing } }
+            Analytics.compute state score out value book
         ) state
     [<Test>]
     member this.ComputeAccuracyDifferentVariance() =
