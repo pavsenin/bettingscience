@@ -10,7 +10,6 @@ open System.IO
 let main argv =
     Console.SetWindowSize(160, 60)
     // избавиться от необходимости везде писать типы
-    // test save/load data
     // tennis to 2/3 sets in wimbledon?
     // get rid of long floats?
     // get rid of fetch tracing in code
@@ -33,11 +32,9 @@ let main argv =
     //("CYE9yYa7", 11, "England", "Championship", Y14, "ENGCham1415.json");
     //("QwlQakAC", 11, "England", "Championship", Y13, "ENGCham1314.json");
     //("QgPQWITg", 11, "England", "Championship", Y12, "ENGCham1213.json")]
-    //@
-    [("jgR4MfcI", 11, "England", "League One", Y17, "ENGL11718.json")]
-    |> List.iter (fun file ->
-        OddsPortalScraper.fetchLeagueDataAndSaveToFile (soccerID, soccerDataID) [| O1X2; OU; AH |] file
-    )
+    //|> List.iter (fun file ->
+    //    OddsPortalScraper.fetchLeagueDataAndSaveToFile (soccerID, soccerDataID) [| O1X2; OU; AH |] file
+    //)
     
 
     let getInitState out book =
