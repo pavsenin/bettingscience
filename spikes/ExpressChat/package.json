@@ -1,16 +1,3 @@
-{
-  "name": "expresschat",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "start": "node ./bin/www"
-  },
-  "dependencies": {
-    "cookie-parser": "~1.4.3",
-    "debug": "~2.6.9",
-    "ejs": "~2.5.7",
-    "express": "~4.16.0",
-    "http-errors": "~1.6.2",
-    "morgan": "~1.9.0"
-  }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:78b8770ce0f2d2977635a2965deaaa47795c935d1e2c98ddfecd139d982d2a59
+size 313

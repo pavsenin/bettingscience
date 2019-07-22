@@ -1,14 +1,3 @@
-{
-  "name": "jquery",
-  "main": "dist/jquery.js",
-  "license": "MIT",
-  "ignore": [
-    "package.json"
-  ],
-  "keywords": [
-    "jquery",
-    "javascript",
-    "browser",
-    "library"
-  ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:ab5197827946d0b36c7707c60beddedc8c14446138e0e79f548be5001c87ab73
+size 203

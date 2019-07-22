@@ -2,6 +2,27 @@
 open NUnit.Framework
 open OddsPortalScraper
 open Domain
+open Microsoft.FSharpLu.Json
+open System.IO
+open System
+
+[<TestFixture>]
+type SerializationTests() =
+    [<TestCase("../../../data/soccer/england/apl/", "APL1213.json", "England")>]
+    [<TestCase("../../../data/soccer/russia/rpl/", "RPL1314.json", "Russia")>]
+    [<TestCase("../../../data/soccer/russia/fnl/", "FNL1415.json", "Russia")>]
+    member this.SaveLoadLeague(directory, file, country) =
+        let tempPath = Path.Combine(Path.GetTempPath(), file)
+        try
+            let baseDirectory = AppDomain.CurrentDomain.BaseDirectory
+            let filePath = Path.Combine(Path.Combine(baseDirectory, directory), file)
+            let loadedLeague = Compact.deserializeFile<LeagueData> filePath
+            Compact.serializeToFile tempPath loadedLeague
+            let savedLeague = Compact.deserializeFile<LeagueData> tempPath
+            Assert.That(savedLeague, Is.EqualTo(loadedLeague))
+            Assert.That(savedLeague.Country, Is.EqualTo(country))
+        finally
+            File.Delete tempPath
 
 [<TestFixture>]
 type InternetTests() =

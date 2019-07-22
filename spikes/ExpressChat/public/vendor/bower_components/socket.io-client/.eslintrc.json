@@ -1,15 +1,3 @@
-{
-  "extends": "standard",
-  "parser": "babel-eslint",
-  "env": {
-    // Note: mocha env is defined inside test/.eslintrc.json
-    "node": true,
-    "browser": true
-  },
-  "rules": {
-    "yoda": 0,
-    "semi": [2, "always"],
-    "no-extra-semi": 2,
-    "semi-spacing": [2, { "before": false, "after": true }]
-  }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:33a63fd5f66f0d6f85d27213e45ee5751cffb1472b582197809f725a590f6b95
+size 330
