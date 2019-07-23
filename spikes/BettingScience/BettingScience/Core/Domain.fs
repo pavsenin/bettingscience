@@ -1,9 +1,6 @@
 ﻿module Domain
 open Newtonsoft.Json
 
-type XValue<'a, 'b> = X2 of 'a | X3 of 'b
-type OValue2<'a> = { O1: 'a; O2: 'a }
-type OValue3<'a> = { O1: 'a; O0: 'a; O2: 'a }
 type Sport = Soccer | Tennis | Basketball | Baseball
 type Bookmaker = Pin | BF | B365 | Mar
 type Outcome = HA | O1X2 | OU | AH
@@ -34,7 +31,7 @@ type Outcome3Odds = {
     [<JsonProperty(PropertyName = "o2")>]
     O2 : float32 * int
 }
-type OutcomeOdds = XValue<Outcome2Odds, Outcome3Odds>
+type OutcomeOdds = X2 of Outcome2Odds | X3 of Outcome3Odds
 type OddsData = {
     [<JsonProperty(PropertyName = "opening")>]
     Opening : OutcomeOdds

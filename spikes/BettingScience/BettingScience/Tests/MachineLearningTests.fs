@@ -23,13 +23,13 @@ type MachineLearningTests() =
         let collectMatches leagues =
             leagues |> List.map (fun l -> l.Matches) |> Array.concat |> Array.sortBy (fun m -> m.Time)
         collectMatches train, collectMatches test
-    let plainModel out : Prediction option=
+    let plainModel out =
         match out with
         | O1X2 ->
             let of3 = 1.f / 3.f;
-            Some(X3 { O1 = of3; O0 = of3; O2 = of3 })
+            Some(PX3 { PO1 = of3; PO0 = of3; PO2 = of3 })
         | _ ->
-            Some(X2 { O1 = 0.5f; O2 = 0.5f })
+            Some(PX2 { PO1 = 0.5f; PO2 = 0.5f })
     let trainDistibutionModel (set:MatchData array) =
         let o1, o0, o2 =
             set
@@ -40,9 +40,9 @@ type MachineLearningTests() =
                 | O2 -> o1, o0, o2 + 1.f
             ) (0.f, 0.f, 0.f)
         let total = o1 + o0 + o2
-        let distibutionModel out :Prediction option =
+        let distibutionModel out =
             match out with
-            | O1X2 -> Some(X3 { O1 = o1 / total; O0 = o0 / total; O2 = o2 / total })
+            | O1X2 -> Some(PX3 { PO1 = o1 / total; PO0 = o0 / total; PO2 = o2 / total })
             | _ -> failwith "TODO"
         distibutionModel
     [<Test>]
@@ -81,13 +81,13 @@ type MachineLearningTests() =
             | O1X2 ->
                 let pred:Prediction =
                     match getMatchResult matchData.Score with
-                    | O1 -> X3 { O1 = 1.f; O0 = 0.f; O2 = 0.f }
-                    | O0 -> X3 { O1 = 0.f; O0 = 1.f; O2 = 0.f }
-                    | O2 -> X3 { O1 = 0.f; O0 = 0.f; O2 = 1.f }
+                    | O1 -> PX3 { PO1 = 1.f; PO0 = 0.f; PO2 = 0.f }
+                    | O0 -> PX3 { PO1 = 0.f; PO0 = 1.f; PO2 = 0.f }
+                    | O2 -> PX3 { PO1 = 0.f; PO0 = 0.f; PO2 = 1.f }
                 Some(pred)
             | _ -> failwith "TODO"
         let out, handicap = O1X2, None
-        let initState:AccuracyScore = X3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
+        let initState = AX3 { AO1 = { Expected = 0.f; Variance = 0.f }; AO0 = { Expected = 0.f; Variance = 0.f }; AO2 = { Expected = 0.f; Variance = 0.f } }
         let earn, accuracy, count =
             testMatches
             |> Array.fold (fun ((earn, accuracy, count) as state) matchData ->
@@ -98,7 +98,7 @@ type MachineLearningTests() =
                 //let pred = distibutionModel out
                 let bet =
                     match closing, pred with
-                    | Some(X3 { O1 = (c1, _); O0 = (c0, _); O2 = (c2, _) }), Some(X3 { O1 = p1; O0 = p0; O2 = p2 }) ->
+                    | Some(X3 { O1 = (c1, _); O0 = (c0, _); O2 = (c2, _) }), Some(PX3 { PO1 = p1; PO0 = p0; PO2 = p2 }) ->
                         let m1, m0, m2 = c1 * p1, c0 * p0, c2 * p2
                         if m1 > m0 && m1 > m2 then Some(O1, c1)
                         else if m0 > m1 && m0 > m2 then Some(O0, c0)
@@ -113,7 +113,6 @@ type MachineLearningTests() =
                         | (O1, c), O1 | (O0, c), O0 | (O2, c), O2 -> c - 1.f
                         | _ -> -1.f
                     System.Diagnostics.Debug.WriteLine(sprintf "%A %A %2f %2f %s" bet result win earn matchData.Url)
-                    System.Diagnostics.Debug.Flush()
                     earn + win, getAccuracy accuracy pred real, count + 1
                 | _ -> state
             ) (0.f, initState, 0)

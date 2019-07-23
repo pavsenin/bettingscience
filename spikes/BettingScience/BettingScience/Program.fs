@@ -9,12 +9,8 @@ open System.IO
 [<EntryPoint>]
 let main argv =
     Console.SetWindowSize(160, 60)
-    // избавиться от необходимости везде писать типы
-    // tennis to 2/3 sets in wimbledon?
-    // get rid of long floats?
     // get rid of fetch tracing in code
     // simple models: random, (home, away) / total, ideal
-    // можно ли быть в плюсе за счет variance, если expected 0 
     // calculate accuracy by sports \ leagues \ seasons \ teams \ bookmakers \ outcomes 
     
     //[("MmbLsWh8", 29, "USA", "NBA", Y15, "NBA1516.json"); ("rcgzdfbO", 29, "USA", "NBA", Y14, "NBA1415.json"); ("f7RlGfit", 29, "USA", "NBA", Y13, "NBA1314.json"); ("0l4l9qpR", 29, "USA", "NBA", Y12, "NBA1213.json")]
@@ -42,14 +38,14 @@ let main argv =
         | O1X2 ->
             {
                 Book = book; Count = 0;
-                Opening = X3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
-                Closing = X3 { O1 = { Expected = 0.f; Variance = 0.f }; O0 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
+                Opening = AX3 { AO1 = { Expected = 0.f; Variance = 0.f }; AO0 = { Expected = 0.f; Variance = 0.f }; AO2 = { Expected = 0.f; Variance = 0.f } };
+                Closing = AX3 { AO1 = { Expected = 0.f; Variance = 0.f }; AO0 = { Expected = 0.f; Variance = 0.f }; AO2 = { Expected = 0.f; Variance = 0.f } }
             }
         | _ ->
             {
                 Book = book; Count = 0;
-                Opening = X2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } };
-                Closing = X2 { O1 = { Expected = 0.f; Variance = 0.f }; O2 = { Expected = 0.f; Variance = 0.f } }
+                Opening = AX2 { AO1 = { Expected = 0.f; Variance = 0.f }; AO2 = { Expected = 0.f; Variance = 0.f } };
+                Closing = AX2 { AO1 = { Expected = 0.f; Variance = 0.f }; AO2 = { Expected = 0.f; Variance = 0.f } }
             }
     //let generateHandicaps min max out = [|min * 2..max * 2|] |> Array.map (fun h -> (out, Some (float32(h) / 2.f)))
     //let tennisOUHandicaps = generateHandicaps 20 50 OU

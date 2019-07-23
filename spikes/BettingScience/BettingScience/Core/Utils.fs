@@ -8,6 +8,7 @@ let defArg defaultValue arg = defaultArg arg defaultValue
 let (|>>) v f = try v |> Option.map f with | _ -> None
 let (||>) v f = try v |> Option.bind f with | _ -> None
 
+let round (r:float32) = float32(Math.Round((decimal)r, 3))
 let toInt value =
     match Int32.TryParse value with
     | true, v -> v
