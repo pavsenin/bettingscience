@@ -26,15 +26,15 @@ let main argv =
     //    OddsPortalScraper.fetchLeagueDataAndSaveToFile (tennisID, tennisDataID) [| HA; OU; AH |] file
     //)
 
-    //[("Crp25tJq", 11, "England", "Championship", Y17, "ENGCham1718.json");
-    //("4rGIVFO5", 11, "England", "Championship", Y16, "ENGCham1617.json");
-    //("2qovK39D", 11, "England", "Championship", Y15, "ENGCham1516.json");
-    //("CYE9yYa7", 11, "England", "Championship", Y14, "ENGCham1415.json");
-    //("QwlQakAC", 11, "England", "Championship", Y13, "ENGCham1314.json");
-    //("QgPQWITg", 11, "England", "Championship", Y12, "ENGCham1213.json")]
-    //|> List.iter (fun file ->
-    //    OddsPortalScraper.fetchLeagueDataAndSaveToFile (soccerID, soccerDataID) [| O1X2; OU; AH |] file
-    //)
+    //("Crp25tJq", 11, "England", "Championship", Y17, "ENGCham1718.json");
+    [
+    ("2qovK39D", 11, "England", "Championship", Y15, "ENGCham1516.json");
+    ("CYE9yYa7", 11, "England", "Championship", Y14, "ENGCham1415.json");
+    ("QwlQakAC", 11, "England", "Championship", Y13, "ENGCham1314.json");
+    ("QgPQWITg", 11, "England", "Championship", Y12, "ENGCham1213.json")]
+    |> List.iter (fun file ->
+        OddsPortalScraper.fetchLeagueDataAndSaveToFile (soccerID, soccerDataID) [| O1X2; OU; AH |] file
+    )
     
 
     let getInitState out book =
