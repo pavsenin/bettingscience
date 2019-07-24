@@ -8,6 +8,7 @@ open System.Windows.Media.Imaging
 open System.IO
 open System.Drawing
 open System.Drawing.Imaging
+open Accord.DataSets
 
 type Sample(database) =
     member val Database:DigitsDatabase = database with get, set
@@ -163,8 +164,7 @@ let getInstances (set:Sample array) =
     )
     (input, output)
 
-let computeAccuracy (network:DeepBeliefNetwork) set =
-    let testInputs, testOutputs = getInstances set
+let computeAccuracy (network:DeepBeliefNetwork) (testInputs:float[][], testOutputs:float[][]) =
     let mutable total, correct = 0, 0
     [0..testInputs.Length-1] |> List.iter (fun i ->
         let predicted = network.GenerateOutput(testInputs.[i])
@@ -177,8 +177,7 @@ let computeAccuracy (network:DeepBeliefNetwork) set =
     let accuracy = float(correct) / float(total)
     printfn "Total %d Correct %d Accuracy %2f" total correct accuracy
 
-[<EntryPoint>]
-let main argv = 
+let digitsExample() =
     let database = new DigitsDatabase(IsNormalized = false)
     database.Load()
     let network = new DeepBeliefNetwork(new BernoulliFunction(), 1024, 50, 10) // TODO WTF?
@@ -192,6 +191,34 @@ let main argv =
         printfn "Epoch %d Error %3f" (i + 1) error
     )
     network.UpdateVisibleWeights() // TODO WTF?
-    computeAccuracy network database.Training
-    computeAccuracy network database.Testing
+    computeAccuracy network (getInstances database.Training)
+    computeAccuracy network (getInstances database.Testing)
+
+[<EntryPoint>]
+let main argv =
+    let asVector (data:float array) =
+        let jagged = data.ToJagged()
+        let inted = data.ToInt32()
+        [0..inted.Length-1] |> List.iter (fun i ->
+            let newArray = Array.create 10 0.
+            newArray.[inted.[i]] <- 1.
+            jagged.[i] <- newArray
+        )
+        jagged
+    let mnist = new MNIST()
+    let (xtrainData, ytrainData) = mnist.Training
+    let (xtestData, ytestData) = mnist.Testing
+    let xtrain, ytrain = xtrainData.ToDense(), asVector ytrainData
+    let xtest, ytest = xtestData.ToDense(), asVector ytestData
+    let network = new DeepBeliefNetwork(new BernoulliFunction(), 778, 50, 10)
+    let weights = new GaussianWeights(network)
+    weights.Randomize()
+    network.UpdateVisibleWeights()
+    let teacher = new BackPropagationLearning(network, LearningRate = 0.05, Momentum = 0.98)
+    [0..19] |> List.iter(fun i ->
+        let error = teacher.RunEpoch(xtrain, ytrain)
+        printfn "Epoch %d Error %3f" (i + 1) error
+    )
+    computeAccuracy network (xtrain, ytrain)
+    computeAccuracy network (xtest, ytest)
     0

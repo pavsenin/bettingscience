@@ -22,20 +22,20 @@ let main argv =
     //    OddsPortalScraper.fetchLeagueDataAndSaveToFile (tennisID, tennisDataID) [| HA; OU; AH |] file
     //)
     [("r3414Mwe", 58, "USA", "MLB", Y18, "MLB18.json");
-    ("bwFloypH", 58, "USA", "MLB", Y17, "MLB17.json");
-    ("67blnzDc", 57, "USA", "MLB", Y16, "MLB16.json");
-    ("QgQMkPOM", 57, "USA", "MLB", Y15, "MLB15.json");
-    ("Y9I8VpDI", 57, "USA", "MLB", Y14, "MLB14.json");
-    ("WQgD6nC9", 58, "USA", "MLB", Y13, "MLB13.json");
-    ("lt4GysvE", 57, "USA", "MLB", Y12, "MLB12.json")]
+    ("bwFloypH", 58, "USA", "MLB", Y17, "MLB17.json")]
+    //("67blnzDc", 57, "USA", "MLB", Y16, "MLB16.json");
+    //("QgQMkPOM", 57, "USA", "MLB", Y15, "MLB15.json");
+    //("Y9I8VpDI", 57, "USA", "MLB", Y14, "MLB14.json");
+    //("WQgD6nC9", 58, "USA", "MLB", Y13, "MLB13.json");
+    //("lt4GysvE", 57, "USA", "MLB", Y12, "MLB12.json")]
     |> List.iter (fun file ->
         OddsPortalScraper.fetchLeagueDataAndSaveToFile (baseballID, baseballDataID) [| HA; OU; AH |] file
     )
 
-    [("Qyo0OIgA", 7, "Germany", "Bundesliga", Y15, "BUN1516.json");
-    ("M1VFOdWr", 7, "Germany", "Bundesliga", Y14, "BUN1415.json");
-    ("UV4Vlz26", 7, "Germany", "Bundesliga", Y13, "BUN1314.json");
-    ("nNYg5pkp", 7, "Germany", "Bundesliga", Y12, "BUN1213.json")]
+    //[("Qyo0OIgA", 7, "Germany", "Bundesliga", Y15, "BUN1516.json");
+    //("M1VFOdWr", 7, "Germany", "Bundesliga", Y14, "BUN1415.json");
+    //("UV4Vlz26", 7, "Germany", "Bundesliga", Y13, "BUN1314.json");
+    //("nNYg5pkp", 7, "Germany", "Bundesliga", Y12, "BUN1213.json")]
     //2 bundesliga
 
     //("GChlCjfd", 7, "Germany", "Bundesliga2", Y18, "BUN21819.json");
@@ -75,9 +75,9 @@ let main argv =
     //("AkYRdE1o", 8, "France", "Ligue2", Y14, "FRAL21415.json");
     //("n1Kf0Bs4", 8, "France", "Ligue2", Y13, "FRAL21314.json");
     //("zwAAwQeM", 8, "France", "Ligue2", Y12, "FRAL21213.json")]
-    |> List.iter (fun file ->
-        OddsPortalScraper.fetchLeagueDataAndSaveToFile (soccerID, soccerDataID) [| O1X2; OU; AH |] file
-    )
+    //|> List.iter (fun file ->
+    //    OddsPortalScraper.fetchLeagueDataAndSaveToFile (soccerID, soccerDataID) [| O1X2; OU; AH |] file
+    //)
     
 
     let getInitState out book =

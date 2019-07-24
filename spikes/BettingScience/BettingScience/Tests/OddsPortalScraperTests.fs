@@ -23,6 +23,98 @@ type SerializationTests() =
             Assert.That(savedLeague.Country, Is.EqualTo(country))
         finally
             File.Delete tempPath
+    
+    //// Soccer
+    // Russia
+    [<TestCase("soccer/russia/rpl/RPL1819.json", "Russia", "RPL", "2018", 244)>]
+    [<TestCase("soccer/russia/rpl/RPL1718.json", "Russia", "RPL", "2017", 244)>]
+    [<TestCase("soccer/russia/rpl/RPL1617.json", "Russia", "RPL", "2016", 244)>]
+    [<TestCase("soccer/russia/rpl/RPL1516.json", "Russia", "RPL", "2015", 242)>]
+    [<TestCase("soccer/russia/rpl/RPL1415.json", "Russia", "RPL", "2014", 244)>]
+    [<TestCase("soccer/russia/rpl/RPL1314.json", "Russia", "RPL", "2013", 243)>]
+    [<TestCase("soccer/russia/rpl/RPL1213.json", "Russia", "RPL", "2012", 243)>]
+
+    [<TestCase("soccer/russia/fnl/FNL1819.json", "Russia", "FNL", "2018", 384)>]
+    [<TestCase("soccer/russia/fnl/FNL1718.json", "Russia", "FNL", "2017", 330)>]
+    [<TestCase("soccer/russia/fnl/FNL1617.json", "Russia", "FNL", "2016", 338)>]
+    [<TestCase("soccer/russia/fnl/FNL1516.json", "Russia", "FNL", "2015", 341)>]
+    [<TestCase("soccer/russia/fnl/FNL1415.json", "Russia", "FNL", "2014", 275)>]
+    [<TestCase("soccer/russia/fnl/FNL1314.json", "Russia", "FNL", "2013", 319)>]
+    [<TestCase("soccer/russia/fnl/FNL1213.json", "Russia", "FNL", "2012", 240)>]
+    // Ireland
+    [<TestCase("soccer/ireland/irpd/IRPD18.json", "Ireland", "Premier Division", "2018", 184)>]
+    [<TestCase("soccer/ireland/irpd/IRPD17.json", "Ireland", "Premier Division", "2017", 198)>]
+    [<TestCase("soccer/ireland/irpd/IRPD16.json", "Ireland", "Premier Division", "2016", 202)>]
+    [<TestCase("soccer/ireland/irpd/IRPD15.json", "Ireland", "Premier Division", "2015", 202)>]
+    [<TestCase("soccer/ireland/irpd/IRPD14.json", "Ireland", "Premier Division", "2014", 202)>]
+    [<TestCase("soccer/ireland/irpd/IRPD13.json", "Ireland", "Premier Division", "2013", 202)>]
+    [<TestCase("soccer/ireland/irpd/IRPD12.json", "Ireland", "Premier Division", "2012", 183)>]
+
+    [<TestCase("soccer/ireland/ird1/IRD118.json", "Ireland", "Division 1", "2018", 140)>]
+    [<TestCase("soccer/ireland/ird1/IRD117.json", "Ireland", "Division 1", "2017", 111)>]
+    [<TestCase("soccer/ireland/ird1/IRD116.json", "Ireland", "Division 1", "2016", 115)>]
+    [<TestCase("soccer/ireland/ird1/IRD115.json", "Ireland", "Division 1", "2015", 116)>]
+    [<TestCase("soccer/ireland/ird1/IRD114.json", "Ireland", "Division 1", "2014", 116)>]
+    [<TestCase("soccer/ireland/ird1/IRD113.json", "Ireland", "Division 1", "2013", 116)>]
+    [<TestCase("soccer/ireland/ird1/IRD112.json", "Ireland", "Division 1", "2012", 116)>]
+    // England
+    [<TestCase("soccer/england/apl/APL1819.json", "England", "APL", "2018", 380)>]
+    [<TestCase("soccer/england/apl/APL1718.json", "England", "APL", "2017", 380)>]
+    [<TestCase("soccer/england/apl/APL1617.json", "England", "APL", "2016", 380)>]
+    [<TestCase("soccer/england/apl/APL1516.json", "England", "APL", "2015", 380)>]
+    [<TestCase("soccer/england/apl/APL1415.json", "England", "APL", "2014", 380)>]
+    [<TestCase("soccer/england/apl/APL1314.json", "England", "APL", "2013", 380)>]
+    [<TestCase("soccer/england/apl/APL1213.json", "England", "APL", "2012", 380)>]
+
+    [<TestCase("soccer/england/champ/ENGCham1819.json", "England", "Championship", "2018", 549)>]
+    [<TestCase("soccer/england/champ/ENGCham1718.json", "England", "Championship", "2017", 550)>]
+    [<TestCase("soccer/england/champ/ENGCham1617.json", "England", "Championship", "2016", 550)>]
+    [<TestCase("soccer/england/champ/ENGCham1516.json", "England", "Championship", "2015", 550)>]
+    [<TestCase("soccer/england/champ/ENGCham1415.json", "England", "Championship", "2014", 550)>]
+    [<TestCase("soccer/england/champ/ENGCham1314.json", "England", "Championship", "2013", 550)>]
+    [<TestCase("soccer/england/champ/ENGCham1213.json", "England", "Championship", "2012", 550)>]
+
+    [<TestCase("soccer/england/engl1/ENGL11819.json", "England", "League One", "2018", 550)>]
+    [<TestCase("soccer/england/engl1/ENGL11718.json", "England", "League One", "2017", 550)>]
+    [<TestCase("soccer/england/engl1/ENGL11617.json", "England", "League One", "2016", 550)>]
+    [<TestCase("soccer/england/engl1/ENGL11516.json", "England", "League One", "2015", 550)>]
+    [<TestCase("soccer/england/engl1/ENGL11415.json", "England", "League One", "2014", 550)>]
+    [<TestCase("soccer/england/engl1/ENGL11314.json", "England", "League One", "2013", 550)>]
+    [<TestCase("soccer/england/engl1/ENGL11213.json", "England", "League One", "2012", 550)>]
+
+    [<TestCase("soccer/england/engl2/ENGL21819.json", "England", "League Two", "2018", 522)>]
+    [<TestCase("soccer/england/engl2/ENGL21718.json", "England", "League Two", "2017", 550)>]
+    [<TestCase("soccer/england/engl2/ENGL21617.json", "England", "League Two", "2016", 539)>]
+    [<TestCase("soccer/england/engl2/ENGL21516.json", "England", "League Two", "2015", 532)>]
+    [<TestCase("soccer/england/engl2/ENGL21415.json", "England", "League Two", "2014", 533)>]
+    [<TestCase("soccer/england/engl2/ENGL21314.json", "England", "League Two", "2013", 530)>]
+    [<TestCase("soccer/england/engl2/ENGL21213.json", "England", "League Two", "2012", 539)>]
+    // Germany
+    [<TestCase("soccer/germany/bun/BUN1819.json", "Germany", "Bundesliga", "2018", 308)>]
+    [<TestCase("soccer/germany/bun/BUN1718.json", "Germany", "Bundesliga", "2017", 308)>]
+    [<TestCase("soccer/germany/bun/BUN1617.json", "Germany", "Bundesliga", "2016", 308)>]
+
+    //// Baseball
+    // MLB
+    [<TestCase("baseball/mlb/MLB18.json", "USA", "MLB", "2018", 2808)>]
+    
+    //// Basketball
+    // NBA
+    [<TestCase("basketball/nba/NBA1819.json", "USA", "NBA", "2018", 1355)>]
+    [<TestCase("basketball/nba/NBA1718.json", "USA", "NBA", "2017", 1384)>]
+    [<TestCase("basketball/nba/NBA1617.json", "USA", "NBA", "2016", 1408)>]
+
+    //// Tennis
+    // ATP Wimbledon
+    [<TestCase("tennis/atpwim/ATPWIM19.json", "UK", "ATP Wimbledon", "2019", 214)>]
+    member this.CheckData(file, country, division, season, count) =
+        let baseDirectory = AppDomain.CurrentDomain.BaseDirectory
+        let filePath = Path.Combine(Path.Combine(baseDirectory, "../../../data/"), file)
+        let league = Compact.deserializeFile<LeagueData> filePath
+        Assert.AreEqual(country, league.Country)
+        Assert.AreEqual(division, league.Division)
+        Assert.AreEqual(season, league.Season.ToFullString())
+        Assert.AreEqual(count, league.Matches.Length)
 
 [<TestFixture>]
 type InternetTests() =

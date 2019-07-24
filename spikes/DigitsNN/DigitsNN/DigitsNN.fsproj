@@ -62,8 +62,14 @@
     <Reference Include="Accord">
       <HintPath>..\packages\Accord.3.8.0\lib\net46\Accord.dll</HintPath>
     </Reference>
+    <Reference Include="Accord.DataSets">
+      <HintPath>..\packages\Accord.DataSets.3.8.0\lib\net46\Accord.DataSets.dll</HintPath>
+    </Reference>
     <Reference Include="Accord.Genetic">
       <HintPath>..\packages\Accord.Genetic.3.8.0\lib\net46\Accord.Genetic.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.IO">
+      <HintPath>..\packages\Accord.IO.3.8.0\lib\net46\Accord.IO.dll</HintPath>
     </Reference>
     <Reference Include="Accord.Math">
       <HintPath>..\packages\Accord.Math.3.8.0\lib\net46\Accord.Math.dll</HintPath>
@@ -80,10 +86,14 @@
     <Reference Include="FSharp.Core">
       <HintPath>..\packages\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.ValueTuple">
