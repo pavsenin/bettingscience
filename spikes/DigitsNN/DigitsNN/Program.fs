@@ -2,9 +2,12 @@
 open Accord.Neuro.ActivationFunctions
 open Accord.Neuro.Learning
 open Accord.Neuro
+open Accord.Math
 open System
 open System.Windows.Media.Imaging
 open System.IO
+open System.Drawing
+open System.Drawing.Imaging
 
 type Sample(database) =
     member val Database:DigitsDatabase = database with get, set
@@ -22,35 +25,44 @@ and DigitsDatabase() =
     let mean = Array.zeroCreate 1024
     let dev = Array.create 1024 1
 
-    let extract text =
+    let extract (text:string) =
         let bitmap = new Bitmap(32, 32, PixelFormat.Format32bppRgb)
         let lines = text.Split([|"\n"|], StringSplitOptions.RemoveEmptyEntries)
-        //for (int i = 0; i < 32; i++)
-        //{
-        //    for (int j = 0; j < 32; j++)
-        //    {
-        //        if (lines[i][j] == '0')
-        //            bitmap.SetPixel(j, i, Color.White);
-        //        else bitmap.SetPixel(j, i, Color.Black);
-        //    }
-        //}
+        [0..31] |> List.iter (fun i ->
+            [0..31] |> List.iter (fun j ->
+                let line = lines.[i]
+                if line.[j] = '0' then bitmap.SetPixel(j, i, Color.White)
+                else bitmap.SetPixel(j, i, Color.Black)
+            )
+        )
         bitmap
 
-    public double[] ToFeatures(Bitmap bmp)
-    {
-        double[] features = new double[32 * 32];
-        for (int i = 0; i < 32; i++)
-            for (int j = 0; j < 32; j++)
-                features[i * 32 + j] = (bmp.GetPixel(j, i).R > 0) ? 0 : 1;
+    let toFeatures (bmp:Bitmap) =
+        let features = Array.create (32 * 32) 0.
+        [0..31] |> List.iter (fun i ->
+            [0..31] |> List.iter (fun j ->
+                features.[i * 32 + j] <- if bmp.GetPixel(j, i).R > 0uy then 0. else 1.
+            )
+        )
+        features
 
-        return features;
-    }
+    let toBitmapImage (bitmap:Bitmap) =
+        use memory = new MemoryStream()
+        bitmap.Save(memory, ImageFormat.Bmp)
+        memory.Position <- 0L
+        let bitmapImage = new BitmapImage()
+        bitmapImage.BeginInit()
+        bitmapImage.StreamSource <- memory
+        bitmapImage.CacheOption <- BitmapCacheOption.OnLoad
+        bitmapImage.EndInit()
+        bitmapImage.Freeze()
+        bitmapImage
 
-    let extractSample database buffer label =
-        let bitmap = Extract(new String(buffer))
-        let image = bitmap.ToBitmapImage()
+    let extractSample database (buffer:char array) label =
+        let bitmap = extract(new String(buffer))
+        let image = toBitmapImage bitmap
 
-        let features = ToFeatures(bitmap)
+        let features = toFeatures bitmap
         let classLabel = Int32.Parse(label)
         new Sample(database, Features = features, Image = image, Class = classLabel, Result = -1)
 
@@ -72,7 +84,7 @@ and DigitsDatabase() =
             if read < buffer.Length || label = null then
                 isBreak <- true
             else
-                let sample = extractSample buffer label
+                let sample = extractSample this buffer label
                 if count < 1000 then
                     this.Training <- Array.append this.Training [|sample|]
                 else
@@ -139,36 +151,47 @@ and DigitsDatabase() =
 //    }
 //    }
 
+
+let getInstances (set:Sample array) =
+    let input = Array.create set.Length [||]
+    let output = Array.create set.Length [||]
+    [0..input.Length-1] |> List.iter (fun i ->
+        input.[i] <- set.[i].Features
+        let out = Array.create set.[i].Database.Classes 0.
+        out.[set.[i].Class] <- 1.
+        output.[i] <- out
+    )
+    (input, output)
+
+let computeAccuracy (network:DeepBeliefNetwork) set =
+    let testInputs, testOutputs = getInstances set
+    let mutable total, correct = 0, 0
+    [0..testInputs.Length-1] |> List.iter (fun i ->
+        let predicted = network.GenerateOutput(testInputs.[i])
+        let _, predIndex = predicted.Max()
+        let _, index = testOutputs.[i].Max()
+        total <- total + 1
+        if predIndex = index then
+            correct <- correct + 1
+    )
+    let accuracy = float(correct) / float(total)
+    printfn "Total %d Correct %d Accuracy %2f" total correct accuracy
+
 [<EntryPoint>]
 let main argv = 
-    let network = new DeepBeliefNetwork(new BernoulliFunction(), 1024, 50, 10) // TODO WTF?
     let database = new DigitsDatabase(IsNormalized = false)
+    database.Load()
+    let network = new DeepBeliefNetwork(new BernoulliFunction(), 1024, 50, 10) // TODO WTF?
     let weights = new GaussianWeights(network) // TODO WTF?
     weights.Randomize() // TODO WTF?
     network.UpdateVisibleWeights() // TODO WTF?
     let teacher = new BackPropagationLearning(network, LearningRate = 0.1, Momentum = 0.9) // TODO WTF?
-    //let (inputs, outputs) = Main.Database.Training.GetInstances()
+    let (inputs, outputs) = getInstances database.Training
+    [0..200] |> List.iter(fun i ->
+        let error = teacher.RunEpoch(inputs, outputs) // TODO WTF?
+        printfn "Epoch %d Error %3f" (i + 1) error
+    )
+    network.UpdateVisibleWeights() // TODO WTF?
+    computeAccuracy network database.Training
+    computeAccuracy network database.Testing
     0
-
-
-        //        ComputeAccuracy(Main.Database.Testing);
-        //        ComputeAccuracy(Main.Database.Training);
-
-        //    }).Start();
-        //}
-
-        //void ComputeAccuracy(ObservableCollection<Sample> set) {
-        //    double[][] testInputs, testOutputs;
-        //    set.GetInstances(out testInputs, out testOutputs);
-        //    int total = 0, correct = 0;
-        //    for(var i = 0; i < testInputs.Length; i++) {
-        //        double[] predicted = Main.Network.GenerateOutput(testInputs[i]);
-        //        predicted.Max(out var predValue);
-        //        testOutputs[i].Max(out var value);
-        //        total++;
-        //        if(predicted[value] > 0)
-        //            correct++;
-        //    }
-        //    var accuracy = (1.0 * correct) / total;
-        //    Debug.WriteLine($"Total {total} Correct {correct} Accuracy {accuracy}");
-        //}

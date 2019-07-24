@@ -106,7 +106,7 @@ type AccuracyTests() =
     
     [<TestCase(-2.5f, 8, -4.f, 2.28f, -4.8f, 2.88f)>]
     [<TestCase(-1.5f, 8, 0.f, 3.48f, -0.8f, 2.08f)>]
-    [<TestCase(-0.5f, 8, 4.f, 2.28f, 3.2f, 1.29f)>]
+    [<TestCase(-0.5f, 8, 4.f, 2.28f, 3.2f, 1.28f)>]
     [<TestCase(0.5f, 8, 4.f, 2.28f, 3.2f, 1.28f)>]
     member this.ComputeAccuracyHandicap(handicap, count, openingExp, openingVar, closingExp, closingVar) =
         let expected = {

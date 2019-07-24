@@ -886,6 +886,7 @@ type InternetTests() =
         let matchID = "OIyXBXea"
         let matchUrl = "soccer/russia/premier-league-2014-2015/arsenal-tula-akhmat-grozny-" + matchID + "/"
         let actual = extractMatchOdds [| B365 |] (soccerID, soccerDataID) [| O1X2 |] (matchID, matchUrl)
+        let a = sprintf "%A" actual
         match actual with
         | Some({
                 ID = "OIyXBXea";
@@ -902,8 +903,9 @@ type InternetTests() =
                         Value = None;
                         BookOdds = [|{
                             Book = B365;
-                            Odds = { Opening = X3 { O1 = (2.88f, 1431443386); O0 = (3.2f, 1431443386); O2 = (2.5f, 1431443386) };
-                                     Closing = X3 { O1 = (2.38f, 1431763683); O0 = (3.2f, 1431443386); O2 = (3.f, 1431763683) }
+                            Odds = {
+                                Opening = X3 { O1 = (2.88000011f, 1431443386); O0 = (3.20000005f, 1431443386); O2 = (2.5f, 1431443386) };
+                                Closing = X3 { O1 = (2.38000011f, 1431763683); O0 = (3.20000005f, 1431443386); O2 = (3.0f, 1431763683) }
                             }
                         }|]
                     }|]
