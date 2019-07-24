@@ -8,3 +8,4 @@ obj/
 packages/
 build/
 node_modules/
+data/

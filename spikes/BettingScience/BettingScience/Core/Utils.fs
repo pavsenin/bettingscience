@@ -23,7 +23,7 @@ let fromUnixTimestamp() =
 type LongWebClient() =
     inherit WebClient()
     override this.GetWebRequest uri =
-        let timeout = 600 * 60 * 1000
+        let timeout = 60 * 60 * 1000
         let webRequest = base.GetWebRequest uri
         webRequest.Timeout <- timeout
         match webRequest with | :? HttpWebRequest as httpRequest -> httpRequest.ReadWriteTimeout <- timeout | _ -> () |> ignore
