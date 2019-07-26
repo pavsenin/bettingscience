@@ -3,6 +3,7 @@
 open Domain
 open Utils
 open System
+open Accord.Controls
 
 type PredictionX2 = { PO1 : float32; PO2 : float32 }
 type PredictionX3 = { PO1 : float32; PO0 : float32; PO2 : float32 }
@@ -116,3 +117,36 @@ let analyze (sport, out, ex) state matches =
             )
         ) |> defArg state
     ) state
+
+let check matches =
+    let inputs, outputs =
+        matches
+        |> Array.choose (fun m ->
+            let outcome = m.Odds |> Array.tryFind (fun o -> o.Outcome = HA)
+            let value = outcome ||> (fun out -> out.Values |> Array.tryFind (fun v -> v.Value = None))
+            let odds = value ||> (fun v -> v.BookOdds |> Array.tryFind (fun b -> b.Book = Pin)) |>> (fun b -> b.Odds)
+            match odds with
+            |  Some { Opening = X2 { O1 = (coefoO1, _); O2 = (coefoO2, _) } as opening;
+                      Closing = X2 { O1 = (coefcO1, _); O2 = (coefcO2, _) } as closing } ->
+                let result = getMatchResult m.Score
+                let real = if result = O1 then 1 else 0
+                let openingProb = getProbabilities opening
+                let closingProb = getProbabilities closing
+                match openingProb, closingProb with
+                | PX2 { PO1 = oO1; PO2 = oO2 }, PX2 { PO1 = cO1; PO2 = cO2 } ->
+                    let diff = (cO1 - oO1) / oO1
+                    //printfn "%f %f %d" oO1 diff real
+                    if diff > 2.f then None
+                    else if cO1 > 0.35f then None
+                    else
+                        //printfn "CoefcO1 %f Real %d Match %s" coefcO1 real m.Url
+                        Some([|double(cO1); double(diff)|], real)
+                | _ -> None
+            | _ -> None
+        ) |> Array.unzip
+        //|> Array.groupBy (fun (prob, _) -> prob)
+        //|> Array.sortBy (fun (prob, _) -> prob)
+        //|> Array.filter (fun (_, arr) -> (Array.length arr) >= 5)
+        //|> Array.map (fun (prob, arr) -> (prob, arr |> Array.map (fun (_, r) -> r) |> Array.average))
+        //|> Array.map (fun (prob, real) -> [|double(prob); double(real)|])
+    ScatterplotBox.Show("MLB", inputs, outputs).SetSymbolSize(2.f).Hold()

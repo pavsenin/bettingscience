@@ -194,6 +194,67 @@ let digitsExample() =
     computeAccuracy network (getInstances database.Training)
     computeAccuracy network (getInstances database.Testing)
 
+let mnistDeepBeliefExample() =
+    let asVector (data:float array) =
+        let jagged = data.ToJagged()
+        let inted = data.ToInt32()
+        [0..inted.Length-1] |> List.iter (fun i ->
+            let newArray = Array.create 10 0.
+            newArray.[inted.[i]] <- 1.
+            jagged.[i] <- newArray
+        )
+        jagged
+    let mnist = new MNIST()
+    let (xtrainData, ytrainData) = mnist.Training
+    let (xtestData, ytestData) = mnist.Testing
+    let xtrain, ytrain = xtrainData.ToDense(784), (asVector ytrainData)
+    let xtest, ytest = xtestData.ToDense(784), asVector ytestData
+    let options =
+        //[[|200; 10|]; [|389; 10|]]
+        [[|200; 10|]]
+        |> List.map (fun layers ->
+            //[0.9; 0.95]
+            [0.9]
+            |> List.map (fun moment ->
+                //[0.01; 0.03]
+                [0.02]
+                |> List.map (fun rate ->
+                    let network = new DeepBeliefNetwork(new BernoulliFunction(), 784, layers)
+                    let weights = new GaussianWeights(network)
+                    weights.Randomize()
+                    network.UpdateVisibleWeights()
+                    let teacher = new BackPropagationLearning(network, LearningRate = rate, Momentum = moment)
+                    layers, moment, rate, teacher, network
+                )
+            ) |> List.concat
+        ) |> List.concat
+    [0..99] |> List.iter(fun i ->
+        printfn "============================================================================"
+        options |> List.iter(fun (layers, moment, rate, teacher, network) ->
+            let error = teacher.RunEpoch(xtrain, ytrain)
+            printfn "----------------------------------------------------------------------------"
+            printfn "Epoch %d Error %3f Layers %A Moment %3f Rate %3f" (i + 1) error layers moment rate
+            //computeAccuracy network (xtrain, ytrain)
+            computeAccuracy network (xtest, ytest)
+        )
+    )
+
+let print() =
+    //let size = 28
+    //[0..19] |> List.iter (fun index ->
+    //    let x = xtest.[index].ToInt32()
+    //    let y = int(ytestData.[index])
+    //    [0..size-1] |> List.iter (fun i ->
+    //        [0..size-1] |> List.iter (fun j ->
+    //            let xv = int(x.[i*size+j]) / 32
+    //            printf "%d" xv
+    //        )
+    //        printfn ""
+    //    )
+    //    printfn "%d" y
+    //)
+    ()
+
 [<EntryPoint>]
 let main argv =
     let asVector (data:float array) =
@@ -208,17 +269,7 @@ let main argv =
     let mnist = new MNIST()
     let (xtrainData, ytrainData) = mnist.Training
     let (xtestData, ytestData) = mnist.Testing
-    let xtrain, ytrain = xtrainData.ToDense(), asVector ytrainData
-    let xtest, ytest = xtestData.ToDense(), asVector ytestData
-    let network = new DeepBeliefNetwork(new BernoulliFunction(), 778, 50, 10)
-    let weights = new GaussianWeights(network)
-    weights.Randomize()
-    network.UpdateVisibleWeights()
-    let teacher = new BackPropagationLearning(network, LearningRate = 0.05, Momentum = 0.98)
-    [0..19] |> List.iter(fun i ->
-        let error = teacher.RunEpoch(xtrain, ytrain)
-        printfn "Epoch %d Error %3f" (i + 1) error
-    )
-    computeAccuracy network (xtrain, ytrain)
-    computeAccuracy network (xtest, ytest)
+    let xtrain, ytrain = xtrainData.ToDense(784), (asVector ytrainData)
+    let xtest, ytest = xtestData.ToDense(784), asVector ytestData
+    mnistDeepBeliefExample()
     0
