@@ -9,6 +9,12 @@ open System.IO
 open System.Drawing
 open System.Drawing.Imaging
 open Accord.DataSets
+open Accord.MachineLearning
+open Accord.MachineLearning.Bayes
+open Accord.Statistics.Distributions.Univariate
+open Accord.MachineLearning.VectorMachines.Learning
+open Accord.Statistics.Kernels
+open Accord.MachineLearning.VectorMachines
 
 type Sample(database) =
     member val Database:DigitsDatabase = database with get, set
@@ -177,6 +183,19 @@ let computeAccuracy (network:DeepBeliefNetwork) (testInputs:float[][], testOutpu
     let accuracy = float(correct) / float(total)
     printfn "Total %d Correct %d Accuracy %2f" total correct accuracy
 
+let computeAccuracy2 (network:ActivationNetwork) (testInputs:float[][], testOutputs:float[][]) =
+    let mutable total, correct = 0, 0
+    [0..testInputs.Length-1] |> List.iter (fun i ->
+        let predicted = network.Compute(testInputs.[i])
+        let _, predIndex = predicted.Max()
+        let _, index = testOutputs.[i].Max()
+        total <- total + 1
+        if predIndex = index then
+            correct <- correct + 1
+    )
+    let accuracy = float(correct) / float(total)
+    printfn "Total %d Correct %d Accuracy %2f" total correct accuracy
+
 let digitsExample() =
     let database = new DigitsDatabase(IsNormalized = false)
     database.Load()
@@ -271,5 +290,46 @@ let main argv =
     let (xtestData, ytestData) = mnist.Testing
     let xtrain, ytrain = xtrainData.ToDense(784), (asVector ytrainData)
     let xtest, ytest = xtestData.ToDense(784), asVector ytestData
-    mnistDeepBeliefExample()
+    
+    //let bayes = new NaiveBayes(10, [|0;1;2;3;4;5;6;7;8;9|])
+    //let teacher = new NaiveBayesLearning(Model = bayes)
+    //teacher.Options.InnerOption.UseLaplaceRule <- true
+    //let nb = teacher.Learn(xtrain.ToInt32(), ytrain)
+    //let answers = nb.Decide(xtrain.ToInt32())
+
+    //let teacher = new LinearCoordinateDescent()
+    //let svm = teacher.Learn(xtrain, ytestData)
+    //let answers = svm.Decide(xtrain)
+
+    //let teacher = new SequentialMinimalOptimization<Gaussian>(UseComplexityHeuristic = true, UseKernelEstimation = true)
+    //let svm = teacher.Learn(xtrain, ytestData)
+    //let answers = svm.Decide(xtrain)
+
+    //let learning =
+    //    new SequentialMinimalOptimization<Linear>(Complexity = 10000.0) :>
+    //    ISupervisedLearning<Accord.MachineLearning.VectorMachines.SupportVectorMachine<Linear>,float [],bool>
+    //let teacher = new MulticlassSupportVectorLearning<Linear>(Learner = new Func<_, _>(fun _ -> learning))
+    //let svm = teacher.Learn(xtrain.[..999], ytrainData.[..999].ToInt32())
+    //let answers = svm.Decide(xtrain.[..999])
+
+    //let learning =
+    //    new SequentialMinimalOptimization<Linear>(Complexity = 100.0) :>
+    //    ISupervisedLearning<Accord.MachineLearning.VectorMachines.SupportVectorMachine<Linear>,float [],bool>
+    //let teacher = new MultilabelSupportVectorLearning<Linear>(Learner = new Func<_, _>(fun _ -> learning))
+    //let svm = teacher.Learn(xtrain.[..999], ytrain.[..999].ToInt32())
+    //let answers = svm.Decide(xtrain.[..999])
+
+    let network = new ActivationNetwork(new BipolarSigmoidFunction(), 784, [|50; 10|])
+    //let teacher = new LevenbergMarquardtLearning(network, UseRegularization = true)
+    let teacher = new ParallelResilientBackpropagationLearning(network)
+    let weights = new GaussianWeights(network)
+    weights.Randomize()
+
+    [0..99] |> List.iter (fun i ->
+        let error = teacher.RunEpoch(xtrain, ytrain)
+        printfn "Epoch %d Error %f" (i + 1) error
+        computeAccuracy2 network (xtest, ytest)
+    )
+    
+
     0

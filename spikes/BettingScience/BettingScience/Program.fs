@@ -14,6 +14,23 @@ let main argv =
     // simple models: random, (home, away) / total, ideal
     // calculate accuracy by sports \ leagues \ seasons \ teams \ bookmakers \ outcomes 
 
+    // https://www.oddsportal.com/soccer/russia/youth-league-2018-2019/results/
+    // https://www.oddsportal.com/soccer/russia/pfl-center-2018-2019/results/
+    // https://www.oddsportal.com/soccer/russia/pfl-south-2018-2019/results/
+    // https://www.oddsportal.com/soccer/russia/pfl-west-2018-2019/results/
+    // https://www.oddsportal.com/soccer/russia/pfl-east-2018-2019/results/
+    // https://www.oddsportal.com/soccer/russia/pfl-ural-povolzhye-2018-2019/results/
+    
+    // https://www.oddsportal.com/soccer/germany/regionalliga-north-2018-2019/results/
+    // https://www.oddsportal.com/soccer/germany/regionalliga-nordost-2018-2019/results/
+    // https://www.oddsportal.com/soccer/germany/regionalliga-west-2018-2019/results/
+    // https://www.oddsportal.com/soccer/germany/regionalliga-sudwest-2018-2019/results/
+    // https://www.oddsportal.com/soccer/germany/regionalliga-bayern-2018-2019/results/
+
+    // https://www.oddsportal.com/soccer/england/national-league-north-2018-2019/results/
+    // https://www.oddsportal.com/soccer/england/national-league-south-2018-2019/results/
+    // https://www.oddsportal.com/soccer/england/national-league-2018-2019/results/
+
     //let matches =
     //    [|"../../../data/baseball/mlb/MLB17.json"; "../../../data/baseball/mlb/MLB18.json"|]
     //    |> Array.map (fun fileName ->
