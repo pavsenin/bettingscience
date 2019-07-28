@@ -274,23 +274,6 @@ let print() =
     //)
     ()
 
-[<EntryPoint>]
-let main argv =
-    let asVector (data:float array) =
-        let jagged = data.ToJagged()
-        let inted = data.ToInt32()
-        [0..inted.Length-1] |> List.iter (fun i ->
-            let newArray = Array.create 10 0.
-            newArray.[inted.[i]] <- 1.
-            jagged.[i] <- newArray
-        )
-        jagged
-    let mnist = new MNIST()
-    let (xtrainData, ytrainData) = mnist.Training
-    let (xtestData, ytestData) = mnist.Testing
-    let xtrain, ytrain = xtrainData.ToDense(784), (asVector ytrainData)
-    let xtest, ytest = xtestData.ToDense(784), asVector ytestData
-    
     //let bayes = new NaiveBayes(10, [|0;1;2;3;4;5;6;7;8;9|])
     //let teacher = new NaiveBayesLearning(Model = bayes)
     //teacher.Options.InnerOption.UseLaplaceRule <- true
@@ -319,17 +302,34 @@ let main argv =
     //let svm = teacher.Learn(xtrain.[..999], ytrain.[..999].ToInt32())
     //let answers = svm.Decide(xtrain.[..999])
 
-    let network = new ActivationNetwork(new BipolarSigmoidFunction(), 784, [|50; 10|])
-    //let teacher = new LevenbergMarquardtLearning(network, UseRegularization = true)
-    let teacher = new ParallelResilientBackpropagationLearning(network)
-    let weights = new GaussianWeights(network)
-    weights.Randomize()
+    //let network = new ActivationNetwork(new BipolarSigmoidFunction(), 784, [|200; 10|])
+    ////let teacher = new LevenbergMarquardtLearning(network, UseRegularization = true)
+    //let teacher = new ParallelResilientBackpropagationLearning(network)
+    //let weights = new GaussianWeights(network)
+    //weights.Randomize()
 
-    [0..99] |> List.iter (fun i ->
-        let error = teacher.RunEpoch(xtrain, ytrain)
-        printfn "Epoch %d Error %f" (i + 1) error
-        computeAccuracy2 network (xtest, ytest)
-    )
+    //[0..99] |> List.iter (fun i ->
+    //    let error = teacher.RunEpoch(xtrain, ytrain)
+    //    printfn "Epoch %d Error %f" (i + 1) error
+    //    computeAccuracy2 network (xtest, ytest)
+    //)
+
+[<EntryPoint>]
+let main argv =
+    let asVector (data:float array) =
+        let jagged = data.ToJagged()
+        let inted = data.ToInt32()
+        [0..inted.Length-1] |> List.iter (fun i ->
+            let newArray = Array.create 10 0.
+            newArray.[inted.[i]] <- 1.
+            jagged.[i] <- newArray
+        )
+        jagged
+    let mnist = new MNIST()
+    let (xtrainData, ytrainData) = mnist.Training
+    let (xtestData, ytestData) = mnist.Testing
+    let xtrain, ytrain = xtrainData.ToDense(784), asVector ytrainData
+    let xtest, ytest = xtestData.ToDense(784), asVector ytestData
     
 
     0

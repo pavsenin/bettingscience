@@ -324,7 +324,7 @@ let fetchLeagueDataAndSaveToFile (sportID, dataID) outIDs (leagueID, pageCount, 
         [1..pageCount]
         |> List.map (fun pageNum -> fetchLeagueMatches leagueRelativeUrl pageNum)
         |> List.concat
-    printfn "%d" matches.Length
+    printfn "%s %d" fileName matches.Length
     let matchesOdds = matches |> List.mapi (fun i m -> printfn "%d" i; extractMatchOdds books (sportID, dataID) outIDs m) |> List.choose id |> List.toArray
     let leagueData = { ID = leagueID; Country = country; Division = div; Season = season; Matches = matchesOdds }
     Compact.serializeToFile fileName leagueData

@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "DigitsNN", "DigitsNN\DigitsNN.fsproj", "{EADE7104-3BD2-41B6-93E7-2635B296CD5A}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "DigitsTensorflow", "DigitsTensorflow\DigitsTensorflow.fsproj", "{AA1F3A9F-77DC-4002-89A9-ADBEA8461231}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "DigitsTensorflowCore", "DigitsTensorflowCore\DigitsTensorflowCore.fsproj", "{59B46D3E-4013-4AD0-9E11-7850FA1EB95B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{EADE7104-3BD2-41B6-93E7-2635B296CD5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EADE7104-3BD2-41B6-93E7-2635B296CD5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EADE7104-3BD2-41B6-93E7-2635B296CD5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA1F3A9F-77DC-4002-89A9-ADBEA8461231}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA1F3A9F-77DC-4002-89A9-ADBEA8461231}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA1F3A9F-77DC-4002-89A9-ADBEA8461231}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA1F3A9F-77DC-4002-89A9-ADBEA8461231}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59B46D3E-4013-4AD0-9E11-7850FA1EB95B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59B46D3E-4013-4AD0-9E11-7850FA1EB95B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59B46D3E-4013-4AD0-9E11-7850FA1EB95B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59B46D3E-4013-4AD0-9E11-7850FA1EB95B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -20,16 +20,6 @@ let main argv =
     // https://www.oddsportal.com/soccer/russia/pfl-west-2018-2019/results/
     // https://www.oddsportal.com/soccer/russia/pfl-east-2018-2019/results/
     // https://www.oddsportal.com/soccer/russia/pfl-ural-povolzhye-2018-2019/results/
-    
-    // https://www.oddsportal.com/soccer/germany/regionalliga-north-2018-2019/results/
-    // https://www.oddsportal.com/soccer/germany/regionalliga-nordost-2018-2019/results/
-    // https://www.oddsportal.com/soccer/germany/regionalliga-west-2018-2019/results/
-    // https://www.oddsportal.com/soccer/germany/regionalliga-sudwest-2018-2019/results/
-    // https://www.oddsportal.com/soccer/germany/regionalliga-bayern-2018-2019/results/
-
-    // https://www.oddsportal.com/soccer/england/national-league-north-2018-2019/results/
-    // https://www.oddsportal.com/soccer/england/national-league-south-2018-2019/results/
-    // https://www.oddsportal.com/soccer/england/national-league-2018-2019/results/
 
     //let matches =
     //    [|"../../../data/baseball/mlb/MLB17.json"; "../../../data/baseball/mlb/MLB18.json"|]
@@ -47,46 +37,17 @@ let main argv =
     //|> List.iter (fun file ->
     //    OddsPortalScraper.fetchLeagueDataAndSaveToFile (tennisID, tennisDataID) [| HA; OU; AH |] file
     //)
-    
-    //2 bundesliga
 
-    [("GChlCjfd", 7, "Germany", "Bundesliga2", Y18, "BUN21819.json");
-    ("fTCHtXML", 7, "Germany", "Bundesliga2", Y17, "BUN21718.json");
-    ("KlL5XT59", 7, "Germany", "Bundesliga2", Y16, "BUN21617.json");
-    ("zRjVAGwT", 7, "Germany", "Bundesliga2", Y15, "BUN21516.json");
-    ("n1GyUI8L", 7, "Germany", "Bundesliga2", Y14, "BUN21415.json");
-    ("CxaBVZl4", 7, "Germany", "Bundesliga2", Y13, "BUN21314.json");
-    ("zw4KYpw8", 7, "Germany", "Bundesliga2", Y12, "BUN21213.json");
+    [
+    ("EubWlaac", 8, "Italy", "Serie A", Y12, "SERA1213.json");
 
-    //3 bundesliga
-
-    ("zwaqzfn3", 8, "Germany", "Liga3", Y18, "GERL31819.json");
-    ("rsFUZ8U1", 8, "Germany", "Liga3", Y17, "GERL31718.json");
-    ("buK9WmLF", 8, "Germany", "Liga3", Y16, "GERL31617.json");
-    ("69s15f1j", 8, "Germany", "Liga3", Y15, "GERL31516.json");
-    ("rHJOMz1e", 8, "Germany", "Liga3", Y14, "GERL31415.json");
-    ("OdIUCQv3", 8, "Germany", "Liga3", Y13, "GERL31314.json");
-    ("hMrVH44j", 8, "Germany", "Liga3", Y12, "GERL31213.json");
-
-    //Ligue 1
-
-    ("Gji6p9u4", 8, "France", "Ligue1", Y18, "FRAL11819.json");
-    ("hn9DAGLG", 8, "France", "Ligue1", Y17, "FRAL11718.json");
-    ("OO2KUIR8", 8, "France", "Ligue1", Y16, "FRAL11617.json");
-    ("2Ll8xq90", 8, "France", "Ligue1", Y15, "FRAL11516.json");
-    ("jLZ9xBGT", 8, "France", "Ligue1", Y14, "FRAL11415.json");
-    ("EmMn2XCi", 8, "France", "Ligue1", Y13, "FRAL11314.json");
-    ("hUnbv6tG", 8, "France", "Ligue1", Y12, "FRAL11213.json");
-
-    //Lique 2
-
-    ("fsjAqTfA", 8, "France", "Ligue2", Y18, "FRAL21819.json");
-    ("YqNsgljq", 8, "France", "Ligue2", Y17, "FRAL21718.json");
-    ("I9vuI2cL", 8, "France", "Ligue2", Y16, "FRAL21617.json");
-    ("tCmCy3O6", 8, "France", "Ligue2", Y15, "FRAL21516.json");
-    ("AkYRdE1o", 8, "France", "Ligue2", Y14, "FRAL21415.json");
-    ("n1Kf0Bs4", 8, "France", "Ligue2", Y13, "FRAL21314.json");
-    ("zwAAwQeM", 8, "France", "Ligue2", Y12, "FRAL21213.json")]
+    ("K28bJgeL", 8, "Italy", "Serie B", Y18, "SERB1819.json");
+    ("6ufhxjSq", 10, "Italy", "Serie B", Y17, "SERB1718.json");
+    ("r1LsqvuO", 10, "Italy", "Serie B", Y16, "SERB1617.json");
+    ("foMr7IwS", 10, "Italy", "Serie B", Y15, "SERB1516.json");
+    ("WGbJytvd", 10, "Italy", "Serie B", Y14, "SERB1415.json");
+    ("G6oDJsAU", 10, "Italy", "Serie B", Y13, "SERB1314.json");
+    ("06vj9g8T", 10, "Italy", "Serie B", Y12, "SERB1213.json")]
     |> List.iter (fun file ->
         OddsPortalScraper.fetchLeagueDataAndSaveToFile (soccerID, soccerDataID) [| O1X2; OU; AH |] file
     )
