@@ -38,19 +38,19 @@ let main argv =
     //    OddsPortalScraper.fetchLeagueDataAndSaveToFile (tennisID, tennisDataID) [| HA; OU; AH |] file
     //)
 
-    [
-    ("EubWlaac", 8, "Italy", "Serie A", Y12, "SERA1213.json");
+    //[
+    //("EubWlaac", 8, "Italy", "Serie A", Y12, "SERA1213.json");
 
-    ("K28bJgeL", 8, "Italy", "Serie B", Y18, "SERB1819.json");
-    ("6ufhxjSq", 10, "Italy", "Serie B", Y17, "SERB1718.json");
-    ("r1LsqvuO", 10, "Italy", "Serie B", Y16, "SERB1617.json");
-    ("foMr7IwS", 10, "Italy", "Serie B", Y15, "SERB1516.json");
-    ("WGbJytvd", 10, "Italy", "Serie B", Y14, "SERB1415.json");
-    ("G6oDJsAU", 10, "Italy", "Serie B", Y13, "SERB1314.json");
-    ("06vj9g8T", 10, "Italy", "Serie B", Y12, "SERB1213.json")]
-    |> List.iter (fun file ->
-        OddsPortalScraper.fetchLeagueDataAndSaveToFile (soccerID, soccerDataID) [| O1X2; OU; AH |] file
-    )
+    //("K28bJgeL", 8, "Italy", "Serie B", Y18, "SERB1819.json");
+    //("6ufhxjSq", 10, "Italy", "Serie B", Y17, "SERB1718.json");
+    //("r1LsqvuO", 10, "Italy", "Serie B", Y16, "SERB1617.json");
+    //("foMr7IwS", 10, "Italy", "Serie B", Y15, "SERB1516.json");
+    //("WGbJytvd", 10, "Italy", "Serie B", Y14, "SERB1415.json");
+    //("G6oDJsAU", 10, "Italy", "Serie B", Y13, "SERB1314.json");
+    //("06vj9g8T", 10, "Italy", "Serie B", Y12, "SERB1213.json")]
+    //|> List.iter (fun file ->
+    //    OddsPortalScraper.fetchLeagueDataAndSaveToFile (soccerID, soccerDataID) [| O1X2; OU; AH |] file
+    //)
     
 
     let getInitState out book =

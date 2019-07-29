@@ -305,7 +305,7 @@ let buildComplexGraph() =
                 tf.variable_scope("Accuracy"),
                 fun _ ->
                     let correctPrediction = tf.equal(tf.argmax(outputLogits, 1), tf.argmax(y, 1), name = "correct_pred")
-                    accuracy = tf.reduce_mean(tf.cast(correctPrediction, tf.float32), name = "accuracy")
+                    accuracy <- tf.reduce_mean(tf.cast(correctPrediction, tf.float32), name = "accuracy")
             ) |> ignore
             Python.``with``(
                 tf.variable_scope("Prediction"),
@@ -341,11 +341,11 @@ let train (sess:Session) (train:DataSetMnist) (validation:DataSetMnist) =
 
     let x_train, y_train = reformat train.Data train.Labels
 
-    for epoch in Python.range(epochs) do
+    [0..epochs-1] |> List.iter (fun epoch ->
         printfn "Training epoch: %d" (epoch + 1)
         let xTrain, yTrain = randomize x_train y_train
 
-        for iteration in Python.range(numTrIter) do
+        [0..numTrIter-1] |> List.iter (fun iteration ->
             let start = iteration * batchSize
             let _end = (iteration + 1) * batchSize
             let xBatch, yBatch = getNextBatch xTrain yTrain start _end
@@ -356,17 +356,21 @@ let train (sess:Session) (train:DataSetMnist) (validation:DataSetMnist) =
                 lossVal <- !> result.[0]
                 accuracyVal <- !> result.[1]
                 printfn "iter %s: Loss=%s, Training Accuracy=%s"
-                    (iteration.ToString("000")) (lossVal.ToString("0.0000")) (accuracyVal.ToString("P"))
-        let results1 = sess.run([|loss; accuracy|], new FeedItem(x, validation.Data), new FeedItem(y, validation.Labels))
+                    (iteration.ToString("000")) (lossVal.ToString("0.0000")) (accuracyVal.ToString("P"))            
+        )
+        let x_valid, y_valid = reformat validation.Data validation.Labels
+        let results1 = sess.run([|loss; accuracy|], new FeedItem(x, x_valid), new FeedItem(y, y_valid))
         lossVal <- !> results1.[0]
         accuracyVal <- !> results1.[1]
         printfn "---------------------------------------------------------"
         printfn "Epoch: %d, validation loss: %s, validation accuracy: %s"
             (epoch + 1) (lossVal.ToString("0.0000")) (accuracyVal.ToString("P"))
         printfn "---------------------------------------------------------"
+    )
 
 let test (sess:Session) (test:DataSetMnist) =
-    let result = sess.run([|loss; accuracy|], new FeedItem(x, test.Data), new FeedItem(y, test.Labels))
+    let x_test, y_test = reformat test.Data test.Labels
+    let result = sess.run([|loss; accuracy|], new FeedItem(x, x_test), new FeedItem(y, y_test))
     let lossTest:float32 = !> result.[0]
     let accuracyTest:float32 = !> result.[1]
     printfn "---------------------------------------------------------"
