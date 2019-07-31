@@ -6,6 +6,9 @@ open System.IO
 open Microsoft.FSharpLu.Json
 open System
 open Utils
+open Accord.Statistics
+open Accord.Statistics.Models.Regression.Fitting
+open Accord.Statistics.Models.Regression
 
 type BookType = Opening | Closing
 type DistributionType = Train | Validation
@@ -83,7 +86,6 @@ let trainDistibutionModel out (set:MatchData array) =
                 | O0 -> o1, o0 + 1.f, o2
                 | O2 -> o1, o0, o2 + 1.f
             | _ -> o1, o0, o2
-                
         ) (0.f, 0.f, 0.f)
     match out with
     | O1X2 ->
@@ -186,3 +188,48 @@ type MachineLearningTests() =
         let model = getModel name out (mlbTrain, mlbValidation)
         let expectedState = AX2 { AO1 = { Expected = exeO1; Variance = exv }; AO2 = { Expected = -exeO1; Variance = exv } }
         checkPredictedModels (exO1, exO0, exO2, expectedState, exEarn) model out handicap initState [O1; O2] mlbValidation
+
+    [<Test>]
+    member this.PredictMLB18LogisticRegression() =
+        let out, handicap = HA, None
+        let transform data =
+            let d, c, w =
+                data
+                |> Array.choose (fun m ->
+                    let opening = getOpening out m
+                    let openingProbs = opening |>> getProbabilities
+                    let closing = getClosing out m
+                    let closingProbs = closing |>> getProbabilities
+                    let result = getMatchResult m.Score
+                    match opening, openingProbs, closing, closingProbs, result with
+                    | _, Some(PX2 { PO1 = oo1 }), Some(X2 { O1 = (o1, _); O2 = (o2, _)} as c), Some (PX2 { PO1 = co1 }), res when res = O1 || res = O2 ->
+                        let o1Diff = (co1 - oo1) / oo1
+                        let o1Real, w = if result = O1 then 1, o1 - 1.f else 0, o2 - 1.f
+                        Some(([|float(oo1); float(o1Diff)|], o1Real), c, float(w))
+                    | _ -> None
+                )
+                |> Array.unzip3
+            let x, y = Array.unzip d
+            x, y, c, w
+        let xTrain, yTrain, _, wTrain = transform mlbTrain
+        let xValid, yValid, closingValid, _ = transform mlbTrain
+        let teacher = new IterativeReweightedLeastSquares<LogisticRegression>(MaxIterations = 100, Regularization = 1e-6)
+        let regression = teacher.Learn(xTrain, yTrain, wTrain)
+        let predicted = regression.Decide(xValid).ToZeroOne()
+        let mutable correct = 0
+        let mutable money = 0.f
+        Array.zip3 yValid predicted closingValid
+        |> Array.iter (fun (y, p, c) ->
+            let m = 
+                match y, c with
+                | 0, X2 { O2 = (o2, _) } -> o2
+                | 1, X2 { O1 = (o1, _) } -> o1
+                | _ -> 0.f
+            if y = p then
+                correct <- correct + 1
+                money <- money + m
+            money <- money - 1.f
+            System.Diagnostics.Debug.WriteLine(sprintf "Y %A P %A M %A T %A" y p m money)
+        )
+        let accuracy = float(correct) / float(yValid.Length)
+        ()
