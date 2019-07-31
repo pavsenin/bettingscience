@@ -163,6 +163,9 @@ type MachineLearningTests() =
 
     [<TestCase(plain, 72, 17, 153, 23.4139996f, 25.4107437f, -11.5860004f, 20.5946293f, -11.5860004f, 20.5946293f, 21.5900059f)>]
     [<TestCase(bookOpening, 101, 23, 118, 1.56900001f, 20.9008274f, 1.84000003f, 19.7190094f, -3.4230001f, 18.6012402f, -4.109997f)>]
+    [<TestCase(bookClosing, 40, 33, 169, 0.658999979f, 20.7206612f, 0.460999995f, 19.5528927f, -1.11199999f, 18.4731407f, -27.32f)>]
+    [<TestCase(distributionTrain, 116, 0, 126, -1.75399995f, 24.5148754f, 6.07999992f, 20.4574375f, -4.32600021f, 20.4338837f, 7.550004f)>]
+    [<TestCase(distributionValidation, 124, 0, 118, -0.0599999987f, 24.5165291f, 0.0299999993f, 20.3603306f, 0.0299999993f, 20.3603306f, 12.7000055f)>]
     [<TestCase(ideal, 104, 69, 69, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 458.86f)>]
     member this.PredictRPL18BasedOnRPL1217_O1X2(name, exO1, exO0, exO2, exeO1, exvO1, exeO0, exvO0, exeO2, exvO2, exEarn) =
         let out, handicap = O1X2, None
