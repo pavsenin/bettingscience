@@ -5,10 +5,19 @@ open Analytics
 open System.IO
 open Microsoft.FSharpLu.Json
 open System
+open System.Data
 open Utils
 open Accord.Statistics
+open Accord.Statistics.Filters
 open Accord.Statistics.Models.Regression.Fitting
 open Accord.Statistics.Models.Regression
+open Accord.Neuro.Networks
+open Accord.Neuro.ActivationFunctions
+open Accord.Neuro
+open Accord.Neuro.Learning
+open Accord.Math
+open System.Diagnostics
+open System.Collections.Generic
 
 type BookType = Opening | Closing
 type DistributionType = Train | Validation
@@ -189,13 +198,12 @@ type MachineLearningTests() =
         let expectedState = AX2 { AO1 = { Expected = exeO1; Variance = exv }; AO2 = { Expected = -exeO1; Variance = exv } }
         checkPredictedModels (exO1, exO0, exO2, expectedState, exEarn) model out handicap initState [O1; O2] mlbValidation
 
-    [<Test>]
-    member this.PredictMLB18LogisticRegression() =
-        let out, handicap = HA, None
+    [<TestCase(1156, 0.42735675f, 0.169989109f)>]
+    member this.PredictMLB18BasedOnMLB1217Coefficients(exCorrect, exAccuracy, exMoney) = // WeightedLogisticRegression
+        let out = HA
         let transform data =
-            let d, c, w =
-                data
-                |> Array.choose (fun m ->
+            let values, closingOdds, weights =
+                data |> Array.choose (fun m ->
                     let opening = getOpening out m
                     let openingProbs = opening |>> getProbabilities
                     let closing = getClosing out m
@@ -207,29 +215,148 @@ type MachineLearningTests() =
                         let o1Real, w = if result = O1 then 1, o1 - 1.f else 0, o2 - 1.f
                         Some(([|float(oo1); float(o1Diff)|], o1Real), c, float(w))
                     | _ -> None
-                )
-                |> Array.unzip3
-            let x, y = Array.unzip d
-            x, y, c, w
+                ) |> Array.unzip3
+            let inputs, outputs = Array.unzip values
+            inputs, outputs, closingOdds, weights
         let xTrain, yTrain, _, wTrain = transform mlbTrain
-        let xValid, yValid, closingValid, _ = transform mlbTrain
+        let xValid, yValid, oddsValid, _ = transform mlbValidation
         let teacher = new IterativeReweightedLeastSquares<LogisticRegression>(MaxIterations = 100, Regularization = 1e-6)
         let regression = teacher.Learn(xTrain, yTrain, wTrain)
         let predicted = regression.Decide(xValid).ToZeroOne()
-        let mutable correct = 0
-        let mutable money = 0.f
-        Array.zip3 yValid predicted closingValid
-        |> Array.iter (fun (y, p, c) ->
-            let m = 
-                match y, c with
-                | 0, X2 { O2 = (o2, _) } -> o2
-                | 1, X2 { O1 = (o1, _) } -> o1
-                | _ -> 0.f
-            if y = p then
-                correct <- correct + 1
-                money <- money + m
-            money <- money - 1.f
-            System.Diagnostics.Debug.WriteLine(sprintf "Y %A P %A M %A T %A" y p m money)
+        let data = Array.zip3 yValid predicted oddsValid
+        let correct, money =
+            data
+            |> Array.fold (fun (correct, money) (result, predict, closing) ->
+                if result = predict then
+                    let win = 
+                        match result, closing with
+                        | 0, X2 { O2 = (o2, _) } -> o2
+                        | 1, X2 { O1 = (o1, _) } -> o1
+                        | _ -> 0.f
+                    (correct + 1, money + win - 1.f)
+                else
+                    (correct, money - 1.f)
+            ) (0, 0.f)
+        let accuracy = float32(correct) / float32(yValid.Length)
+        Assert.AreEqual(exCorrect, correct)
+        Assert.AreEqual(exAccuracy, accuracy)
+        Assert.AreEqual(exMoney, money)
+
+    [<TestCase(1373, 0.42735675f, 0.169989109f)>]
+    member this.PredictMLB18BasedOnMLB1217Coefficients_2(exCorrect, exAccuracy, exMoney) = // DeepBeliefNetwork
+        let out = HA
+        let transform data =
+            let values, closingOdds, weights =
+                data |> Array.choose (fun m ->
+                    let opening = getOpening out m
+                    let openingProbs = opening |>> getProbabilities
+                    let closing = getClosing out m
+                    let closingProbs = closing |>> getProbabilities
+                    let result = getMatchResult m.Score
+                    match opening, openingProbs, closing, closingProbs, result with
+                    | _, Some(PX2 { PO1 = oo1 }), Some(X2 { O1 = (o1, _); O2 = (o2, _)} as c), Some (PX2 { PO1 = co1 }), res when res = O1 || res = O2 ->
+                        let o1Diff = (co1 - oo1) / oo1
+                        let o1Real, w = if result = O1 then 1, o1 - 1.f else 0, o2 - 1.f
+                        Some(([|float(oo1); float(o1Diff)|], o1Real), c, float(w))
+                    | _ -> None
+                ) |> Array.unzip3
+            let inputs, outputs = Array.unzip values
+            inputs, outputs, closingOdds, weights
+        let xTrain, yTrain, _, wTrain = transform mlbTrain
+        let xValid, yValid, oddsValid, _ = transform mlbValidation
+        
+
+        let reformat (y:int []) = 
+            let reformatted = Array.create y.Length [||]
+            [0..y.Length-1] |> List.iter (fun i ->
+                let t = Array.create 2 0.
+                t.[y.[i]] <- 1.
+                reformatted.[i] <- t
+            )
+            reformatted
+        
+        [[|10;2|]]
+        //[[|2|];[|5; 2|];[|10; 2|];[|50; 2|]]
+        |> List.iter(fun layers ->
+            [0.2]
+            //[0.2;0.1;0.05;0.01]
+            |> List.iter (fun rate ->
+                [0.99]
+                //[0.8;0.9;0.95;0.99]
+                |> List.iter (fun mom ->
+                    let network = new DeepBeliefNetwork(new BernoulliFunction(), 2, layers)
+                    let weights = new GaussianWeights(network)
+                    weights.Randomize()
+                    network.UpdateVisibleWeights()
+
+                    let reTrain = reformat yTrain
+                    let teacher = new BackPropagationLearning(network, LearningRate = rate, Momentum = mom)
+                    [0..99] |> List.iter(fun i ->
+                        let error = teacher.RunEpoch(xTrain, reTrain)
+                        //Debug.WriteLine(sprintf "Epoch %d Error %3f" (i + 1) error)
+                        ()
+                    )
+                    
+                    let predicted = xValid |> Array.map (fun x ->
+                        let predicted = network.GenerateOutput(x)
+                        let _, predict = predicted.Max()
+                        predict
+                    )
+                    let data = Array.zip3 yValid predicted oddsValid
+                    let correct, money =
+                        data
+                        |> Array.fold (fun (correct, money) (result, predict, closing) ->
+                            if result = predict then
+                                let win = 
+                                    match result, closing with
+                                    | 0, X2 { O2 = (o2, _) } -> o2
+                                    | 1, X2 { O1 = (o1, _) } -> o1
+                                    | _ -> 0.f
+                                (correct + 1, money + win - 1.f)
+                            else
+                                (correct, money - 1.f)
+                        ) (0, 0.f)
+                    let accuracy = float32(correct) / float32(yValid.Length)
+                    Debug.WriteLine(sprintf "%A %2f %2f %d %2f" layers rate mom correct money)
+                    //Assert.AreEqual(exCorrect, correct)
+                    //Assert.AreEqual(exAccuracy, accuracy)
+                    //Assert.AreEqual(exMoney, money)
+                )
+            )
         )
-        let accuracy = float(correct) / float(yValid.Length)
+
+    [<Test>]
+    member this.Transform() =
+        let ignoredTeam = ["American League"; "National League"; "Australia"; "Sacramento River Cats"; "El Paso Chihuahuas"]
+        let isIgnoredTeam team =
+            ignoredTeam |> List.contains team
+        let mlb =
+            Array.append mlbTrain mlbValidation
+            |> Array.filter (fun m -> not(isIgnoredTeam m.TeamAway || isIgnoredTeam m.TeamHome))
+        let teams =
+            mlb |> Array.fold (fun (set: HashSet<string>) m ->
+                set.Add m.TeamHome |> ignore
+                set.Add m.TeamAway |> ignore
+                set
+            ) (HashSet<string>())
+        Assert.AreEqual(30, teams.Count)
+
+        let teamHomeColumn, teamAwayColumn, scoreColumn = "TeamHome", "TeamAway", "Score"
+        let table = new DataTable()
+        table.Columns.Add(teamHomeColumn) |> ignore
+        table.Columns.Add(teamAwayColumn) |> ignore
+        table.Columns.Add(scoreColumn) |> ignore
+        mlb |> Array.iter (fun m ->
+            table.Rows.Add(m.TeamHome, m.TeamAway, m.Score) |> ignore
+        )
+        let code = new Codification()
+        code.Add(teamHomeColumn, CodificationVariable.Categorical)
+        code.Add(teamAwayColumn, CodificationVariable.Categorical)
+        code.Learn(table) |> ignore
+
+        let numberOfInputs = code.NumberOfInputs
+        let numberOfOutputs = code.NumberOfOutputs
+        let inputs, inputNames = code.Apply(table, teamHomeColumn, teamAwayColumn).ToJagged()
+        //let teamMatches =
+        //    mlb |> Array.groupBy (fun m -> m.TeamHome) |> Array.map (fun (name, ms) -> name, ms.Length) 
         ()
