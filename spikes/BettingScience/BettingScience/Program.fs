@@ -10,8 +10,8 @@ open System.IO
 let main argv =
     Console.SetWindowSize(160, 60)
     // проверить новые лиги
+    // считать просадку для моделей
     // get rid of fetch tracing in code
-    // simple models: random, (home, away) / total, ideal
     // calculate accuracy by sports \ leagues \ seasons \ teams \ bookmakers \ outcomes 
 
     // https://www.oddsportal.com/soccer/russia/youth-league-2018-2019/results/
